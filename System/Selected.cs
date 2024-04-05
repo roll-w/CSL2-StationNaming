@@ -18,51 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using Colossal.Serialization.Entities;
-using Unity.Collections;
 using Unity.Entities;
 
 namespace StationNaming.System;
 
-[InternalBufferCapacity(0)]
-public struct NameCandidate(
-    string name,
-    Entity refer,
-    NameSource source,
-    Direction direction,
-    EdgeType edgeType
-) : IBufferElementData,
-    IEmptySerializable, IEquatable<NameCandidate>
+public struct Selected : IComponentData, IEmptySerializable
 {
-    public FixedString512Bytes Name = new(name);
-    public Entity Refer = refer;
-    public NameSource Source = source;
-    public Direction Direction = direction;
-    public EdgeType EdgeType = edgeType;
-
-    public bool Equals(NameCandidate other)
-    {
-        return Name.Equals(other.Name) && Source == other.Source;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return obj is NameCandidate other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var hashCode = Name.GetHashCode();
-            hashCode = (hashCode * 397) ^ (int)Source;
-            return hashCode;
-        }
-    }
-
-    public override string ToString()
-    {
-        return $"Candidate['{Name}'({Source}-{Direction})]";
-    }
 }

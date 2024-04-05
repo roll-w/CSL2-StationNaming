@@ -37,11 +37,11 @@ public static class NameUtils
         { typeof(PoliceStation), NameSource.PoliceStation },
         { typeof(Hospital), NameSource.Hospital },
         { typeof(TransportStation), NameSource.TransportStation },
-        { typeof(GarbageFacility), NameSource.CityService},
-        { typeof(DisasterFacility), NameSource.CityService},
-        { typeof(DeathcareFacility), NameSource.CityService},
-        { typeof(TelecomFacility), NameSource.CityService},
-        { typeof(Building), NameSource.Building}
+        { typeof(GarbageFacility), NameSource.CityService },
+        { typeof(DisasterFacility), NameSource.CityService },
+        { typeof(DeathcareFacility), NameSource.CityService },
+        { typeof(TelecomFacility), NameSource.CityService },
+        { typeof(Building), NameSource.Building }
     };
 
     public static NameSource TryGetBuildingSource(Entity target, EntityManager entityManager)
