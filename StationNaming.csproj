@@ -24,6 +24,10 @@
     <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.props"/>
     <Import Project="$([System.Environment]::GetEnvironmentVariable('CSII_TOOLPATH', 'EnvironmentVariableTarget.User'))\Mod.targets"/>
 
+    <Target Name="BuildUI" AfterTargets="AfterBuild">
+        <Exec Command="npm run build" WorkingDirectory="$(ProjectDir)/UI" />
+    </Target>
+
     <ItemGroup>
         <Reference Include="Game">
             <Private>false</Private>
@@ -35,6 +39,12 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="Colossal.IO.AssetDatabase">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Colossal.UI">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Colossal.UI.Binding">
             <Private>false</Private>
         </Reference>
         <Reference Include="UnityEngine.CoreModule">
