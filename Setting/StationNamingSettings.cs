@@ -33,9 +33,14 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetOptions))]
     public string RoadNamingFormat { get; set; } = "{0}{1}";
 
+    [SettingsUISlider(max = 5, min = 1)]
+    public int SearchDepth { get; set; } = 2;
+
     public override void SetDefaults()
     {
+        Enable = true;
         RoadNamingFormat = "{0}{1}";
+        SearchDepth = 2;
     }
 
     public string FormatRoadName(string first, string second, bool reverse = false)
@@ -54,6 +59,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                 new DropdownItem<string> { value = "{0}{1}", displayName = "{0}{1}" },
                 new DropdownItem<string> { value = "{0}-{1}", displayName = "{0}-{1}" },
                 new DropdownItem<string> { value = "{0} @{1}", displayName = "{0} @{1}" },
+                new DropdownItem<string> { value = "{0} & {1}", displayName = "{0} & {1}" },
                 new DropdownItem<string> { value = "{0} {1}", displayName = "{0} {1}" },
                 new DropdownItem<string> { value = "{0}, {1}", displayName = "{0}, {1}" },
                 new DropdownItem<string> { value = "{0} ({1})", displayName = "{0} ({1})" },

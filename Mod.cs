@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using Colossal.IO.AssetDatabase;
+using Colossal.Json;
 using Colossal.Logging;
 using Game;
 using Game.Modding;
@@ -56,7 +57,10 @@ namespace StationNaming
                 Name, _settings, new StationNamingSettings(this)
             );
 
-            updateSystem.UpdateAfter<StationNamingSystem>(SystemUpdatePhase.GameSimulation);
+            LOG.Info($"Load settings: {_settings.ToJSONString()}");
+
+            updateSystem.UpdateAt<UIBindingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<StationNamingSystem>(SystemUpdatePhase.UIUpdate);
         }
 
         public void OnDispose()

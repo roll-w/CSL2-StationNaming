@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using System.Collections.Generic;
+using System.Linq;
 using Game.Buildings;
 using Game.Net;
 using Game.Objects;
@@ -32,7 +33,7 @@ public class StopNameHelper(
     NameSystem nameSystem
 )
 {
-    public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop)
+    public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
     {
         if (!entityManager.HasComponent<Attached>(stop))
         {
@@ -46,37 +47,41 @@ public class StopNameHelper(
         }
 
         return entityManager.HasComponent<Edge>(attached.m_Parent)
-            ? AddCandidatesIfRoadStop(stop)
-            : AddCandidatesIfBuildingStop(stop);
+            ? AddCandidatesIfRoadStop(stop, attached, length)
+            : AddCandidatesIfBuildingStop(stop, attached, length);
     }
 
 
-    private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(Entity stop)
+    private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
+        Entity stop, Attached attached, int length)
     {
-        var attached = entityManager.GetComponentData<Attached>(stop);
         // TODO: Check if the attached entity is a building
+
+
         return [];
     }
 
 
-    private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop)
+    private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
+        Attached attached, int length)
     {
-        var attached = entityManager.GetComponentData<Attached>(stop);
-        if (attached.m_Parent == Entity.Null ||
-            !entityManager.HasComponent<Edge>(attached.m_Parent))
-        {
-            return [];
-        }
-
         HashSet<NameCandidate> nameCandidates = [];
 
         var collectEdges = EdgeUtils.CollectEdges(
-            entityManager, attached.m_Parent, 1);
+            entityManager, attached.m_Parent, length);
 
         var aggregated = entityManager.GetComponentData<Aggregated>(attached.m_Parent);
         var currentRoadName = nameSystem.GetRenderedLabelName(
             aggregated.m_Aggregate
         );
+
+        nameCandidates.Add(new NameCandidate(
+            currentRoadName,
+            attached.m_Parent,
+            NameSource.Road,
+            Direction.Init,
+            EdgeType.Same
+        ));
 
         bool hasStart = false, hasEnd = false;
         foreach (var roadEdge in collectEdges)
@@ -173,9 +178,16 @@ public class StopNameHelper(
     {
         var nameCandidates = entityManager.AddBuffer<NameCandidate>(target);
         nameCandidates.Clear();
-        foreach (var nameCandidate in candidates)
+        foreach (var nameCandidate in SortBySource(candidates))
         {
             nameCandidates.Add(nameCandidate);
         }
+    }
+
+    private static IEnumerable<NameCandidate> SortBySource(
+        IEnumerable<NameCandidate> candidates
+    )
+    {
+        return candidates.OrderBy(candidate => candidate.Source);
     }
 }

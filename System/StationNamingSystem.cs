@@ -20,13 +20,13 @@
 
 using System;
 using Game;
-using Game.Buildings;
 using Game.Common;
-using Game.Routes;
 using Game.Tools;
 using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
+using TransportStation = Game.Buildings.TransportStation;
+using TransportStop = Game.Routes.TransportStop;
 
 namespace StationNaming.System;
 
@@ -45,9 +45,10 @@ public partial class StationNamingSystem : GameSystemBase
             return;
         }
 
+        var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
         try
         {
-            ProcessStopCandidates();
+            ProcessStopCandidates(searchDepth);
         }
         catch (Exception e)
         {
@@ -55,14 +56,14 @@ public partial class StationNamingSystem : GameSystemBase
         }
     }
 
-    private void ProcessStopCandidates()
+    private void ProcessStopCandidates(int searchDepth)
     {
         var stops = _stopQuery.ToEntityArray(Allocator.Temp);
 
         foreach (var entity in stops)
         {
             var candidates =
-                _stopNameHelper.SetCandidatesForStop(entity);
+                _stopNameHelper.SetCandidatesForStop(entity, searchDepth);
         }
     }
 
@@ -80,7 +81,8 @@ public partial class StationNamingSystem : GameSystemBase
             [
                 ComponentType.ReadOnly<TransportStop>(),
             ],
-            Any = [
+            Any =
+            [
                 ComponentType.ReadOnly<Highlighted>(),
                 ComponentType.ReadOnly<Selected>(),
                 ComponentType.ReadOnly<Created>()
