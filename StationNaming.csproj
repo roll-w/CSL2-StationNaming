@@ -1,6 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
     <PropertyGroup>
+        <Title>Station Naming</Title>
+        <AssemblyTitle>$(Title)</AssemblyTitle>
+        <Description>A Cities: Skylines 2 mod.</Description>
+        <Authors>RollW</Authors>
+        <Copyright>Copyright (c) 2024 RollW (github.com/Roll-W). All rights reserved.</Copyright>
+        <Product>$(Title)</Product>
+        <Version>0.1.0</Version>
+        <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
+
         <OutputType>Library</OutputType>
         <TargetFramework>net472</TargetFramework>
         <Configurations>Debug;Release</Configurations>
@@ -33,6 +41,9 @@
             <Private>false</Private>
         </Reference>
         <Reference Include="Colossal.Core">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Colossal.Mathematics">
             <Private>false</Private>
         </Reference>
         <Reference Include="Colossal.Logging">
