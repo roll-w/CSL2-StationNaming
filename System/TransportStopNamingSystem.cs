@@ -26,13 +26,13 @@ using Game.Tools;
 using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
-using TransportStation = Game.Buildings.TransportStation;
+using TransportStop = Game.Routes.TransportStop;
 
 namespace StationNaming.System;
 
-public partial class StationNamingSystem : GameSystemBase
+public partial class TransportStopNamingSystem : GameSystemBase
 {
-    private EntityQuery _stationQuery;
+    private EntityQuery _stopQuery;
 
     private NameSystem _nameSystem;
     private StopNameHelper _stopNameHelper;
@@ -47,12 +47,12 @@ public partial class StationNamingSystem : GameSystemBase
         var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
         try
         {
-            var stations = _stationQuery.ToEntityArray(Allocator.Temp);
+            var stops = _stopQuery.ToEntityArray(Allocator.Temp);
 
-            foreach (var entity in stations)
+            foreach (var entity in stops)
             {
                 var candidates =
-                    _stopNameHelper.SetCandidatesForStation(entity, searchDepth);
+                    _stopNameHelper.SetCandidatesForStop(entity, searchDepth);
             }
         }
         catch (Exception e)
@@ -61,20 +61,19 @@ public partial class StationNamingSystem : GameSystemBase
         }
     }
 
+
     protected override void OnCreate()
     {
         base.OnCreate();
-
         _nameSystem = World.DefaultGameObjectInjectionWorld
             .GetOrCreateSystemManaged<NameSystem>();
         _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem);
 
-        // fixme: query bug
-        _stationQuery = GetEntityQuery(new EntityQueryDesc
+        _stopQuery = GetEntityQuery(new EntityQueryDesc
         {
             All =
             [
-                ComponentType.ReadOnly<TransportStation>(),
+                ComponentType.ReadOnly<TransportStop>(),
             ],
             Any =
             [
@@ -90,7 +89,7 @@ public partial class StationNamingSystem : GameSystemBase
             ]
         });
 
-        RequireForUpdate(_stationQuery);
+        RequireForUpdate(_stopQuery);
     }
 
     public override int GetUpdateInterval(SystemUpdatePhase phase)

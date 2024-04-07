@@ -21,9 +21,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Buildings;
+using Game.Common;
 using Game.Net;
 using Game.Objects;
 using Game.UI;
+using StationNaming.Setting;
 using Unity.Entities;
 
 namespace StationNaming.System;
@@ -33,9 +35,24 @@ public class StopNameHelper(
     NameSystem nameSystem
 )
 {
+    private readonly StationNamingSettings _settings = Mod.GetInstance().GetSettings();
+
     public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
     {
-        if (!entityManager.HasComponent<Attached>(stop))
+        var hasAttached = entityManager.HasComponent<Attached>(stop);
+        var hasOwner = entityManager.HasComponent<Owner>(stop);
+
+        // if the stop has an owner, it could be a inner stop
+        if (hasOwner)
+        {
+            var owner = entityManager.GetComponentData<Owner>(stop);
+            if (entityManager.HasComponent<Building>(owner.m_Owner))
+            {
+                return AddCandidatesIfBuildingStop(stop, owner, length);
+            }
+        }
+
+        if (!hasAttached)
         {
             return [];
         }
@@ -48,16 +65,39 @@ public class StopNameHelper(
 
         return entityManager.HasComponent<Edge>(attached.m_Parent)
             ? AddCandidatesIfRoadStop(stop, attached, length)
-            : AddCandidatesIfBuildingStop(stop, attached, length);
+            : [];
     }
 
+    public IEnumerable<NameCandidate> SetCandidatesForStation(
+        Entity station, int length = 2)
+    {
+        if (!entityManager.HasComponent<Building>(station))
+        {
+            return [];
+        }
+
+        var building = entityManager.GetComponentData<Building>(station);
+        if (building.m_RoadEdge == Entity.Null || building.m_RoadEdge == default)
+        {
+            return [];
+        }
+
+        var edge = building.m_RoadEdge;
+        return SetCandidatesIfRoad(station, edge, length);
+    }
 
     private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
-        Entity stop, Attached attached, int length)
+        Entity stop, Owner owner, int length)
     {
-        // TODO: Check if the attached entity is a building
+        // TODO
+        var entity = owner.m_Owner;
+        if (!entityManager.HasComponent<Building>(entity))
+        {
+            return [];
+        }
 
-
+        var candidates = SetCandidatesForStation(entity, length);
+        SetCandidates(candidates, stop);
         return [];
     }
 
@@ -65,19 +105,25 @@ public class StopNameHelper(
     private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
         Attached attached, int length)
     {
+        return SetCandidatesIfRoad(stop, attached.m_Parent, length);
+    }
+
+    private IEnumerable<NameCandidate> SetCandidatesIfRoad(
+        Entity target, Entity edge, int length)
+    {
         HashSet<NameCandidate> nameCandidates = [];
 
         var collectEdges = EdgeUtils.CollectEdges(
-            entityManager, attached.m_Parent, length);
+            entityManager, edge, length);
 
-        var aggregated = entityManager.GetComponentData<Aggregated>(attached.m_Parent);
+        var aggregated = entityManager.GetComponentData<Aggregated>(edge);
         var currentRoadName = nameSystem.GetRenderedLabelName(
             aggregated.m_Aggregate
         );
 
         nameCandidates.Add(new NameCandidate(
-            currentRoadName,
-            attached.m_Parent,
+            _settings.FormatCandidateName(currentRoadName),
+            edge,
             NameSource.Road,
             Direction.Init,
             EdgeType.Same
@@ -108,18 +154,18 @@ public class StopNameHelper(
             }
         }
 
-        SetCandidates(nameCandidates, stop);
+        SetCandidates(nameCandidates, target);
         return nameCandidates;
     }
-
 
     private void AddRoadCandidate(
         RoadEdge roadEdge,
         string currentRoadName,
         ICollection<NameCandidate> nameCandidates)
     {
-        var name = Mod.GetInstance().GetSettings()
+        var roadName = _settings
             .FormatRoadName(currentRoadName, GetEdgeName(roadEdge.Edge));
+        var name = _settings.FormatCandidateName(roadName);
 
         nameCandidates.Add(new NameCandidate(
             name,
@@ -161,9 +207,10 @@ public class StopNameHelper(
             var buildingName = nameSystem.GetRenderedLabelName(
                 connectedBuilding.m_Building
             );
+            var name = _settings.FormatCandidateName(buildingName);
 
             candidates.Add(new NameCandidate(
-                buildingName,
+                name,
                 connectedBuilding.m_Building,
                 source,
                 roadEdge.Direction, roadEdge.EdgeType

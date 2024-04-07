@@ -61,6 +61,7 @@ namespace StationNaming
 
             updateSystem.UpdateAt<UIBindingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<StationNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<TransportStopNamingSystem>(SystemUpdatePhase.UIUpdate);
         }
 
         public void OnDispose()
