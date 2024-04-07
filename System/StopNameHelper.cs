@@ -69,7 +69,7 @@ public class StopNameHelper(
     }
 
     public IEnumerable<NameCandidate> SetCandidatesForStation(
-        Entity station, int length = 2)
+        Entity station, int length = 2, bool includeSelf = false)
     {
         if (!entityManager.HasComponent<Building>(station))
         {
@@ -83,7 +83,13 @@ public class StopNameHelper(
         }
 
         var edge = building.m_RoadEdge;
-        return SetCandidatesIfRoad(station, edge, length);
+        var candidates = SetCandidatesIfRoad(station, edge, length);
+        var copy = new HashSet<NameCandidate>(candidates);
+        if (!includeSelf)
+        {
+           copy.RemoveWhere(it => it.Refer == station);
+        }
+        return copy;
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
@@ -96,9 +102,21 @@ public class StopNameHelper(
             return [];
         }
 
-        var candidates = SetCandidatesForStation(entity, length);
-        SetCandidates(candidates, stop);
-        return [];
+        var candidates = SetCandidatesForStation(
+            entity, length, includeSelf: false
+        );
+        var buildingName = nameSystem.GetRenderedLabelName(entity);
+        var nameCandidate = new NameCandidate(
+            _settings.FormatCandidateName(buildingName),
+            entity, NameSource.Owner,
+            Direction.Init, EdgeType.Same
+        );
+        var copy = new HashSet<NameCandidate>(candidates)
+        {
+            nameCandidate
+        };
+        SetCandidates(copy, stop);
+        return copy;
     }
 
 
