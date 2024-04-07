@@ -119,12 +119,29 @@ export namespace StationNaming {
         __Type: string;
     }
 
+    export const toEntity = (entity: SerializedEntity): Entity => {
+        return {
+            index: entity.Index,
+            version: entity.Version
+        }
+    }
+
     export type SerializedNameCandidate = {
         Name: string;
         Source: BaseSerialized<NameSource>;
         Refer: SerializedEntity;
         Direction: BaseSerialized<Direction>;
-        EdgeType: BaseSerialized<string>;
+        EdgeType: BaseSerialized<EdgeType>;
+    }
+
+    export const toNameCandidate = (candidate: SerializedNameCandidate): NameCandidate => {
+        return {
+            name: candidate.Name,
+            source: nameSourceToString(candidate.Source.value__),
+            refer: toEntity(candidate.Refer),
+            direction: directionToString(candidate.Direction.value__),
+            edgeType: edgeTypeToString(candidate.EdgeType.value__)
+        }
     }
 
     export const getTranslationKeyOf = (key: string, type = '') => {

@@ -1,5 +1,4 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
-
 import React, {useEffect, useState} from "react";
 import {PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
 import {call, trigger} from "cs2/api";
@@ -9,6 +8,7 @@ import NameCandidate = StationNaming.NameCandidate;
 import SerializedNameCandidate = StationNaming.SerializedNameCandidate;
 import ModName = StationNaming.ModName;
 import nameSourceToString = StationNaming.nameSourceToString;
+import toNameCandidate = StationNaming.toNameCandidate;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -60,11 +60,16 @@ const CandidatesComponent = () => {
             <PanelFoldout initialExpanded={true} header={
                 <PanelSectionRow left={"Candidates"}/>
             }>
-                <PanelSectionRow left={"Name"} right={"Source"}/>
                 {(nameCandidates || []).map(candidate =>
                     <PanelSectionRow
-                        left={candidate.Name}
-                        right={nameSourceToString(candidate.Source.value__)}
+                        left={candidate.Name + " [" + nameSourceToString(candidate.Source.value__) + "]"}
+                        link={
+                            <div onClick={() => {
+                                setSelectedCandidate(toNameCandidate(candidate));
+                            }}>
+                                Adopt
+                            </div>
+                        }
                     />
                 )}
             </PanelFoldout>
