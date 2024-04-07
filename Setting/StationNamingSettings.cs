@@ -36,19 +36,30 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUISlider(max = 5, min = 1)]
     public int SearchDepth { get; set; } = 2;
 
+    public string Prefix { get; set; } = "";
+
+    public string Suffix { get; set; } = "";
+
     public override void SetDefaults()
     {
         Enable = true;
         RoadNamingFormat = "{0}{1}";
         SearchDepth = 2;
+        Prefix = "";
+        Suffix = "";
     }
 
     public string FormatRoadName(string first, string second, bool reverse = false)
     {
-        return reverse ? string.Format(RoadNamingFormat, second, first) :
-            string.Format(RoadNamingFormat, first, second);
+        return reverse
+            ? string.Format(RoadNamingFormat, second, first)
+            : string.Format(RoadNamingFormat, first, second);
     }
 
+    public string FormatCandidateName(string name)
+    {
+        return $"{Prefix}{name}{Suffix}";
+    }
 
     public static class RoadNamingProvider
     {
