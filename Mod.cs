@@ -53,6 +53,8 @@ namespace StationNaming
 
             _settings = new StationNamingSettings(this);
             _settings.RegisterInOptionsUI();
+            Localizations.LoadTranslations();
+
             AssetDatabase.global.LoadSettings(
                 Name, _settings, new StationNamingSettings(this)
             );
