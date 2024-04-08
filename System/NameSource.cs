@@ -22,7 +22,8 @@ namespace StationNaming.System;
 
 public enum NameSource
 {
-    Road,
+    Road = 0,
+    Intersection,
     Owner,
     TransportStation,
     TransportDepot,

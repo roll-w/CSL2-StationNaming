@@ -56,6 +56,7 @@ export namespace StationNaming {
     // StationNaming.System.NameSource
     export enum NameSource {
         Road = 0,
+        Intersection,
         Owner,
         TransportStation,
         TransportDepot,
@@ -83,6 +84,8 @@ export namespace StationNaming {
         switch (nameSource) {
             case NameSource.Road:
                 return "Road";
+            case NameSource.Intersection:
+                return "Intersection";
             case NameSource.Owner:
                 return "Owner";
             case NameSource.TransportStation:
@@ -146,9 +149,9 @@ export namespace StationNaming {
 
     export const getTranslationKeyOf = (key: string, type = '') => {
         if (!type || type === '') {
-            return `${ModName}.${key}`;
+            return `StationNaming.${key}`;
         }
 
-        return `${ModName}.${type}[${key}]`;
+        return `StationNaming.${type}[${key}]`;
     }
 }

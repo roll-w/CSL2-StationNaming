@@ -9,6 +9,8 @@ import SerializedNameCandidate = StationNaming.SerializedNameCandidate;
 import ModName = StationNaming.ModName;
 import nameSourceToString = StationNaming.nameSourceToString;
 import toNameCandidate = StationNaming.toNameCandidate;
+import {useLocalization} from "cs2/l10n";
+import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -44,6 +46,8 @@ const CandidatesComponent = () => {
         fetchCandidates();
     }, [selectedEntity])
 
+    const {translate} = useLocalization();
+
     return (
         <PanelSection tooltip={
             <Tooltip tooltip={<div></div>}>
@@ -51,18 +55,26 @@ const CandidatesComponent = () => {
             </Tooltip>
         }>
             <PanelSectionRow
-                left={"Name Candidates"}
+                left={translate(
+                    getTranslationKeyOf("NameCandidates"),
+                    "Name Candidates")
+                }
                 uppercase={true}
                 right={
                     (nameCandidates || []).length
                 }
             />
             <PanelFoldout initialExpanded={true} header={
-                <PanelSectionRow left={"Candidates"}/>
+                <PanelSectionRow left={translate(
+                    getTranslationKeyOf("Candidates"))}/>
             }>
                 {(nameCandidates || []).map(candidate =>
                     <PanelSectionRow
-                        left={candidate.Name + " [" + nameSourceToString(candidate.Source.value__) + "]"}
+                        left={candidate.Name + " [" +
+                            translate(
+                                getTranslationKeyOf(nameSourceToString(candidate.Source.value__), "NameSource"),
+                                nameSourceToString(candidate.Source.value__)
+                            ) + "]"}
                         link={
                             <div onClick={() => {
                                 setSelectedCandidate(toNameCandidate(candidate));

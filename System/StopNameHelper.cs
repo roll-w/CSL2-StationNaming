@@ -83,20 +83,14 @@ public class StopNameHelper(
         }
 
         var edge = building.m_RoadEdge;
-        var candidates = SetCandidatesIfRoad(station, edge, length);
-        var copy = new HashSet<NameCandidate>(candidates);
-        if (!includeSelf)
-        {
-           copy.RemoveWhere(it => it.Refer == station);
-        }
-        return copy;
+        return SetCandidatesIfRoad(station, edge, length, includeSelf);
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
         Entity stop, Owner owner, int length)
     {
-        // TODO
-        var entity = owner.m_Owner;
+        // get the real owner, not the extension
+        var entity = RetrieveOwner(owner.m_Owner);
         if (!entityManager.HasComponent<Building>(entity))
         {
             return [];
@@ -106,19 +100,28 @@ public class StopNameHelper(
             entity, length, includeSelf: false
         );
         var buildingName = nameSystem.GetRenderedLabelName(entity);
-        var nameCandidate = new NameCandidate(
-            _settings.FormatCandidateName(buildingName),
-            entity, NameSource.Owner,
-            Direction.Init, EdgeType.Same
-        );
         var copy = new HashSet<NameCandidate>(candidates)
         {
-            nameCandidate
+            new(
+                buildingName,
+                entity, NameSource.Owner,
+                Direction.Init, EdgeType.Same
+            )
         };
         SetCandidates(copy, stop);
         return copy;
     }
 
+    private Entity RetrieveOwner(Entity entity)
+    {
+        if (!entityManager.HasComponent<Owner>(entity))
+        {
+            return entity;
+        }
+
+        var owner = entityManager.GetComponentData<Owner>(entity);
+        return RetrieveOwner(owner.m_Owner);
+    }
 
     private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
         Attached attached, int length)
@@ -127,7 +130,7 @@ public class StopNameHelper(
     }
 
     private IEnumerable<NameCandidate> SetCandidatesIfRoad(
-        Entity target, Entity edge, int length)
+        Entity target, Entity edge, int length, bool includeSelf = false)
     {
         HashSet<NameCandidate> nameCandidates = [];
 
@@ -150,7 +153,7 @@ public class StopNameHelper(
         bool hasStart = false, hasEnd = false;
         foreach (var roadEdge in collectEdges)
         {
-            CollectBuildingNames(roadEdge, nameCandidates);
+            CollectBuildingNames(target, roadEdge, nameCandidates, includeSelf);
             if (roadEdge.EdgeType != EdgeType.Other)
             {
                 continue;
@@ -188,7 +191,7 @@ public class StopNameHelper(
         nameCandidates.Add(new NameCandidate(
             name,
             roadEdge.Edge,
-            NameSource.Road,
+            NameSource.Intersection,
             roadEdge.Direction,
             roadEdge.EdgeType
         ));
@@ -206,8 +209,10 @@ public class StopNameHelper(
     }
 
     private void CollectBuildingNames(
+        Entity self,
         RoadEdge roadEdge,
-        ICollection<NameCandidate> candidates)
+        ICollection<NameCandidate> candidates,
+        bool includeSelf)
     {
         if (!entityManager.HasBuffer<ConnectedBuilding>(roadEdge.Edge))
         {
@@ -218,6 +223,10 @@ public class StopNameHelper(
             entityManager.GetBuffer<ConnectedBuilding>(roadEdge.Edge);
         foreach (var connectedBuilding in connectedBuildings)
         {
+            if (connectedBuilding.m_Building == self && !includeSelf)
+            {
+                continue;
+            }
             var source = NameUtils.TryGetBuildingSource(
                 connectedBuilding.m_Building,
                 entityManager
