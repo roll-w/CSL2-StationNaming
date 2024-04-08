@@ -26,12 +26,17 @@ using Game.UI.Widgets;
 namespace StationNaming.Setting;
 
 [FileLocation(Mod.Name)]
+[SettingsUIShowGroupName(Experimental)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
+    private const string Experimental = "Experimental";
+
     public bool Enable { get; set; } = true;
 
-    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetOptions))]
-    public string RoadNamingFormat { get; set; } = "{0}{1}";
+    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
+    public string IntersectionNamingFormat { get; set; } = "{0}{1}";
+
+    public bool ReverseRoadOrder { get; set; } = false;
 
     [SettingsUISlider(max = 5, min = 1)]
     public int SearchDepth { get; set; } = 2;
@@ -40,21 +45,32 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public string Suffix { get; set; } = "";
 
+    [SettingsUISection(Experimental)]
+    public bool AutoUpdate { get; set; } = true;
+
+    [SettingsUISection(Experimental)]
+    public bool AutoNaming { get; set; } = true;
+
     public override void SetDefaults()
     {
         Enable = true;
-        RoadNamingFormat = "{0}{1}";
+        IntersectionNamingFormat = "{0}{1}";
+        ReverseRoadOrder = false;
         SearchDepth = 2;
         Prefix = "";
         Suffix = "";
+        AutoUpdate = true;
+        AutoNaming = true;
     }
 
-    public string FormatRoadName(string first, string second, bool reverse = false)
+    public string FormatRoadName(string first, string second)
     {
-        return reverse
-            ? string.Format(RoadNamingFormat, second, first)
-            : string.Format(RoadNamingFormat, first, second);
+        return ReverseRoadOrder
+            ? string.Format(IntersectionNamingFormat, second, first)
+            : string.Format(IntersectionNamingFormat, first, second);
     }
+
+
 
     public string FormatCandidateName(string name)
     {
@@ -63,7 +79,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public static class RoadNamingProvider
     {
-        public static DropdownItem<string>[] GetOptions()
+        public static DropdownItem<string>[] GetFormatOptions()
         {
             return
             [
@@ -78,6 +94,26 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                 new DropdownItem<string> { value = "{0}_{1}", displayName = "{0}_{1}" },
                 new DropdownItem<string> { value = "{0}:{1}", displayName = "{0}:{1}" },
                 new DropdownItem<string> { value = "{0}.{1}", displayName = "{0}.{1}" }
+            ];
+        }
+
+        public static DropdownItem<string>[] GetPrefixOptions()
+        {
+            return
+            [
+                new DropdownItem<string> {value = "", displayName = "No Prefix"},
+                new DropdownItem<string> {value = "Station ", displayName = "Station "},
+                new DropdownItem<string> {value = "Stop ", displayName = "Stop "},
+            ];
+        }
+
+        public static DropdownItem<string>[] GetSuffixOptions()
+        {
+            return
+            [
+                new DropdownItem<string> {value = "", displayName = "No Suffix"},
+                new DropdownItem<string> {value = " Station", displayName = " Station"},
+                new DropdownItem<string> {value = " Stop", displayName = " Stop"},
             ];
         }
     }
