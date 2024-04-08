@@ -59,11 +59,18 @@ public partial class UIBindingSystem : UISystemBase
 
     private void SetSelectedEntity(Entity entity)
     {
+        if (_selectedEntity == entity)
+        {
+            EntityManager.AddComponent<Selected>(entity);
+            return;
+        }
+
         if (_selectedEntity != Entity.Null &&
             EntityManager.HasComponent<Selected>(_selectedEntity))
         {
             EntityManager.RemoveComponent<Selected>(_selectedEntity);
         }
+
         EntityManager.AddComponent<Selected>(entity);
         _selectedEntity = entity;
     }
@@ -75,19 +82,15 @@ public partial class UIBindingSystem : UISystemBase
 
         if (entity == Entity.Null)
         {
-            // Mod.GetLogger().Info($"[GetNameCandidates] entity is NULL");
             return [];
         }
 
         if (!EntityManager.HasBuffer<NameCandidate>(entity))
         {
-            // Mod.GetLogger().Info($"[GetNameCandidates] Get candidates for {entity}, but it has no buffer.");
             return [];
         }
 
         var buffer = EntityManager.GetBuffer<NameCandidate>(entity);
-
-        // Mod.GetLogger().Info($"[GetNameCandidates] Get candidates for {entity} with {buffer.Length} candidates.");
 
         List<ManagedNameCandidate> result = [];
         foreach (var nameCandidate in buffer)
@@ -115,7 +118,37 @@ public partial class UIBindingSystem : UISystemBase
             return;
         }
 
+        CheckAndAddCurrent(candidate.Refer, entity);
+
         EntityManager.AddComponentData(entity, naming);
         _nameSystem.SetCustomName(entity, candidate.Name.ToString());
+    }
+
+
+    private DynamicBuffer<T> GetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
+    {
+        return EntityManager.HasBuffer<T>(entity)
+            ? EntityManager.GetBuffer<T>(entity)
+            : EntityManager.AddBuffer<T>(entity);
+    }
+
+    private void CheckAndAddCurrent(Entity refer, Entity entity)
+    {
+        var buffer = GetBuffer<NamingAssociation>(refer);
+        if (buffer.Length == 0)
+        {
+            buffer.Add(new NamingAssociation(entity));
+            return;
+        }
+
+        foreach (var naming in buffer)
+        {
+            if (naming.Target == entity)
+            {
+                return;
+            }
+        }
+
+        buffer.Add(new NamingAssociation(entity));
     }
 }
