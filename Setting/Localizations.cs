@@ -106,9 +106,10 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoNaming]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "When enabled, the station will be automatically named when created.")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的站点命名。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的站點命名。"),
+                    "When enabled, the station will be automatically named when created. " +
+                    "Named according to the order of the owner and the current road.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的站点命名。按照所有者、当前道路的顺序命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的站點命名。按照所有者、當前道路的順序命名。"),
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")
@@ -124,6 +125,10 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Name Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "名称候选")
                 .AddTranslation(LocaleCode.ZhHant, "名稱候選"),
+            new Translation("StationNaming.NameCandidates[Tooltip]")
+                .AddTranslation(LocaleCode.EnUs, "Here are all the name candidates, you can select them to replace the existing name.")
+                .AddTranslation(LocaleCode.ZhHans, "这里是所有的名称候选，您可以选择它们来替换现有名称。")
+                .AddTranslation(LocaleCode.ZhHant, "這裡是所有的名稱候選，您可以選擇它們來替換現有名稱。"),
             new Translation("StationNaming.Candidates")
                 .AddTranslation(LocaleCode.EnUs, "Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "候选列表")
@@ -159,8 +164,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "區域建築"),
             new Translation("StationNaming.NameSource[SignatureBuilding]")
                 .AddTranslation(LocaleCode.EnUs, "Signature Building")
-                .AddTranslation(LocaleCode.ZhHans, "特色建筑")
-                .AddTranslation(LocaleCode.ZhHant, "特色建築"),
+                .AddTranslation(LocaleCode.ZhHans, "标志性建筑")
+                .AddTranslation(LocaleCode.ZhHant, "標誌性建築"),
             new Translation("StationNaming.NameSource[School]")
                 .AddTranslation(LocaleCode.EnUs, "School")
                 .AddTranslation(LocaleCode.ZhHans, "学校")

@@ -90,7 +90,7 @@ public class StopNameHelper(
         Entity stop, Owner owner, int length)
     {
         // get the real owner, not the extension
-        var entity = RetrieveOwner(owner.m_Owner);
+        var entity = RetrieveOwner(entityManager, owner.m_Owner);
         if (!entityManager.HasComponent<Building>(entity))
         {
             return [];
@@ -112,7 +112,7 @@ public class StopNameHelper(
         return copy;
     }
 
-    private Entity RetrieveOwner(Entity entity)
+    public static Entity RetrieveOwner(EntityManager entityManager, Entity entity)
     {
         if (!entityManager.HasComponent<Owner>(entity))
         {
@@ -120,7 +120,7 @@ public class StopNameHelper(
         }
 
         var owner = entityManager.GetComponentData<Owner>(entity);
-        return RetrieveOwner(owner.m_Owner);
+        return RetrieveOwner(entityManager, owner.m_Owner);
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
@@ -227,6 +227,7 @@ public class StopNameHelper(
             {
                 continue;
             }
+
             var source = NameUtils.TryGetBuildingSource(
                 connectedBuilding.m_Building,
                 entityManager

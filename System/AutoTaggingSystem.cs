@@ -18,24 +18,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using Game;
+using Game.Buildings;
 using Game.Common;
-using Game.Objects;
-using Game.Tools;
-using Game.UI;
+using Game.Routes;
 using Unity.Collections;
 using Unity.Entities;
-using TransportStation = Game.Buildings.TransportStation;
 
 namespace StationNaming.System;
 
-public partial class StationNamingSystem : GameSystemBase
+public partial class AutoTaggingSystem : GameSystemBase
 {
-    private EntityQuery _stationQuery;
-
-    private NameSystem _nameSystem;
-    private StopNameHelper _stopNameHelper;
+    private EntityQuery _createdQuery;
 
     protected override void OnUpdate()
     {
@@ -43,21 +37,17 @@ public partial class StationNamingSystem : GameSystemBase
         {
             return;
         }
-
-        var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
-        try
+        if (!Mod.GetInstance().GetSettings().AutoNaming)
         {
-            var stations = _stationQuery.ToEntityArray(Allocator.Temp);
-
-            foreach (var entity in stations)
-            {
-                var candidates =
-                    _stopNameHelper.SetCandidatesForStation(entity, searchDepth);
-            }
+            return;
         }
-        catch (Exception e)
+
+        var entities = _createdQuery.ToEntityArray(Allocator.Temp);
+
+        foreach (var entity in entities)
         {
-            Mod.GetLogger().Error(e);
+            EntityManager.AddComponent<ToAutoNaming>(entity);
+            EntityManager.AddComponent<Selected>(entity);
         }
     }
 
@@ -65,40 +55,23 @@ public partial class StationNamingSystem : GameSystemBase
     {
         base.OnCreate();
 
-        _nameSystem = World.DefaultGameObjectInjectionWorld
-            .GetOrCreateSystemManaged<NameSystem>();
-        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem);
-
-        _stationQuery = GetEntityQuery(new EntityQueryDesc
+        _createdQuery = GetEntityQuery(new EntityQueryDesc
         {
             All =
             [
-                ComponentType.ReadOnly<TransportStation>(),
+                ComponentType.ReadOnly<Created>()
             ],
             Any =
             [
-                ComponentType.ReadOnly<Highlighted>(),
-                ComponentType.ReadOnly<Selected>(),
-                ComponentType.ReadOnly<Created>()
+                ComponentType.ReadOnly<TransportStop>(),
+                ComponentType.ReadOnly<TransportStation>(),
             ],
             None =
             [
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Temp>(),
-                ComponentType.ReadOnly<OutsideConnection>()
+                ComponentType.ReadOnly<Deleted>()
             ]
         });
 
-        RequireForUpdate(_stationQuery);
-    }
-
-    public override int GetUpdateInterval(SystemUpdatePhase phase)
-    {
-        return 1;
-    }
-
-    public override int GetUpdateOffset(SystemUpdatePhase phase)
-    {
-        return -1;
+        RequireForUpdate(_createdQuery);
     }
 }

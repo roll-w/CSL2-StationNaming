@@ -25,7 +25,8 @@ using Unity.Entities;
 namespace StationNaming.System;
 
 public struct NamingAssociation(Entity target) : IBufferElementData,
-    IQueryTypeParameter, IEmptySerializable, IEquatable<NamingAssociation>
+    IQueryTypeParameter, IEmptySerializable, IEquatable<NamingAssociation>,
+    ISerializable
 {
     public Entity Target = target;
 
@@ -52,5 +53,15 @@ public struct NamingAssociation(Entity target) : IBufferElementData,
     public static bool operator !=(NamingAssociation left, NamingAssociation right)
     {
         return !left.Equals(right);
+    }
+
+    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    {
+        writer.Write(Target);
+    }
+
+    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    {
+        reader.Read(out Target);
     }
 }

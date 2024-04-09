@@ -51,7 +51,9 @@ const CandidatesComponent = () => {
     return (
         <PanelSection tooltip={
             <Tooltip tooltip={<div></div>}>
-                <div>Here is all the name candidates, you can choose them to replace the default name.</div>
+                <div>{
+                    translate(getTranslationKeyOf("NameCandidates[Tooltip]"))
+                }</div>
             </Tooltip>
         }>
             <PanelSectionRow
@@ -79,7 +81,7 @@ const CandidatesComponent = () => {
                             <div onClick={() => {
                                 setSelectedCandidate(toNameCandidate(candidate));
                             }}>
-                                Adopt
+                                ✓
                             </div>
                         }
                     />

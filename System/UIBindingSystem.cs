@@ -19,7 +19,9 @@
 // SOFTWARE.
 
 using System.Collections.Generic;
+using System.Linq;
 using Colossal.UI.Binding;
+using Game.Net;
 using Game.UI;
 using Unity.Entities;
 
@@ -59,7 +61,7 @@ public partial class UIBindingSystem : UISystemBase
 
     private void SetSelectedEntity(Entity entity)
     {
-        if (_selectedEntity == entity)
+        if (_selectedEntity == entity && entity != Entity.Null && entity != default)
         {
             EntityManager.AddComponent<Selected>(entity);
             return;
@@ -71,7 +73,11 @@ public partial class UIBindingSystem : UISystemBase
             EntityManager.RemoveComponent<Selected>(_selectedEntity);
         }
 
-        EntityManager.AddComponent<Selected>(entity);
+        if (entity != Entity.Null || entity != default)
+        {
+            EntityManager.AddComponent<Selected>(entity);
+        }
+
         _selectedEntity = entity;
     }
 
@@ -111,14 +117,17 @@ public partial class UIBindingSystem : UISystemBase
             return;
         }
 
-        var naming = new ManualSelectNaming(candidate);
         if (!EntityManager.HasBuffer<NameCandidate>(entity))
         {
             // we dont want to set the name if the buffer is not present
             return;
         }
 
-        CheckAndAddCurrent(candidate.Refer, entity);
+        var naming = new ManualSelectNaming(candidate);
+        CheckAndAddCurrent(
+            GetRootEntity(candidate.Refer),
+            entity
+        );
 
         EntityManager.AddComponentData(entity, naming);
         _nameSystem.SetCustomName(entity, candidate.Name.ToString());
@@ -130,6 +139,16 @@ public partial class UIBindingSystem : UISystemBase
         return EntityManager.HasBuffer<T>(entity)
             ? EntityManager.GetBuffer<T>(entity)
             : EntityManager.AddBuffer<T>(entity);
+    }
+
+    private Entity GetRootEntity(Entity entity)
+    {
+        if (EntityManager.HasComponent<Aggregated>(entity))
+        {
+            return EntityManager.GetComponentData<Aggregated>(entity).m_Aggregate;
+        }
+
+        return entity;
     }
 
     private void CheckAndAddCurrent(Entity refer, Entity entity)

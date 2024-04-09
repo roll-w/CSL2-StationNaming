@@ -18,31 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Colossal.Serialization.Entities;
+using Unity.Entities;
+
 namespace StationNaming.System;
 
-public enum NameSource: uint
-{
-    Owner = 0,
-    Road,
-    Intersection,
-    TransportStation,
-    TransportDepot,
-    ZoneBuilding,
-    SignatureBuilding,
-    School,
-    FireStation,
-    PoliceStation,
-    Hospital,
-    Park,
-
-    /**
-     * Other city service buildings not listed
-     */
-    CityService,
-
-    /**
-     * Other buildings that we don't know its type.
-     */
-    Building,
-    Unknown
-}
+public struct ToAutoNaming: IComponentData, IEmptySerializable;

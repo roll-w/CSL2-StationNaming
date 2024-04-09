@@ -62,8 +62,11 @@ namespace StationNaming
             LOG.Info($"Load settings: {_settings.ToJSONString()}");
 
             updateSystem.UpdateAt<UIBindingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<AutoTaggingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<StationNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<TransportStopNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateBefore<AutoUpdateNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAfter<AutoNamingSystem>(SystemUpdatePhase.UIUpdate);
         }
 
         public void OnDispose()

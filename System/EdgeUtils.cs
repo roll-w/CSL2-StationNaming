@@ -148,14 +148,14 @@ public readonly struct RoadEdge(
     }
 }
 
-public enum Direction
+public enum Direction: uint
 {
     Init,
     Start,
     End
 }
 
-public enum EdgeType
+public enum EdgeType: uint
 {
     Same,
     Other

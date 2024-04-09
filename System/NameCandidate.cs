@@ -28,7 +28,7 @@ namespace StationNaming.System;
 
 [InternalBufferCapacity(0)]
 public struct NameCandidate : IBufferElementData,
-    IEmptySerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable
+    ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable
 {
     public FixedString512Bytes Name;
     public Entity Refer;
@@ -122,6 +122,32 @@ public struct NameCandidate : IBufferElementData,
     public static implicit operator ManagedNameCandidate(NameCandidate candidate)
     {
         return new ManagedNameCandidate(candidate);
+    }
+
+    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    {
+        writer.Write(Name.ToString());
+        writer.Write(Refer);
+        writer.Write((uint)Source);
+        writer.Write((uint)Direction);
+        writer.Write((uint)EdgeType);
+    }
+
+    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    {
+        reader.Read(out string name);
+        Name = name;
+
+        reader.Read(out Refer);
+
+        reader.Read(out uint source);
+        Source = (NameSource)source;
+
+        reader.Read(out uint direction);
+        Direction = (Direction)direction;
+
+        reader.Read(out uint edgeType);
+        EdgeType = (EdgeType)edgeType;
     }
 }
 

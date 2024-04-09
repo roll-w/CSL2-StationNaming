@@ -24,7 +24,8 @@ using Unity.Entities;
 
 namespace StationNaming.System;
 
-public struct ManualSelectNaming : IComponentData, IEmptySerializable, IEquatable<ManualSelectNaming>
+public struct ManualSelectNaming : IComponentData, ISerializable,
+    IEquatable<ManualSelectNaming>
 {
     public NameCandidate SelectedName;
 
@@ -50,5 +51,15 @@ public struct ManualSelectNaming : IComponentData, IEmptySerializable, IEquatabl
     public override int GetHashCode()
     {
         return SelectedName.GetHashCode();
+    }
+
+    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+    {
+        writer.Write(SelectedName);
+    }
+
+    public void Deserialize<TReader>(TReader reader) where TReader : IReader
+    {
+        reader.Read(out SelectedName);
     }
 }

@@ -55,9 +55,9 @@ export namespace StationNaming {
 
     // StationNaming.System.NameSource
     export enum NameSource {
-        Road = 0,
+        Owner = 0,
+        Road,
         Intersection,
-        Owner,
         TransportStation,
         TransportDepot,
         ZoneBuilding,
