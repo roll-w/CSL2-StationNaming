@@ -1,6 +1,41 @@
 ﻿# Station Naming
 
+This is a mod for `Cities: Skylines 2` that allows you naming your
+transport stations and stops automatically.
 
+This mod should be compatible with other auto naming mods, but you should
+check the mod settings to avoid conflicts.
+
+## Features
+
+- Automatically name your transport stations and stops.
+- Customizable naming rules.
+- Could generate names from the surrounding buildings or roads.
+
+Note: I haven't found a way to keep the update information in the saves, so
+after you load a save, their names can't be updated automatically anymore,
+unless you manually select the name to let the mod add update information.
+
+## Settings
+
+Except the showing settings, you could also customize the naming rules in the
+mod setting file where is located at 
+`AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
+
+You could change the naming format for the intersection and set your own prefix
+and suffix for the station names.
+
+```json lines
+RollW_StationNaming
+{
+    "IntersectionNamingFormat": "{0} & {1}", // The naming format for intersection
+    "Prefix": " ", // Set your own prefix here
+    "Suffix": " ", // Set your own suffix here
+}
+```
+
+If you have any problems during using this mod, please open an issue or discussion
+on Github.
 
 ## License
 
