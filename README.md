@@ -34,6 +34,13 @@ RollW_StationNaming
 }
 ```
 
+## Translations
+
+- English
+- Simplified Chinese (简体中文)
+- Traditional Chinese (繁體中文)
+
+
 If you have any problems during using this mod, please open an issue or discussion
 on Github.
 
