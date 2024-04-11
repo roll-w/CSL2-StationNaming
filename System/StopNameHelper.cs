@@ -45,8 +45,8 @@ public class StopNameHelper(
         // if the stop has an owner, it could be a inner stop
         if (hasOwner)
         {
-            var owner = entityManager.GetComponentData<Owner>(stop);
-            if (entityManager.HasComponent<Building>(owner.m_Owner))
+            var owner = RetrieveOwner(entityManager, stop);
+            if (entityManager.HasComponent<Building>(owner))
             {
                 return AddCandidatesIfBuildingStop(stop, owner, length);
             }
@@ -87,24 +87,23 @@ public class StopNameHelper(
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
-        Entity stop, Owner owner, int length)
+        Entity stop, Entity owner, int length)
     {
         // get the real owner, not the extension
-        var entity = RetrieveOwner(entityManager, owner.m_Owner);
-        if (!entityManager.HasComponent<Building>(entity))
+        if (!entityManager.HasComponent<Building>(owner))
         {
             return [];
         }
 
         var candidates = SetCandidatesForStation(
-            entity, length, includeSelf: false
+            owner, length, includeSelf: false
         );
-        var buildingName = nameSystem.GetRenderedLabelName(entity);
+        var buildingName = nameSystem.GetRenderedLabelName(owner);
         var copy = new HashSet<NameCandidate>(candidates)
         {
             new(
                 buildingName,
-                entity, NameSource.Owner,
+                owner, NameSource.Owner,
                 Direction.Init, EdgeType.Same
             )
         };
