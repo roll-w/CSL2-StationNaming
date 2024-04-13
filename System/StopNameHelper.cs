@@ -26,6 +26,7 @@ using Game.Net;
 using Game.Objects;
 using Game.UI;
 using StationNaming.Setting;
+using Unity.Collections;
 using Unity.Entities;
 
 namespace StationNaming.System;
@@ -35,6 +36,10 @@ public class StopNameHelper(
     NameSystem nameSystem
 )
 {
+    public bool EnableNameScopeRoad { get; set; } = true;
+
+
+
     private readonly StationNamingSettings _settings = Mod.GetInstance().GetSettings();
 
     public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
@@ -101,10 +106,9 @@ public class StopNameHelper(
         var buildingName = nameSystem.GetRenderedLabelName(owner);
         var copy = new HashSet<NameCandidate>(candidates)
         {
-            new(
-                buildingName,
-                owner, NameSource.Owner,
-                Direction.Init, EdgeType.Same
+            NameCandidate.Of(
+                buildingName, Direction.Init, EdgeType.Same,
+                owner, NameSource.Owner
             )
         };
         SetCandidates(copy, stop);
@@ -136,23 +140,25 @@ public class StopNameHelper(
         var collectEdges = EdgeUtils.CollectEdges(
             entityManager, edge, length);
 
-        var aggregated = entityManager.GetComponentData<Aggregated>(edge);
-        var currentRoadName = nameSystem.GetRenderedLabelName(
-            aggregated.m_Aggregate
-        );
+        var root = EdgeUtils.GetRootEntityForEdge(edge, entityManager);
+        var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
 
-        nameCandidates.Add(new NameCandidate(
+        var currentRoadName = currentRoad.GetRoadName(entityManager, nameSystem);
+
+        nameCandidates.Add(NameCandidate.Of(
             _settings.FormatCandidateName(currentRoadName),
-            edge,
-            NameSource.Road,
-            Direction.Init,
-            EdgeType.Same
-        ));
+            Direction.Init, EdgeType.Same,
+            root, NameSource.Road)
+        );
 
         bool hasStart = false, hasEnd = false;
         foreach (var roadEdge in collectEdges)
         {
-            CollectBuildingNames(target, roadEdge, nameCandidates, includeSelf);
+            CollectBuildingNames(
+                target,
+                currentRoad, roadEdge,
+                nameCandidates, includeSelf
+            );
             if (roadEdge.EdgeType != EdgeType.Other)
             {
                 continue;
@@ -162,11 +168,11 @@ public class StopNameHelper(
             {
                 case Direction.Start when !hasStart:
                     hasStart = true;
-                    AddRoadCandidate(roadEdge, currentRoadName, nameCandidates);
+                    AddRoadCandidate(roadEdge, currentRoadName, root, nameCandidates);
                     break;
                 case Direction.End when !hasEnd:
                     hasEnd = true;
-                    AddRoadCandidate(roadEdge, currentRoadName, nameCandidates);
+                    AddRoadCandidate(roadEdge, currentRoadName, root, nameCandidates);
                     break;
                 case Direction.Init:
                 default:
@@ -181,34 +187,28 @@ public class StopNameHelper(
     private void AddRoadCandidate(
         RoadEdge roadEdge,
         string currentRoadName,
+        Entity currentRoadRoot,
         ICollection<NameCandidate> nameCandidates)
     {
-        var roadName = _settings
-            .FormatRoadName(currentRoadName, GetEdgeName(roadEdge.Edge));
+        var roadName = _settings.FormatRoadName(
+            currentRoadName,
+            roadEdge.GetRoadName(entityManager, nameSystem)
+        );
         var name = _settings.FormatCandidateName(roadName);
+        var root = EdgeUtils.GetRootEntityForEdge(roadEdge.Edge, entityManager);
 
-        nameCandidates.Add(new NameCandidate(
+        nameCandidates.Add(NameCandidate.Of(
             name,
-            roadEdge.Edge,
-            NameSource.Intersection,
             roadEdge.Direction,
-            roadEdge.EdgeType
+            roadEdge.EdgeType,
+            currentRoadRoot, NameSource.Road,
+            root, NameSource.Road
         ));
-    }
-
-    private string GetEdgeName(Entity edge)
-    {
-        if (!entityManager.HasComponent<Aggregated>(edge))
-        {
-            return string.Empty;
-        }
-
-        var aggregated = entityManager.GetComponentData<Aggregated>(edge);
-        return nameSystem.GetRenderedLabelName(aggregated.m_Aggregate);
     }
 
     private void CollectBuildingNames(
         Entity self,
+        RoadEdge currentRoad,
         RoadEdge roadEdge,
         ICollection<NameCandidate> candidates,
         bool includeSelf)
@@ -222,27 +222,56 @@ public class StopNameHelper(
             entityManager.GetBuffer<ConnectedBuilding>(roadEdge.Edge);
         foreach (var connectedBuilding in connectedBuildings)
         {
-            if (connectedBuilding.m_Building == self && !includeSelf)
-            {
-                continue;
-            }
-
-            var source = NameUtils.TryGetBuildingSource(
-                connectedBuilding.m_Building,
-                entityManager
+            GenerateBuildingSourceCandidates(
+                self, currentRoad,
+                roadEdge, candidates,
+                includeSelf, connectedBuilding
             );
-            var buildingName = nameSystem.GetRenderedLabelName(
-                connectedBuilding.m_Building
-            );
-            var name = _settings.FormatCandidateName(buildingName);
-
-            candidates.Add(new NameCandidate(
-                name,
-                connectedBuilding.m_Building,
-                source,
-                roadEdge.Direction, roadEdge.EdgeType
-            ));
         }
+    }
+
+    private void GenerateBuildingSourceCandidates(
+        Entity self,
+        RoadEdge currentRoad,
+        RoadEdge roadEdge,
+        ICollection<NameCandidate> candidates,
+        bool includeSelf,
+        ConnectedBuilding connectedBuilding)
+    {
+        if (connectedBuilding.m_Building == self && !includeSelf)
+        {
+            return;
+        }
+
+        var source = NameUtils.TryGetBuildingSource(
+            connectedBuilding.m_Building,
+            entityManager
+        );
+        var buildingName = nameSystem.GetRenderedLabelName(
+            connectedBuilding.m_Building
+        );
+        var name = _settings.FormatCandidateName(buildingName);
+
+        candidates.Add(NameCandidate.Of(
+            name, roadEdge.Direction, roadEdge.EdgeType,
+            connectedBuilding.m_Building, source
+        ));
+
+        if (!EnableNameScopeRoad)
+        {
+            return;
+        }
+
+        var roadName = currentRoad.GetRoadName(entityManager, nameSystem);
+        name = _settings.FormatRoadName(roadName, buildingName);
+
+        candidates.Add(
+            NameCandidate.Of(
+                name, roadEdge.Direction, roadEdge.EdgeType,
+                connectedBuilding.m_Building, source,
+                roadEdge.Edge, NameSource.Road
+            )
+        );
     }
 
     private void SetCandidates(
@@ -262,6 +291,60 @@ public class StopNameHelper(
         IEnumerable<NameCandidate> candidates
     )
     {
-        return candidates.OrderBy(candidate => candidate.Source);
+        return candidates.OrderBy(candidate => candidate.Refers[0].Source);
+    }
+
+    public static string FormatRefers(
+        IList<NameSourceRefer> refers,
+        EntityManager entityManager,
+        NameSystem nameSystem
+    )
+    {
+        var count = refers.Count;
+        var settings = Mod.GetInstance().GetSettings();
+        switch (count)
+        {
+            case 0:
+                return "";
+            case 1:
+            {
+                var nameSourceRefer = refers[0];
+                if (nameSourceRefer.Source == NameSource.Owner)
+                {
+                    return nameSourceRefer.GetName(entityManager, nameSystem);
+                }
+
+                return settings.FormatCandidateName(
+                    nameSourceRefer.GetName(entityManager, nameSystem)
+                );
+            }
+            case 2:
+            {
+                var first = refers[0];
+                var second = refers[1];
+                var formatRoadName = settings.FormatRoadName(
+                    first.GetName(entityManager, nameSystem),
+                    second.GetName(entityManager, nameSystem)
+                );
+                return settings.FormatCandidateName(formatRoadName);
+            }
+        }
+
+        return "Unsupported";
+    }
+
+
+    public static string FormatRefers(INativeList<NameSourceRefer> refers,
+        EntityManager entityManager,
+        NameSystem nameSystem
+    )
+    {
+        List<NameSourceRefer> copy = [];
+        for (var i = 0; i < refers.Length; i++)
+        {
+            copy.Add(refers[i]);
+        }
+
+        return FormatRefers(copy, entityManager, nameSystem);
     }
 }

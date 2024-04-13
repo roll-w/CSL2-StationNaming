@@ -19,6 +19,8 @@
 // SOFTWARE.
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Colossal.Serialization.Entities;
 using Colossal.UI.Binding;
 using Unity.Collections;
@@ -31,25 +33,50 @@ public struct NameCandidate : IBufferElementData,
     ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable
 {
     public FixedString512Bytes Name;
-    public Entity Refer;
-    public NameSource Source;
+    public FixedList128Bytes<NameSourceRefer> Refers;
     public Direction Direction;
     public EdgeType EdgeType;
 
     public NameCandidate(
-        string name, Entity refer, NameSource source,
+        string name, FixedList128Bytes<NameSourceRefer> refers,
         Direction direction, EdgeType edgeType)
     {
+        switch (refers.Length)
+        {
+            case 0:
+                throw new ArgumentException("NameCandidate must have at least 1 refer");
+            case > 2:
+                // currently we only support 2 refers max
+                throw new ArgumentException("NameCandidate can only have 2 refers");
+        }
+
         Name = name;
-        Refer = refer;
-        Source = source;
+        Refers = refers;
         Direction = direction;
         EdgeType = edgeType;
     }
 
     public bool Equals(NameCandidate other)
     {
-        return Name.Equals(other.Name) && Source == other.Source;
+        if (!Name.Equals(other.Name))
+        {
+            return false;
+        }
+
+        if (Refers.Length != other.Refers.Length)
+        {
+            return false;
+        }
+
+        for (var i = 0; i < Refers.Length; i++)
+        {
+            if (Refers[i].Source != other.Refers[i].Source)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public override bool Equals(object obj)
@@ -62,9 +89,25 @@ public struct NameCandidate : IBufferElementData,
         unchecked
         {
             var hashCode = Name.GetHashCode();
-            hashCode = (hashCode * 397) ^ (int)Source;
+            foreach (var refer in Refers)
+            {
+                hashCode = (hashCode * 397) ^ refer.Source.GetHashCode();
+            }
+
             return hashCode;
         }
+    }
+
+    public List<NameSourceRefer> RefersToList()
+    {
+        List<NameSourceRefer> refers = [];
+
+        foreach (var refer in Refers)
+        {
+            refers.Add(refer);
+        }
+
+        return refers;
     }
 
     public void Read(IJsonReader reader)
@@ -74,15 +117,23 @@ public struct NameCandidate : IBufferElementData,
         reader.Read(out string name);
         Name = name;
 
-        reader.ReadProperty("refer");
-        reader.Read(out Refer);
+        var size = reader.ReadArrayBegin();
+        Refers = [];
+        for (uint i = 0; i < size; i++)
+        {
+            reader.ReadArrayElement(i);
+            reader.ReadMapBegin();
+            reader.ReadProperty("refer");
+            reader.Read(out Entity refer);
+            reader.ReadProperty("source");
+            reader.Read(out string source);
+            var nameSource = Enum.TryParse<NameSource>(source, out var src)
+                ? src
+                : NameSource.None;
+            Refers.Add(new NameSourceRefer(refer, nameSource));
+        }
 
-        reader.ReadProperty("source");
-        reader.Read(out string source);
-        Source = Enum.TryParse<NameSource>(source, out var nameSource)
-            ? nameSource
-            : NameSource.Unknown;
-
+        reader.ReadArrayEnd();
         reader.ReadProperty("direction");
         reader.Read(out string direction);
         Direction = Enum.TryParse<Direction>(direction, out var dir)
@@ -103,20 +154,24 @@ public struct NameCandidate : IBufferElementData,
         writer.TypeBegin("NameCandidate");
         writer.PropertyName("name");
         writer.Write(Name.ToString());
-        writer.PropertyName("source");
-        writer.Write(Source.ToString());
+        writer.PropertyName("refers");
+        writer.ArrayBegin(Refers.Length);
+        foreach (var refer in Refers)
+        {
+            writer.Write(refer);
+        }
+
         writer.PropertyName("direction");
         writer.Write(Direction.ToString());
         writer.PropertyName("edgeType");
         writer.Write(EdgeType.ToString());
-        writer.PropertyName("refer");
-        writer.Write(Refer);
+        writer.ArrayEnd();
         writer.TypeEnd();
     }
 
     public override string ToString()
     {
-        return $"Candidate['{Name}'({Source}-{Direction})]";
+        return $"Candidate['{Name}'({Refers}-{Direction})]";
     }
 
     public static implicit operator ManagedNameCandidate(NameCandidate candidate)
@@ -127,10 +182,9 @@ public struct NameCandidate : IBufferElementData,
     public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
     {
         writer.Write(Name.ToString());
-        writer.Write(Refer);
-        writer.Write((uint)Source);
-        writer.Write((uint)Direction);
-        writer.Write((uint)EdgeType);
+        writer.Write(Refers.ToNativeArray(Allocator.Temp));
+        writer.Write(Direction.ToString());
+        writer.Write(EdgeType.ToString());
     }
 
     public void Deserialize<TReader>(TReader reader) where TReader : IReader
@@ -138,45 +192,91 @@ public struct NameCandidate : IBufferElementData,
         reader.Read(out string name);
         Name = name;
 
-        reader.Read(out Refer);
+        reader.Read(out string direction);
+        Direction = Enum.TryParse<Direction>(direction, out var dir)
+            ? dir
+            : Direction.Init;
 
-        reader.Read(out uint source);
-        Source = (NameSource)source;
+        reader.Read(out string edgeType);
+        EdgeType = Enum.TryParse<EdgeType>(edgeType, out var edge)
+            ? edge
+            : EdgeType.Same;
+    }
 
-        reader.Read(out uint direction);
-        Direction = (Direction)direction;
+    public static NameCandidate Of(
+        string name, Direction direction, EdgeType edgeType,
+        Entity refer, NameSource source)
+    {
+        FixedList128Bytes<NameSourceRefer> refers =
+        [
+            new NameSourceRefer(refer, source)
+        ];
 
-        reader.Read(out uint edgeType);
-        EdgeType = (EdgeType)edgeType;
+        return new NameCandidate(
+            name, refers, direction, edgeType
+        );
+    }
+
+
+    public static NameCandidate Of(
+        string name,
+        Direction direction, EdgeType edgeType,
+        Entity refer1, NameSource source1,
+        Entity refer2, NameSource source2
+    )
+    {
+        FixedList128Bytes<NameSourceRefer> refers =
+        [
+            new NameSourceRefer(refer1, source1),
+            new NameSourceRefer(refer2, source2)
+        ];
+
+        return new NameCandidate(
+            name, refers, direction, edgeType
+        );
+    }
+
+    public static NameCandidate Of(
+        string name, Direction direction, EdgeType edgeType,
+        params KeyValuePair<Entity, NameSource>[] refer)
+    {
+        var refers = new FixedList128Bytes<NameSourceRefer>();
+        foreach (var pair in refer)
+        {
+            refers.Add(new NameSourceRefer(pair.Key, pair.Value));
+        }
+
+        return new NameCandidate(
+            name, refers, direction, edgeType
+        );
     }
 }
 
 public struct ManagedNameCandidate(
     string name,
-    Entity refer,
-    NameSource source,
+    List<NameSourceRefer> refers,
     Direction direction,
-    EdgeType edgeType)
+    EdgeType edgeType
+)
     : IEquatable<ManagedNameCandidate>, IJsonWritable, IJsonReadable
 {
     public string Name = name;
-    public Entity Refer = refer;
-    public NameSource Source = source;
+    public List<NameSourceRefer> Refers = refers;
     public Direction Direction = direction;
     public EdgeType EdgeType = edgeType;
 
     public ManagedNameCandidate(NameCandidate candidate) : this(
         candidate.Name.ToString(),
-        candidate.Refer,
-        candidate.Source,
+        candidate.RefersToList(),
         candidate.Direction,
-        candidate.EdgeType)
+        candidate.EdgeType
+    )
     {
     }
 
     public bool Equals(ManagedNameCandidate other)
     {
-        return Name.Equals(other.Name) && Source == other.Source;
+        return Name.Equals(other.Name) && Refers.SequenceEqual(other.Refers);
     }
 
     public override bool Equals(object obj)
@@ -189,31 +289,42 @@ public struct ManagedNameCandidate(
         unchecked
         {
             var hashCode = Name.GetHashCode();
-            hashCode = (hashCode * 397) ^ (int)Source;
+            hashCode = (hashCode * 397) ^ Refers.GetHashCode();
             return hashCode;
         }
     }
 
     public override string ToString()
     {
-        return $"Candidate['{Name}'({Source}-{Direction})]";
+        return $"Candidate['{Name}'({Refers}-{Direction})]";
     }
 
     public void Read(IJsonReader reader)
     {
         reader.ReadMapBegin();
         reader.ReadProperty("name");
-        reader.Read(out Name);
+        reader.Read(out string name);
+        Name = name;
 
-        reader.ReadProperty("refer");
-        reader.Read(out Refer);
+        reader.ReadProperty("refers");
+        var size = reader.ReadArrayBegin();
+        Refers = [];
 
-        reader.ReadProperty("source");
-        reader.Read(out string source);
-        Source = Enum.TryParse<NameSource>(source, out var nameSource)
-            ? nameSource
-            : NameSource.Unknown;
-
+        for (uint i = 0; i < size; i++)
+        {
+            reader.ReadArrayElement(i);
+            reader.ReadMapBegin();
+            reader.ReadProperty("refer");
+            reader.Read(out Entity refer);
+            reader.ReadProperty("source");
+            reader.Read(out string source);
+            var nameSource = Enum.TryParse<NameSource>(source, out var src)
+                ? src
+                : NameSource.None;
+            Refers.Add(new NameSourceRefer(refer, nameSource));
+            reader.ReadMapEnd();
+        }
+        reader.ReadArrayEnd();
         reader.ReadProperty("direction");
         reader.Read(out string direction);
         Direction = Enum.TryParse<Direction>(direction, out var dir)
@@ -234,14 +345,29 @@ public struct ManagedNameCandidate(
         writer.TypeBegin("NameCandidate");
         writer.PropertyName("name");
         writer.Write(Name);
-        writer.PropertyName("source");
-        writer.Write(Source.ToString());
+        writer.PropertyName("refers");
+        writer.ArrayBegin((uint)Refers.Count);
+        foreach (var refer in Refers)
+        {
+            writer.Write(refer);
+        }
+        writer.ArrayEnd();
         writer.PropertyName("direction");
         writer.Write(Direction.ToString());
         writer.PropertyName("edgeType");
         writer.Write(EdgeType.ToString());
-        writer.PropertyName("refer");
-        writer.Write(Refer);
         writer.TypeEnd();
+    }
+
+    public NameCandidate ToUnmanaged()
+    {
+        FixedList128Bytes<NameSourceRefer> refers = [];
+        foreach (var refer in Refers)
+        {
+            refers.Add(refer);
+        }
+        return new NameCandidate(
+            Name, refers, Direction, EdgeType
+        );
     }
 }

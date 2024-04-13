@@ -18,13 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace StationNaming.System;
 
-public enum NameSource: uint
+public enum NameSource : uint
 {
     Owner = 0,
     Road,
+    /**
+     * Not used in the current version. But reserved for compatibility.
+     */
+    [Obsolete("Not used in the current version. But reserved for compatibility.")]
     Intersection,
+    District,
     TransportStation,
     TransportDepot,
     ZoneBuilding,
@@ -44,5 +51,10 @@ public enum NameSource: uint
      * Other buildings that we don't know its type.
      */
     Building,
-    Unknown
+    Unknown,
+
+    /**
+     * Used for scope, not a real source.
+     */
+    None
 }
