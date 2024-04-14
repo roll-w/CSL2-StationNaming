@@ -11,6 +11,7 @@ import nameSourceToString = StationNaming.nameSourceToString;
 import toNameCandidate = StationNaming.toNameCandidate;
 import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
+import combineNameSource = StationNaming.combineNameSource;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -22,14 +23,46 @@ const selectedEntityChanged = (newEntity: Entity) => {
 }
 
 const setSelectedCandidate = (candidate: NameCandidate) => {
-    trigger(ModName, "SetCandidateFor", selectedEntity, candidate);
+    call(ModName, "SetCandidateFor", selectedEntity, candidate).then(r => {
+    });
 }
 
-const getNameCandidates = async (): Promise<SerializedNameCandidate[]> => {
+const getNameCandidates = async (): Promise<any> => {
     return await call(
         ModName,
         "GetCandidates",
         selectedEntity) as unknown as Promise<SerializedNameCandidate[]>
+}
+
+const CandidatesFoldout = (props: {
+    name: string | null,
+    candidates: SerializedNameCandidate[]
+}) => {
+    const {translate} = useLocalization();
+
+    return (
+        <PanelFoldout initialExpanded={false} header={
+            <PanelSectionRow left={props.name}/>
+        }>
+            {(props.candidates || []).map(candidate =>
+                <PanelSectionRow
+                    left={candidate.Name + " [" +
+                        translate(getTranslationKeyOf(
+                            nameSourceToString(combineNameSource(candidate.Refers)),
+                            "NameSource"
+                        ))
+                        +"]"}
+                    link={
+                        <div onClick={() => {
+                            setSelectedCandidate(toNameCandidate(candidate))
+                        }}>
+                            ✓
+                        </div>
+                    }
+                />
+            )}
+        </PanelFoldout>
+    )
 }
 
 
@@ -66,27 +99,11 @@ const CandidatesComponent = () => {
                     (nameCandidates || []).length
                 }
             />
-            <PanelFoldout initialExpanded={true} header={
-                <PanelSectionRow left={translate(
-                    getTranslationKeyOf("Candidates"))}/>
-            }>
-                {(nameCandidates || []).map(candidate =>
-                    <PanelSectionRow
-                        left={candidate.Name + " [" +
-                            translate(
-                                getTranslationKeyOf(nameSourceToString(candidate.Source.value__), "NameSource"),
-                                nameSourceToString(candidate.Source.value__)
-                            ) + "]"}
-                        link={
-                            <div onClick={() => {
-                                setSelectedCandidate(toNameCandidate(candidate));
-                            }}>
-                                ✓
-                            </div>
-                        }
-                    />
-                )}
-            </PanelFoldout>
+
+            <CandidatesFoldout
+                name={translate(getTranslationKeyOf("Candidates"))}
+                candidates={nameCandidates}
+            />
         </PanelSection>
     )
 }

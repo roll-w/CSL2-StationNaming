@@ -19,9 +19,7 @@
 // SOFTWARE.
 
 using System.Collections.Generic;
-using System.Linq;
 using Colossal.UI.Binding;
-using Game.Net;
 using Game.UI;
 using Unity.Entities;
 
@@ -44,11 +42,10 @@ public partial class UIBindingSystem : UISystemBase
             SetSelectedEntity
         ));
 
-        AddBinding(new TriggerBinding<Entity, NameCandidate>(
+        AddBinding(new CallBinding<Entity, ManagedNameCandidate, bool>(
             Mod.Name,
             nameof(SetCandidateFor),
-            SetCandidateFor,
-            null, new ValueReader<NameCandidate>()
+            SetCandidateFor
         ));
 
         AddBinding(new CallBinding<Entity, List<ManagedNameCandidate>>(
@@ -108,29 +105,35 @@ public partial class UIBindingSystem : UISystemBase
     }
 
 
-    private void SetCandidateFor(Entity entity, NameCandidate candidate)
+    private bool SetCandidateFor(Entity entity, ManagedNameCandidate candidate)
     {
         SetSelectedEntity(entity);
 
         if (entity == Entity.Null)
         {
-            return;
+            return false;
         }
 
         if (!EntityManager.HasBuffer<NameCandidate>(entity))
         {
             // we dont want to set the name if the buffer is not present
-            return;
+            return false;
         }
 
         var naming = new ManualSelectNaming(candidate);
-        CheckAndAddCurrent(
-            GetRootEntity(candidate.Refer),
-            entity
-        );
+
+        foreach (var refer in candidate.Refers)
+        {
+            CheckAndAddCurrent(
+                refer.Refer,
+                entity
+            );
+        }
 
         EntityManager.AddComponentData(entity, naming);
-        _nameSystem.SetCustomName(entity, candidate.Name.ToString());
+        _nameSystem.SetCustomName(entity, candidate.Name);
+
+        return true;
     }
 
 
@@ -141,25 +144,19 @@ public partial class UIBindingSystem : UISystemBase
             : EntityManager.AddBuffer<T>(entity);
     }
 
-    private Entity GetRootEntity(Entity entity)
-    {
-        if (EntityManager.HasComponent<Aggregated>(entity))
-        {
-            return EntityManager.GetComponentData<Aggregated>(entity).m_Aggregate;
-        }
-
-        return entity;
-    }
-
     private void CheckAndAddCurrent(Entity refer, Entity entity)
     {
+        if (refer == Entity.Null)
+        {
+            return;
+        }
+
         var buffer = GetBuffer<NamingAssociation>(refer);
         if (buffer.Length == 0)
         {
             buffer.Add(new NamingAssociation(entity));
             return;
         }
-
         foreach (var naming in buffer)
         {
             if (naming.Target == entity)
@@ -167,7 +164,6 @@ public partial class UIBindingSystem : UISystemBase
                 return;
             }
         }
-
         buffer.Add(new NamingAssociation(entity));
     }
 }

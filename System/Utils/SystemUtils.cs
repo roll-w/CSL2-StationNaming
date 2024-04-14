@@ -18,43 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
+using Game.Prefabs;
+using Unity.Entities;
 
-namespace StationNaming.System;
+namespace StationNaming.System.Utils;
 
-public enum NameSource : uint
+public static class SystemUtils
 {
-    Owner = 0,
-    Road,
-    /**
-     * Not used in the current version. But reserved for compatibility.
-     */
-    [Obsolete("Not used in the current version. But reserved for compatibility.")]
-    Intersection,
-    District,
-    TransportStation,
-    TransportDepot,
-    ZoneBuilding,
-    SignatureBuilding,
-    School,
-    FireStation,
-    PoliceStation,
-    Hospital,
-    Park,
+    public static DynamicBuffer<T> GetBuffer<T>(
+        EntityManager entityManager,
+        Entity entity) where T : unmanaged, IBufferElementData
+    {
+        return entityManager.HasBuffer<T>(entity)
+            ? entityManager.GetBuffer<T>(entity)
+            : entityManager.AddBuffer<T>(entity);
+    }
 
-    /**
-     * Other city service buildings not listed
-     */
-    CityService,
-
-    /**
-     * Other buildings that we don't know its type.
-     */
-    Building,
-    Unknown,
-
-    /**
-     * Used for scope, not a real source.
-     */
-    None
 }

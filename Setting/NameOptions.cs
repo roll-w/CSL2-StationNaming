@@ -18,43 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
+namespace StationNaming.Setting;
 
-namespace StationNaming.System;
-
-public enum NameSource : uint
+public struct NameOptions
 {
-    Owner = 0,
-    Road,
-    /**
-     * Not used in the current version. But reserved for compatibility.
-     */
-    [Obsolete("Not used in the current version. But reserved for compatibility.")]
-    Intersection,
-    District,
-    TransportStation,
-    TransportDepot,
-    ZoneBuilding,
-    SignatureBuilding,
-    School,
-    FireStation,
-    PoliceStation,
-    Hospital,
-    Park,
+    public NameOptions()
+    {
+    }
 
-    /**
-     * Other city service buildings not listed
-     */
-    CityService,
-
-    /**
-     * Other buildings that we don't know its type.
-     */
-    Building,
-    Unknown,
-
-    /**
-     * Used for scope, not a real source.
-     */
-    None
+    public bool BuildingName { get; set; } = true;
+    public bool BuildingNameWithCurrentRoad { get; set; } = true;
 }

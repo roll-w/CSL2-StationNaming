@@ -3,10 +3,14 @@
 export namespace StationNaming {
     export const ModName = "RollW_StationNaming";
 
-    export type NameCandidate = {
-        name: string;
+    export type NameSourceRefer = {
         source: string;
         refer: Entity;
+    }
+
+    export type NameCandidate = {
+        name: string;
+        refers: NameSourceRefer[];
         direction: string;
         edgeType: string;
     }
@@ -58,6 +62,7 @@ export namespace StationNaming {
         Owner = 0,
         Road,
         Intersection,
+        District,
         TransportStation,
         TransportDepot,
         ZoneBuilding,
@@ -77,7 +82,8 @@ export namespace StationNaming {
          * Other buildings that we don't know its type.
          */
         Building,
-        Unknown
+        Unknown,
+        None
     }
 
     export const nameSourceToString = (nameSource: NameSource) => {
@@ -86,6 +92,8 @@ export namespace StationNaming {
                 return "Road";
             case NameSource.Intersection:
                 return "Intersection";
+            case NameSource.District:
+                return "District";
             case NameSource.Owner:
                 return "Owner";
             case NameSource.TransportStation:
@@ -111,8 +119,10 @@ export namespace StationNaming {
             case NameSource.Building:
                 return "Building";
             case NameSource.Unknown:
-            default:
                 return "Unknown";
+            case NameSource.None:
+            default:
+                return "None";
         }
     }
 
@@ -122,6 +132,18 @@ export namespace StationNaming {
         __Type: string;
     }
 
+    export type SerializedNameSourceRefer = {
+        Source: BaseSerialized<NameSource>;
+        Refer: SerializedEntity;
+    }
+
+    export type SerializedNameCandidate = {
+        Name: string;
+        Refers: SerializedNameSourceRefer[];
+        Direction: BaseSerialized<Direction>;
+        EdgeType: BaseSerialized<EdgeType>;
+    }
+
     export const toEntity = (entity: SerializedEntity): Entity => {
         return {
             index: entity.Index,
@@ -129,19 +151,15 @@ export namespace StationNaming {
         }
     }
 
-    export type SerializedNameCandidate = {
-        Name: string;
-        Source: BaseSerialized<NameSource>;
-        Refer: SerializedEntity;
-        Direction: BaseSerialized<Direction>;
-        EdgeType: BaseSerialized<EdgeType>;
-    }
-
     export const toNameCandidate = (candidate: SerializedNameCandidate): NameCandidate => {
         return {
             name: candidate.Name,
-            source: nameSourceToString(candidate.Source.value__),
-            refer: toEntity(candidate.Refer),
+            refers: candidate.Refers.map(ref => {
+                return {
+                    source: nameSourceToString(ref.Source.value__),
+                    refer: toEntity(ref.Refer)
+                }
+            }),
             direction: directionToString(candidate.Direction.value__),
             edgeType: edgeTypeToString(candidate.EdgeType.value__)
         }
@@ -153,5 +171,24 @@ export namespace StationNaming {
         }
 
         return `StationNaming.${type}[${key}]`;
+    }
+
+    export const combineNameSource = (refers: SerializedNameSourceRefer[])
+        : NameSource => {
+        if (refers.length === 0) {
+            return NameSource.None;
+        }
+        if (refers.length === 1) {
+            return refers[0].Source.value__;
+        }
+        if (refers.length === 2) {
+            let first = refers[0].Source.value__;
+            let second = refers[1].Source.value__;
+            if (first === NameSource.Road && second === NameSource.Road) {
+                return NameSource.Intersection;
+            }
+            return second
+        }
+        return refers[refers.length - 1].Source.value__;
     }
 }

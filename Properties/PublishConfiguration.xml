@@ -20,11 +20,7 @@ check the mod settings to avoid conflicts.
 
 - Automatically name your transport stations and stops.
 - Customizable naming rules.
-- Could generate names from the surrounding buildings or roads.
-
-Note: I haven't found a way to keep the update information in the saves, so
-after you load a save, their names can't be updated automatically anymore,
-unless you manually select the name to let the mod add update information.
+- Generate names from surrounding buildings or roads.
 
 ## Settings
 
@@ -55,6 +51,13 @@ RollW_StationNaming
 - Simplified Chinese (简体中文)
 - Traditional Chinese (繁體中文)
 
+## Planned Features
+
+- Supports district name as prefix/suffix.
+- Allow setting the naming format for different name sources.
+- Supports naming Schools, Hospitals...
+
+## Support
 
 If you have any problems during using this mod, please open an issue or discussion
 on Github.
@@ -66,19 +69,22 @@ on Github.
 	<Screenshot Value="Properties/Screenshots/2.jpg" />
 	<Screenshot Value="Properties/Screenshots/3.jpg" />
 	<Screenshot Value="Properties/Screenshots/4.jpg" />
+	<Screenshot Value="Properties/Screenshots/5.jpg" />
+	<Screenshot Value="Properties/Screenshots/6.jpg" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.1.1" />
+	<ModVersion Value="0.2.0" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-Fix: Extra platform stops cannot get the correct name candidates.
+- Feature: Now the mod will save the update infos.
+- Feature: Supports generate name candidates from the surrounding buildings with current road.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />

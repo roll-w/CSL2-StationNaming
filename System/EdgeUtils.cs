@@ -21,12 +21,23 @@
 using System;
 using System.Collections.Generic;
 using Game.Net;
+using Game.UI;
 using Unity.Entities;
 
 namespace StationNaming.System;
 
 public static class EdgeUtils
 {
+    public static Entity GetRootEntityForEdge(Entity entity, EntityManager entityManager)
+    {
+        if (entityManager.HasComponent<Aggregated>(entity))
+        {
+            return entityManager.GetComponentData<Aggregated>(entity).m_Aggregate;
+        }
+
+        return entity;
+    }
+
     public static IEnumerable<RoadEdge> CollectEdges(
         EntityManager entityManager,
         Entity edgeEntity, int depth)
@@ -76,7 +87,6 @@ public static class EdgeUtils
             GetNextEdge(entityManager, edgeEntity, depth, aggregate,
                 edge.m_End, Direction.End, edges);
         }
-
     }
 
     private static void GetNextEdge(
@@ -129,6 +139,19 @@ public readonly struct RoadEdge(
     public readonly EdgeType EdgeType = edgeType;
     public readonly Entity Edge = edge;
 
+    public string GetRoadName(
+        EntityManager entityManager,
+        NameSystem nameSystem)
+    {
+        if (!entityManager.HasComponent<Aggregated>(Edge))
+        {
+            return string.Empty;
+        }
+
+        var aggregate = entityManager.GetComponentData<Aggregated>(Edge).m_Aggregate;
+        return nameSystem.GetRenderedLabelName(aggregate);
+    }
+
     public bool Equals(RoadEdge other)
     {
         return Direction == other.Direction && Edge.Equals(other.Edge) && EdgeType == other.EdgeType;
@@ -148,14 +171,14 @@ public readonly struct RoadEdge(
     }
 }
 
-public enum Direction: uint
+public enum Direction : uint
 {
     Init,
     Start,
     End
 }
 
-public enum EdgeType: uint
+public enum EdgeType : uint
 {
     Same,
     Other

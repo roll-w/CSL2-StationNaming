@@ -52,7 +52,8 @@ namespace StationNaming.Setting
                     "The maximum depth to search for name candidates, setting too high is not recommended as it may affect game performance.")
                 .AddTranslation(LocaleCode.ZhHans, "搜索名称候选的最大深度，不建议设置过大，以免影响游戏性能。")
                 .AddTranslation(LocaleCode.ZhHant, "搜索名稱候選的最大深度，不建議設置過大，以免影響遊戲性能。"),
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.IntersectionNamingFormat]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.IntersectionNamingFormat]")
                 .AddTranslation(LocaleCode.EnUs, "Intersection Naming Format")
                 .AddTranslation(LocaleCode.ZhHans, "交叉口命名格式")
                 .AddTranslation(LocaleCode.ZhHant, "交叉口命名格式"),
@@ -61,14 +62,18 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs,
                     "The format used when generating the name of the intersection source, " +
                     "in addition to the dropdown items, the format can be changed by modifying the settings file. " +
+                    "{0} represents the current road, {1} represents the intersecting road/building. " +
                     "The road order can be reversed by setting.")
-                .AddTranslation(LocaleCode.ZhHans, "在生成交叉口来源的名称时使用的格式，除下拉项以外还可通过修改设置文件变更格式。{0} 表示当前道路，{1} 表示交叉道路。可通过设置反转道路顺序。")
-                .AddTranslation(LocaleCode.ZhHant, "在生成交叉口來源的名稱時使用的格式，除下拉項以外還可通過修改設置文件變更格式。{0} 表示當前道路，{1} 表示交叉道路。可通過設置反轉道路順序。"),
+                .AddTranslation(LocaleCode.ZhHans,
+                    "在生成交叉口来源的名称时使用的格式，除下拉项以外还可通过修改设置文件变更格式。{0} 表示当前道路，{1} 表示交叉道路/建筑。可通过设置反转道路顺序。")
+                .AddTranslation(LocaleCode.ZhHant,
+                    "在生成交叉口來源的名稱時使用的格式，除下拉項以外還可通過修改設置文件變更格式。{0} 表示當前道路，{1} 表示交叉道路/建築。可通過設置反轉道路順序。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
                 .AddTranslation(LocaleCode.EnUs, "Reverse Road Order")
                 .AddTranslation(LocaleCode.ZhHans, "反转道路顺序")
                 .AddTranslation(LocaleCode.ZhHant, "反轉道路順序"),
-            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
                 .AddTranslation(LocaleCode.EnUs,
                     "Reverse the order of the road, swap {0} and {1} in the intersection naming format.")
                 .AddTranslation(LocaleCode.ZhHans, "反转道路顺序，使交叉口命名格式中的 {0} 和 {1} 交换位置。")
@@ -110,11 +115,41 @@ namespace StationNaming.Setting
                     "Named according to the order of the owner and the current road.")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的站点命名。按照所有者、当前道路的顺序命名。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的站點命名。按照所有者、當前道路的順序命名。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingName]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Building Name Source")
+                .AddTranslation(LocaleCode.ZhHans, "启用建筑命名来源")
+                .AddTranslation(LocaleCode.ZhHant, "啟用建築命名來源"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingName]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, allow generate name candidates from surrounding buildings. "+
+                    "After setting, it may take some time to take effect.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成名称候选。修改后，可能需要过一段时间才能生效。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成名稱候選。修改後，可能需要過一段時間才能生效。"),
+
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingNameWithCurrentRoad]")
+                .AddTranslation(LocaleCode.EnUs, "Building Name With Current Road")
+                .AddTranslation(LocaleCode.ZhHans, "建筑命名包含当前道路")
+                .AddTranslation(LocaleCode.ZhHant, "建築命名包含當前道路"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingNameWithCurrentRoad]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, allow generate name candidates from surrounding buildings with current road name, " +
+                    "the format will be the same as the intersection naming format. " +
+                    "After setting, it may take some time to take effect.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成包含当前道路的名称候选，格式将与交叉口命名格式相同。修改后，可能需要过一段时间才能生效。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成包含當前道路的名稱候選，格式將與交叉口命名格式相同。修改後，可能需要過一段時間才能生效。"),
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")
                 .AddTranslation(LocaleCode.ZhHans, "实验性")
                 .AddTranslation(LocaleCode.ZhHant, "實驗性"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.General]")
+                .AddTranslation(LocaleCode.EnUs, "General")
+                .AddTranslation(LocaleCode.ZhHans, "常规")
+                .AddTranslation(LocaleCode.ZhHant, "常規"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Building]")
+                .AddTranslation(LocaleCode.EnUs, "Building")
+                .AddTranslation(LocaleCode.ZhHans, "建筑")
+                .AddTranslation(LocaleCode.ZhHant, "建築"),
             new Translation("Options.GROUP_DESCRIPTION[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental features, may cause game instability")
                 .AddTranslation(LocaleCode.ZhHans, "实验性功能，可能会导致游戏不稳定")
@@ -126,7 +161,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "名称候选")
                 .AddTranslation(LocaleCode.ZhHant, "名稱候選"),
             new Translation("StationNaming.NameCandidates[Tooltip]")
-                .AddTranslation(LocaleCode.EnUs, "Here are all the name candidates, you can select them to replace the existing name.")
+                .AddTranslation(LocaleCode.EnUs,
+                    "Here are all the name candidates, you can select them to replace the existing name.")
                 .AddTranslation(LocaleCode.ZhHans, "这里是所有的名称候选，您可以选择它们来替换现有名称。")
                 .AddTranslation(LocaleCode.ZhHant, "這裡是所有的名稱候選，您可以選擇它們來替換現有名稱。"),
             new Translation("StationNaming.Candidates")
@@ -142,6 +178,10 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Road")
                 .AddTranslation(LocaleCode.ZhHans, "道路")
                 .AddTranslation(LocaleCode.ZhHant, "道路"),
+            new Translation("StationNaming.NameSource[District]")
+                .AddTranslation(LocaleCode.EnUs, "District")
+                .AddTranslation(LocaleCode.ZhHans, "区域")
+                .AddTranslation(LocaleCode.ZhHant, "區域"),
             new Translation("StationNaming.NameSource[Intersection]")
                 .AddTranslation(LocaleCode.EnUs, "Intersection")
                 .AddTranslation(LocaleCode.ZhHans, "交叉口")
@@ -194,6 +234,10 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Unknown")
                 .AddTranslation(LocaleCode.ZhHans, "未知")
                 .AddTranslation(LocaleCode.ZhHant, "未知"),
+            new Translation("StationNaming.NameSource[None]")
+                .AddTranslation(LocaleCode.EnUs, "None")
+                .AddTranslation(LocaleCode.ZhHans, "None")
+                .AddTranslation(LocaleCode.ZhHant, "None"),
         ];
 
         public static void LoadTranslations()

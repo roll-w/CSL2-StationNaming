@@ -20,10 +20,7 @@
 
 using System.Collections.Generic;
 using Game;
-using Game.Buildings;
 using Game.Common;
-using Game.Net;
-using Game.Objects;
 using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
@@ -75,9 +72,9 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
 
             var selectNaming =
                 EntityManager.GetComponentData<ManualSelectNaming>(target);
-            var name = _nameSystem.GetRenderedLabelName(target);
+            var currentName = _nameSystem.GetRenderedLabelName(target);
             var nameCandidate = selectNaming.SelectedName;
-            if (name != nameCandidate.Name)
+            if (currentName != nameCandidate.Name)
             {
                 // it probably means the name has been changed by user,
                 // we should not update it
@@ -85,7 +82,7 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
                 continue;
             }
 
-            var updatedName = GetUpdatedName(entity, target, selectNaming);
+            var updatedName = GetUpdatedName(selectNaming);
 
             var copy = nameCandidate;
             copy.Name = updatedName;
@@ -105,67 +102,14 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
         }
     }
 
-    private string GetUpdatedName(
-        Entity entity,
-        Entity self,
-        ManualSelectNaming selectNaming)
+    private string GetUpdatedName(ManualSelectNaming selectNaming)
     {
         var selectedName = selectNaming.SelectedName;
-        switch (selectedName.Source)
-        {
-            case NameSource.Owner:
-                return _nameSystem.GetRenderedLabelName(entity);
-            case NameSource.Road:
-            {
-                var roadName = _nameSystem.GetRenderedLabelName(entity);
-                return Mod.GetInstance().GetSettings()
-                    .FormatCandidateName(roadName);
-            }
-            case NameSource.Intersection:
-            {
-                var currentRoadName = GetRoadNameByAttached(self);
-                var roadName = _nameSystem.GetRenderedLabelName(entity);
+        var refers = selectedName.Refers;
 
-                var formatRoadName = Mod.GetInstance().GetSettings()
-                    .FormatRoadName(currentRoadName, roadName);
-
-                return Mod.GetInstance().GetSettings().FormatCandidateName(
-                    formatRoadName
-                );
-            }
-        }
-
-        var entityName = _nameSystem.GetRenderedLabelName(entity);
-        return Mod.GetInstance().GetSettings().FormatCandidateName(entityName);
-    }
-
-    private string GetRoadNameByAttached(Entity entity)
-    {
-        if (EntityManager.HasComponent<Building>(entity))
-        {
-            var building = EntityManager.GetComponentData<Building>(entity);
-            return GetRoadName(building.m_RoadEdge);
-        }
-
-        if (!EntityManager.HasComponent<Attached>(entity))
-        {
-            return "";
-        }
-
-        var attached = EntityManager.GetComponentData<Attached>(entity).m_Parent;
-        return GetRoadName(attached);
-    }
-
-    private string GetRoadName(Entity entity)
-    {
-        if (!EntityManager.HasComponent<Aggregated>(entity))
-        {
-            return "";
-        }
-
-        var aggregate = EntityManager.GetComponentData<Aggregated>(entity)
-            .m_Aggregate;
-        return _nameSystem.GetRenderedLabelName(aggregate);
+        var name = StopNameHelper
+            .FormatRefers(refers, EntityManager, _nameSystem);
+        return name;
     }
 
     protected override void OnCreate()
