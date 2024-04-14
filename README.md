@@ -10,7 +10,7 @@ check the mod settings to avoid conflicts.
 
 - Automatically name your transport stations and stops.
 - Customizable naming rules.
-- Could generate names from the surrounding buildings or roads.
+- Generate names from surrounding buildings or roads.
 
 ## Settings
 
