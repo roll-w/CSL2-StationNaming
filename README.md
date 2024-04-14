@@ -12,10 +12,6 @@ check the mod settings to avoid conflicts.
 - Customizable naming rules.
 - Could generate names from the surrounding buildings or roads.
 
-Note: I haven't found a way to keep the update information in the saves, so
-after you load a save, their names can't be updated automatically anymore,
-unless you manually select the name to let the mod add update information.
-
 ## Settings
 
 Except the showing settings, you could also customize the naming rules in the
@@ -40,6 +36,13 @@ RollW_StationNaming
 - Simplified Chinese (简体中文)
 - Traditional Chinese (繁體中文)
 
+## Planned Features
+
+- Supports district name as prefix/suffix.
+- Allow setting the naming format for different name sources.
+- Supports naming Schools, Hospitals...
+
+## Support
 
 If you have any problems during using this mod, please open an issue or discussion
 on Github.
