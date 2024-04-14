@@ -23,6 +23,4 @@ using Unity.Entities;
 
 namespace StationNaming.System;
 
-public struct Selected : IComponentData, IEmptySerializable
-{
-}
+public struct Selected : IComponentData, IEmptySerializable;

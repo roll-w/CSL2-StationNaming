@@ -6,7 +6,7 @@
         <Authors>RollW</Authors>
         <Copyright>Copyright (c) 2024 RollW (github.com/Roll-W). All rights reserved.</Copyright>
         <Product>$(Title)</Product>
-        <Version>0.1.0</Version>
+        <Version>0.2.0</Version>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
         <OutputType>Library</OutputType>
@@ -43,6 +43,9 @@
         <Reference Include="Colossal.Core">
             <Private>false</Private>
         </Reference>
+        <Reference Include="Colossal.Collections">
+            <Private>false</Private>
+        </Reference>
         <Reference Include="Colossal.Mathematics">
             <Private>false</Private>
         </Reference>
@@ -52,7 +55,13 @@
         <Reference Include="Colossal.IO.AssetDatabase">
             <Private>false</Private>
         </Reference>
+        <Reference Include="Colossal.AssetPipeline">
+            <Private>false</Private>
+        </Reference>
         <Reference Include="Colossal.Localization">
+            <Private>false</Private>
+        </Reference>
+        <Reference Include="Colossal.PSI.Common">
             <Private>false</Private>
         </Reference>
         <Reference Include="Colossal.UI">

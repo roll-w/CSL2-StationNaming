@@ -18,16 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace StationNaming.System.Saves;
+using Game.Prefabs;
+using Unity.Entities;
 
-/**
- * Holds current state of loaded save.
- */
-public class SaveState
+namespace StationNaming.System.Utils;
+
+public static class SystemUtils
 {
-    public string AssetId { get; set; }
+    public static DynamicBuffer<T> GetBuffer<T>(
+        EntityManager entityManager,
+        Entity entity) where T : unmanaged, IBufferElementData
+    {
+        return entityManager.HasBuffer<T>(entity)
+            ? entityManager.GetBuffer<T>(entity)
+            : entityManager.AddBuffer<T>(entity);
+    }
 
-    public string SaveName { get; set; }
-
-    public SaveSource SaveSource { get; set; }
 }

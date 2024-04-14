@@ -71,7 +71,6 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     }
 
 
-
     public string FormatCandidateName(string name)
     {
         return $"{Prefix}{name}{Suffix}";
@@ -101,9 +100,9 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         {
             return
             [
-                new DropdownItem<string> {value = "", displayName = "No Prefix"},
-                new DropdownItem<string> {value = "Station ", displayName = "Station "},
-                new DropdownItem<string> {value = "Stop ", displayName = "Stop "},
+                new DropdownItem<string> { value = "", displayName = "No Prefix" },
+                new DropdownItem<string> { value = "Station ", displayName = "Station " },
+                new DropdownItem<string> { value = "Stop ", displayName = "Stop " },
             ];
         }
 
@@ -111,9 +110,9 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         {
             return
             [
-                new DropdownItem<string> {value = "", displayName = "No Suffix"},
-                new DropdownItem<string> {value = " Station", displayName = " Station"},
-                new DropdownItem<string> {value = " Stop", displayName = " Stop"},
+                new DropdownItem<string> { value = "", displayName = "No Suffix" },
+                new DropdownItem<string> { value = " Station", displayName = " Station" },
+                new DropdownItem<string> { value = " Stop", displayName = " Stop" },
             ];
         }
     }

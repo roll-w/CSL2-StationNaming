@@ -62,4 +62,9 @@ public struct ManualSelectNaming : IComponentData, ISerializable,
     {
         reader.Read(out SelectedName);
     }
+
+    public override string ToString()
+    {
+        return $"{nameof(SelectedName)}: {SelectedName}";
+    }
 }

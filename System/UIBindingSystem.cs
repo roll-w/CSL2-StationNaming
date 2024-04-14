@@ -18,10 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using Colossal.UI.Binding;
-using Game.Net;
 using Game.UI;
 using Unity.Entities;
 
@@ -122,7 +120,7 @@ public partial class UIBindingSystem : UISystemBase
             return false;
         }
 
-        var naming = new ManualSelectNaming(candidate.ToUnmanaged());
+        var naming = new ManualSelectNaming(candidate);
 
         foreach (var refer in candidate.Refers)
         {
@@ -148,13 +146,17 @@ public partial class UIBindingSystem : UISystemBase
 
     private void CheckAndAddCurrent(Entity refer, Entity entity)
     {
+        if (refer == Entity.Null)
+        {
+            return;
+        }
+
         var buffer = GetBuffer<NamingAssociation>(refer);
         if (buffer.Length == 0)
         {
             buffer.Add(new NamingAssociation(entity));
             return;
         }
-
         foreach (var naming in buffer)
         {
             if (naming.Target == entity)
@@ -162,7 +164,6 @@ public partial class UIBindingSystem : UISystemBase
                 return;
             }
         }
-
         buffer.Add(new NamingAssociation(entity));
     }
 }

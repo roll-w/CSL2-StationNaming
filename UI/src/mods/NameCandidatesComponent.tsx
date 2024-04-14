@@ -11,6 +11,7 @@ import nameSourceToString = StationNaming.nameSourceToString;
 import toNameCandidate = StationNaming.toNameCandidate;
 import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
+import combineNameSource = StationNaming.combineNameSource;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -22,10 +23,11 @@ const selectedEntityChanged = (newEntity: Entity) => {
 }
 
 const setSelectedCandidate = (candidate: NameCandidate) => {
-    trigger(ModName, "SetCandidateFor", selectedEntity, candidate);
+    call(ModName, "SetCandidateFor", selectedEntity, candidate).then(r => {
+    });
 }
 
-const getNameCandidates = async (): Promise<SerializedNameCandidate[]> => {
+const getNameCandidates = async (): Promise<any> => {
     return await call(
         ModName,
         "GetCandidates",
@@ -66,7 +68,7 @@ const CandidatesComponent = () => {
                     (nameCandidates || []).length
                 }
             />
-            <PanelFoldout initialExpanded={true} header={
+            <PanelFoldout initialExpanded={false} header={
                 <PanelSectionRow left={translate(
                     getTranslationKeyOf("Candidates"))}/>
             }>
@@ -74,12 +76,14 @@ const CandidatesComponent = () => {
                     <PanelSectionRow
                         left={candidate.Name + " [" +
                             translate(
-                                getTranslationKeyOf(nameSourceToString(candidate.Source.value__), "NameSource"),
-                                nameSourceToString(candidate.Source.value__)
+                                getTranslationKeyOf(
+                                    nameSourceToString(combineNameSource(candidate.Refers)),
+                                    "NameSource"
+                                )
                             ) + "]"}
                         link={
                             <div onClick={() => {
-                                setSelectedCandidate(toNameCandidate(candidate));
+                                setSelectedCandidate(toNameCandidate(candidate))
                             }}>
                                 ✓
                             </div>

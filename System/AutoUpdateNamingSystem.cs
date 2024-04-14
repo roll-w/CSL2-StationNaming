@@ -72,9 +72,9 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
 
             var selectNaming =
                 EntityManager.GetComponentData<ManualSelectNaming>(target);
-            var name = _nameSystem.GetRenderedLabelName(target);
+            var currentName = _nameSystem.GetRenderedLabelName(target);
             var nameCandidate = selectNaming.SelectedName;
-            if (name != nameCandidate.Name)
+            if (currentName != nameCandidate.Name)
             {
                 // it probably means the name has been changed by user,
                 // we should not update it

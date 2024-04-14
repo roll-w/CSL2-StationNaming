@@ -95,7 +95,10 @@ public struct NameSourceRefer : IEquatable<NameSourceRefer>,
         return !left.Equals(right);
     }
 
-    public static NameSourceRefer Invalid => new NameSourceRefer(Entity.Null, NameSource.None);
+    public static NameSourceRefer Invalid => new(
+        Entity.Null,
+        NameSource.None
+    );
 
     public static NameSourceRefer From(Entity entity, NameSource type)
     {

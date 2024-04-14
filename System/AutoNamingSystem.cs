@@ -18,11 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
 using Game;
 using Game.Common;
-using Game.Net;
 using Game.UI;
+using StationNaming.System.Utils;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -44,48 +43,6 @@ public partial class AutoNamingSystem : GameSystemBase
         {
             return;
         }
-        //
-        // var entityManager = EntityManager;
-        // var buffer = new EntityCommandBuffer(Allocator.TempJob);
-        //
-        // Entities.WithName("StationNaming_AutoNamingSystem")
-        //     .WithAll<Selected, ToAutoNaming>()
-        //     .WithNone<Deleted>()
-        //     .WithStructuralChanges()
-        //     .ForEach((Entity entity) =>
-        //     {
-        //         if (!entityManager.HasBuffer<NameCandidate>(entity))
-        //         {
-        //             return;
-        //         }
-        //         var candidates = entityManager
-        //             .GetBuffer<NameCandidate>(entity);
-        //         var candidate = ChooseCandidate(candidates);
-        //         if (entityManager.HasComponent<Owner>(entity))
-        //         {
-        //             var owner = StopNameHelper.RetrieveOwner(entityManager, entity);
-        //             candidate.Refers[0] = new NameSourceRefer(owner, NameSource.Owner);
-        //         }
-        //
-        //         buffer.AddComponent(entity, new ToSetName
-        //         {
-        //             Name = candidate.Name
-        //         });
-        //
-        //         buffer.RemoveComponent<ToAutoNaming>(entity);
-        //         buffer.RemoveComponent<Selected>(entity);
-        //
-        //         var entityNaming = new ManualSelectNaming(candidate);
-        //         var association = new NamingAssociation(entity);
-        //
-        //         buffer.AddComponent(entity, entityNaming);
-        //         foreach (var refer in candidate.Refers)
-        //         {
-        //             buffer.AppendToBuffer(refer.Refer, association);
-        //         }
-        //
-        //     }).Schedule();
-
 
         var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
@@ -99,12 +56,6 @@ public partial class AutoNamingSystem : GameSystemBase
             var candidates = EntityManager
                 .GetBuffer<NameCandidate>(entity);
             var candidate = ChooseCandidate(candidates);
-
-            if (EntityManager.HasComponent<Owner>(entity))
-            {
-                var owner = StopNameHelper.RetrieveOwner(EntityManager, entity);
-                candidate.Refers[0] = new NameSourceRefer(owner, NameSource.Owner);
-            }
 
             _nameSystem.SetCustomName(entity, candidate.Name.ToString());
 
@@ -121,47 +72,29 @@ public partial class AutoNamingSystem : GameSystemBase
 
     private void AddAssociations(
         NamingAssociation association,
-        IEnumerable<NameSourceRefer> refers)
+        INativeList<NameSourceRefer> refers
+    )
     {
-        foreach (var refer in refers)
+        var refersLength = refers.Length;
+        if (refersLength == 0)
         {
-            GetBuffer<NamingAssociation>(refer.Refer).Add(association);
+            return;
+        }
+
+        for (var i = 0; i < refersLength; i++)
+        {
+            var refer = refers[i];
+
+            SystemUtils.GetBuffer<NamingAssociation>(
+                EntityManager,
+                refer.Refer
+            ).Add(association);
         }
     }
 
     private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates)
     {
-        NameCandidate ownerCandidate = default;
-        NameCandidate roadCandidate = default;
-
-        foreach (var candidate in candidates)
-        {
-            var size = candidate.Refers.Length;
-            if (size > 1)
-            {
-                continue;
-            }
-
-            var refer = candidate.Refers[0];
-            switch (refer.Source)
-            {
-                case NameSource.Owner:
-                    ownerCandidate = candidate;
-                    break;
-                case NameSource.Road:
-                    roadCandidate = candidate;
-                    break;
-            }
-        }
-
-        if (ownerCandidate.Refers[0].Source == NameSource.Owner)
-        {
-            return ownerCandidate;
-        }
-
-        return roadCandidate.Refers[0].Source == NameSource.Road
-            ? roadCandidate
-            : candidates[0];
+        return candidates[0];
     }
 
     protected override void OnCreate()
@@ -185,12 +118,5 @@ public partial class AutoNamingSystem : GameSystemBase
         });
 
         RequireForUpdate(_createdQuery);
-    }
-
-    private DynamicBuffer<T> GetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
-    {
-        return EntityManager.HasBuffer<T>(entity)
-            ? EntityManager.GetBuffer<T>(entity)
-            : EntityManager.AddBuffer<T>(entity);
     }
 }

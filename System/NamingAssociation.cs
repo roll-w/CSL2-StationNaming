@@ -25,8 +25,7 @@ using Unity.Entities;
 namespace StationNaming.System;
 
 public struct NamingAssociation(Entity target) : IBufferElementData,
-    IQueryTypeParameter, IEmptySerializable, IEquatable<NamingAssociation>,
-    ISerializable
+    IQueryTypeParameter, ISerializable, IEquatable<NamingAssociation>
 {
     public Entity Target = target;
 
@@ -63,5 +62,10 @@ public struct NamingAssociation(Entity target) : IBufferElementData,
     public void Deserialize<TReader>(TReader reader) where TReader : IReader
     {
         reader.Read(out Target);
+    }
+
+    public override string ToString()
+    {
+        return $"{nameof(Target)}: {Target}";
     }
 }
