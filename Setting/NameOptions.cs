@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using NotImplementedException = System.NotImplementedException;
-
 namespace StationNaming.Setting;
 
 public struct NameOptions

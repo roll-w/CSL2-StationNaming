@@ -187,8 +187,8 @@ export namespace StationNaming {
             if (first === NameSource.Road && second === NameSource.Road) {
                 return NameSource.Intersection;
             }
-            return first
+            return second
         }
-        return refers[0].Source.value__;
+        return refers[refers.length - 1].Source.value__;
     }
 }
