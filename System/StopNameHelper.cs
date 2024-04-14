@@ -36,9 +36,16 @@ public class StopNameHelper(
     NameSystem nameSystem
 )
 {
-    public bool EnableNameScopeRoad { get; set; } = true;
+    public bool BuildingName { get; set; } = true;
+    public bool BuildingNameWithCurrentRoad { get; set; } = true;
 
     private readonly StationNamingSettings _settings = Mod.GetInstance().GetSettings();
+
+    public void ApplyTo(NameOptions nameOptions)
+    {
+        BuildingName = nameOptions.BuildingName;
+        BuildingNameWithCurrentRoad = nameOptions.BuildingNameWithCurrentRoad;
+    }
 
     public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
     {
@@ -153,11 +160,15 @@ public class StopNameHelper(
         bool hasStart = false, hasEnd = false;
         foreach (var roadEdge in collectEdges)
         {
-            CollectBuildingNames(
-                target,
-                currentRoad, roadEdge,
-                nameCandidates, includeSelf
-            );
+            if (BuildingName)
+            {
+                CollectBuildingNames(
+                    target,
+                    currentRoad, roadEdge,
+                    nameCandidates, includeSelf
+                );
+            }
+
             if (roadEdge.EdgeType != EdgeType.Other)
             {
                 continue;
@@ -257,7 +268,7 @@ public class StopNameHelper(
             source
         ));
 
-        if (!EnableNameScopeRoad)
+        if (!BuildingNameWithCurrentRoad)
         {
             return;
         }

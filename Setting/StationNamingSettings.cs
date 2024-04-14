@@ -26,30 +26,54 @@ using Game.UI.Widgets;
 namespace StationNaming.Setting;
 
 [FileLocation(Mod.Name)]
+[SettingsUITabOrder(SectionGeneral, SectionBuilding)]
+[SettingsUISection(SectionGeneral, SectionBuilding)]
 [SettingsUIShowGroupName(Experimental)]
+[SettingsUIGroupOrder(Stable, Experimental)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
-    private const string Experimental = "Experimental";
+    public const string Stable = "Stable";
 
+    public const string Experimental = "Experimental";
+
+    public const string SectionGeneral = "General";
+
+    public const string SectionBuilding = "Building";
+
+    [SettingsUISection(SectionGeneral, Stable)]
     public bool Enable { get; set; } = true;
 
+    [SettingsUISection(SectionGeneral, Stable)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
-    public string IntersectionNamingFormat { get; set; } = "{0}{1}";
+    public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
 
+    [SettingsUISection(SectionGeneral, Stable)]
     public bool ReverseRoadOrder { get; set; } = false;
 
+    [SettingsUISection(SectionGeneral, Stable)]
     [SettingsUISlider(max = 5, min = 1)]
     public int SearchDepth { get; set; } = 2;
 
+    [SettingsUISection(SectionGeneral, Stable)]
     public string Prefix { get; set; } = "";
 
+    [SettingsUISection(SectionGeneral, Stable)]
     public string Suffix { get; set; } = "";
 
-    [SettingsUISection(Experimental)]
+    [SettingsUISection(SectionGeneral, Experimental)]
     public bool AutoUpdate { get; set; } = true;
 
-    [SettingsUISection(Experimental)]
+    [SettingsUISection(SectionGeneral, Experimental)]
     public bool AutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionBuilding, Stable)]
+    public bool BuildingName { get; set; } = true;
+
+    public bool IsBuildingNameDisabled() => !BuildingName;
+
+    [SettingsUISection(SectionBuilding, Stable)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool BuildingNameWithCurrentRoad { get; set; } = true;
 
     public override void SetDefaults()
     {
@@ -61,6 +85,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         Suffix = "";
         AutoUpdate = true;
         AutoNaming = true;
+        BuildingName = true;
+        BuildingNameWithCurrentRoad = true;
     }
 
     public string FormatRoadName(string first, string second)
@@ -70,10 +96,18 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             : string.Format(IntersectionNamingFormat, first, second);
     }
 
-
     public string FormatCandidateName(string name)
     {
         return $"{Prefix}{name}{Suffix}";
+    }
+
+    public NameOptions ToNameOptions()
+    {
+        return new NameOptions
+        {
+            BuildingName = BuildingName,
+            BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad
+        };
     }
 
     public static class RoadNamingProvider
@@ -82,10 +116,10 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         {
             return
             [
+                new DropdownItem<string> { value = "{0} & {1}", displayName = "{0} & {1}" },
                 new DropdownItem<string> { value = "{0}{1}", displayName = "{0}{1}" },
                 new DropdownItem<string> { value = "{0}-{1}", displayName = "{0}-{1}" },
                 new DropdownItem<string> { value = "{0} @{1}", displayName = "{0} @{1}" },
-                new DropdownItem<string> { value = "{0} & {1}", displayName = "{0} & {1}" },
                 new DropdownItem<string> { value = "{0} {1}", displayName = "{0} {1}" },
                 new DropdownItem<string> { value = "{0}, {1}", displayName = "{0}, {1}" },
                 new DropdownItem<string> { value = "{0} ({1})", displayName = "{0} ({1})" },

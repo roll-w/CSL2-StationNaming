@@ -44,6 +44,9 @@ public partial class StationNamingSystem : GameSystemBase
             return;
         }
 
+        var options = Mod.GetInstance().GetSettings().ToNameOptions();
+        _stopNameHelper.ApplyTo(options);
+
         var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
         try
         {

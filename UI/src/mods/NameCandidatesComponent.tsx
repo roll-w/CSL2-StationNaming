@@ -34,6 +34,31 @@ const getNameCandidates = async (): Promise<any> => {
         selectedEntity) as unknown as Promise<SerializedNameCandidate[]>
 }
 
+const CandidatesFoldout = (props: {
+    name: string | null,
+    candidates: SerializedNameCandidate[]
+}) => {
+    return (
+        <PanelFoldout initialExpanded={false} header={
+            <PanelSectionRow left={props.name}/>
+        }>
+            {(props.candidates || []).map(candidate =>
+                <PanelSectionRow
+                    left={candidate.Name + " [" +
+                        nameSourceToString(combineNameSource(candidate.Refers)) + "]"}
+                    link={
+                        <div onClick={() => {
+                            setSelectedCandidate(toNameCandidate(candidate))
+                        }}>
+                            ✓
+                        </div>
+                    }
+                />
+            )}
+        </PanelFoldout>
+    )
+}
+
 
 const CandidatesComponent = () => {
     const [nameCandidates, setNameCandidates] =
@@ -68,29 +93,11 @@ const CandidatesComponent = () => {
                     (nameCandidates || []).length
                 }
             />
-            <PanelFoldout initialExpanded={false} header={
-                <PanelSectionRow left={translate(
-                    getTranslationKeyOf("Candidates"))}/>
-            }>
-                {(nameCandidates || []).map(candidate =>
-                    <PanelSectionRow
-                        left={candidate.Name + " [" +
-                            translate(
-                                getTranslationKeyOf(
-                                    nameSourceToString(combineNameSource(candidate.Refers)),
-                                    "NameSource"
-                                )
-                            ) + "]"}
-                        link={
-                            <div onClick={() => {
-                                setSelectedCandidate(toNameCandidate(candidate))
-                            }}>
-                                ✓
-                            </div>
-                        }
-                    />
-                )}
-            </PanelFoldout>
+
+            <CandidatesFoldout
+                name={translate(getTranslationKeyOf("Candidates"))}
+                candidates={nameCandidates}
+            />
         </PanelSection>
     )
 }
