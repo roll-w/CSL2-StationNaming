@@ -121,7 +121,7 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "啟用建築命名來源"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingName]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "When enabled, allow generate name candidates from surrounding buildings."+
+                    "When enabled, allow generate name candidates from surrounding buildings. "+
                     "After setting, it may take some time to take effect.")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成名称候选。修改后，可能需要过一段时间才能生效。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成名稱候選。修改後，可能需要過一段時間才能生效。"),

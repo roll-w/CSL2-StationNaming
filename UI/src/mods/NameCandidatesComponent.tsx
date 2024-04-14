@@ -38,6 +38,8 @@ const CandidatesFoldout = (props: {
     name: string | null,
     candidates: SerializedNameCandidate[]
 }) => {
+    const {translate} = useLocalization();
+
     return (
         <PanelFoldout initialExpanded={false} header={
             <PanelSectionRow left={props.name}/>
@@ -45,7 +47,11 @@ const CandidatesFoldout = (props: {
             {(props.candidates || []).map(candidate =>
                 <PanelSectionRow
                     left={candidate.Name + " [" +
-                        nameSourceToString(combineNameSource(candidate.Refers)) + "]"}
+                        translate(getTranslationKeyOf(
+                            nameSourceToString(combineNameSource(candidate.Refers)),
+                            "NameSource"
+                        ))
+                        +"]"}
                     link={
                         <div onClick={() => {
                             setSelectedCandidate(toNameCandidate(candidate))
