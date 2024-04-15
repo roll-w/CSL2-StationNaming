@@ -235,7 +235,8 @@ public struct NameCandidate : IBufferElementData,
 
         reader.Read(out uint direction);
         Direction = (Direction)direction;
-        EdgeType = EdgeType.Same;
+        reader.Read(out uint edgeType);
+        EdgeType = (EdgeType)edgeType;
     }
 
     private void SetToInvalid()
