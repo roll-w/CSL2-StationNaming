@@ -56,6 +56,11 @@ public struct NameCandidate : IBufferElementData,
         EdgeType = edgeType;
     }
 
+    public bool IsValid()
+    {
+        return Refers.Length > 0;
+    }
+
     public bool Equals(NameCandidate other)
     {
         if (!Name.Equals(other.Name))
@@ -153,6 +158,7 @@ public struct NameCandidate : IBufferElementData,
         {
             writer.Write(refer);
         }
+
         writer.ArrayEnd();
         writer.PropertyName("direction");
         writer.Write(Direction.ToString());
@@ -168,6 +174,7 @@ public struct NameCandidate : IBufferElementData,
 
     public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
     {
+        writer.Write(SerialVersion.Version3.ToFormatString());
         writer.Write(Name.ToString());
         writer.Write(Refers.Length);
         writer.Write(Refers.ToArray(Allocator.Temp));
@@ -177,10 +184,47 @@ public struct NameCandidate : IBufferElementData,
 
     public void Deserialize<TReader>(TReader reader) where TReader : IReader
     {
-        reader.Read(out string name);
-        Name = name;
+        try
+        {
+            reader.Read(out string version);
+            if (!version.StartsWith(SerialVersionExtensions.Prefix))
+            {
+                DeserializeToV2(reader, version);
+                return;
+            }
 
+            reader.Read(out string name);
+            Name = name;
+            reader.Read(out int size);
+            var refers = new NativeArray<NameSourceRefer>(size, Allocator.Temp);
+            reader.Read(refers);
+            Refers = new NativeList<NameSourceRefer>(size, Allocator.Persistent);
+            foreach (var refer in refers)
+            {
+                Refers.Add(refer);
+            }
+
+            reader.Read(out uint direction);
+            Direction = (Direction)direction;
+            reader.Read(out uint edgeType);
+            EdgeType = (EdgeType)edgeType;
+        }
+        catch (Exception)
+        {
+            SetToInvalid();
+        }
+    }
+
+    private void DeserializeToV2<TReader>(TReader reader, string name) where TReader : IReader
+    {
+        Name = name;
         reader.Read(out int size);
+        if (size > 2)
+        {
+            DeserializeToV1(reader, size);
+            return;
+        }
+
         var refers = new NativeArray<NameSourceRefer>(size, Allocator.Temp);
         reader.Read(refers);
         Refers = new NativeList<NameSourceRefer>(size, Allocator.Persistent);
@@ -189,6 +233,35 @@ public struct NameCandidate : IBufferElementData,
             Refers.Add(refer);
         }
 
+        reader.Read(out uint direction);
+        Direction = (Direction)direction;
+        reader.Read(out uint edgeType);
+        EdgeType = (EdgeType)edgeType;
+    }
+
+    private void SetToInvalid()
+    {
+        Refers = new NativeList<NameSourceRefer>(0, Allocator.Persistent);
+        Direction = Direction.Init;
+        EdgeType = EdgeType.Same;
+    }
+
+    /**
+     * Compatibility deserialize for 0.1.x
+     */
+    private void DeserializeToV1<TReader>(
+        TReader reader,
+        int entityIndex) where TReader : IReader
+    {
+        reader.Read(out uint source);
+        var entity = new Entity
+        {
+            Index = entityIndex,
+            Version = 1
+        };
+        var refers = new NativeList<NameSourceRefer>(1, Allocator.Persistent);
+        refers.Add(new NameSourceRefer(entity, (NameSource)source));
+        Refers = refers;
         reader.Read(out uint direction);
         Direction = (Direction)direction;
         reader.Read(out uint edgeType);
@@ -310,6 +383,7 @@ public struct ManagedNameCandidate(
             refer.Read(reader);
             Refers.Add(refer);
         }
+
         reader.ReadArrayEnd();
         reader.ReadProperty("direction");
         reader.Read(out string direction);
@@ -337,6 +411,7 @@ public struct ManagedNameCandidate(
         {
             writer.Write(refer);
         }
+
         writer.ArrayEnd();
         writer.PropertyName("direction");
         writer.Write(Direction.ToString());

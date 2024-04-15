@@ -304,7 +304,12 @@ public class StopNameHelper(
         IEnumerable<NameCandidate> candidates
     )
     {
-        return candidates.OrderBy(candidate => candidate.Refers[0].Source);
+        return candidates.OrderBy(candidate =>
+        {
+            return candidate.Refers.Length == 0
+                ? NameSource.None
+                : candidate.Refers[0].Source;
+        });
     }
 
     public static string FormatRefers(
