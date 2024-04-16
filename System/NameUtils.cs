@@ -20,8 +20,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using Colossal.Localization;
 using Game.Buildings;
+using Game.Prefabs;
+using Game.SceneFlow;
+using Game.UI;
 using Unity.Entities;
+using DeathcareFacility = Game.Buildings.DeathcareFacility;
+using DisasterFacility = Game.Buildings.DisasterFacility;
+using FireStation = Game.Buildings.FireStation;
+using GarbageFacility = Game.Buildings.GarbageFacility;
+using Hospital = Game.Buildings.Hospital;
+using Park = Game.Buildings.Park;
+using PoliceStation = Game.Buildings.PoliceStation;
+using School = Game.Buildings.School;
+using TelecomFacility = Game.Buildings.TelecomFacility;
+using TransportDepot = Game.Buildings.TransportDepot;
+using TransportStation = Game.Buildings.TransportStation;
 
 namespace StationNaming.System;
 
@@ -44,16 +60,203 @@ public static class NameUtils
         { typeof(Building), NameSource.Building }
     };
 
+    private static readonly Dictionary<Type, NameSource> PrefabToNameSource = new()
+    {
+        { typeof(SpawnableBuildingData), NameSource.SpawnableBuilding }
+    };
+
     public static NameSource TryGetBuildingSource(Entity target, EntityManager entityManager)
     {
         foreach (var pair in ComponentToNameSource)
         {
-            if (entityManager.HasComponent(target, pair.Key))
+            if (!entityManager.HasComponent(target, pair.Key))
+            {
+                continue;
+            }
+
+            if (pair.Value != NameSource.Building)
+            {
+                return pair.Value;
+            }
+
+            var source = TryGetBuildingSourceByPrefab(target, entityManager);
+            if (source != NameSource.None && source != NameSource.Unknown)
+            {
+                return source;
+            }
+
+            return pair.Value;
+        }
+
+        return NameSource.Unknown;
+    }
+
+    private static NameSource TryGetBuildingSourceByPrefab(Entity target, EntityManager entityManager)
+    {
+        if (!entityManager.HasComponent<PrefabRef>(target))
+        {
+            return NameSource.None;
+        }
+
+        var prefab = entityManager.GetComponentData<PrefabRef>(target)
+            .m_Prefab;
+        if (prefab == Entity.Null)
+        {
+            return NameSource.None;
+        }
+
+        foreach (var pair in PrefabToNameSource)
+        {
+            if (entityManager.HasComponent(prefab, pair.Key))
             {
                 return pair.Value;
             }
         }
 
-        return NameSource.Unknown;
+        return NameSource.None;
+    }
+
+    private static readonly FieldInfo NameTypeField = typeof(NameSystem.Name)
+        .GetField("m_NameType",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static readonly FieldInfo NameIDField = typeof(NameSystem.Name)
+        .GetField("m_NameID",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+    private static readonly FieldInfo NameArgsField = typeof(NameSystem.Name)
+        .GetField("m_NameArgs",
+            BindingFlags.NonPublic | BindingFlags.Instance);
+
+    public static string TryGetRealRenderedName(
+        this NameSystem nameSystem,
+        Entity entity)
+    {
+        try
+        {
+            var nameByReflection = TryGetNameByReflection(nameSystem, entity);
+            if (!string.IsNullOrEmpty(nameByReflection))
+            {
+                return nameByReflection;
+            }
+        }
+        catch (Exception e)
+        {
+            Mod.GetLogger().Warn(e);
+        }
+
+        return nameSystem.GetRenderedLabelName(entity);
+    }
+
+    private static string TryGetNameByReflection(NameSystem nameSystem, Entity entity)
+    {
+        var name = nameSystem.GetName(entity);
+
+        if (NameTypeField == null || NameIDField == null || NameArgsField == null)
+        {
+            return nameSystem.GetRenderedLabelName(entity);
+        }
+
+        var nameType = (NameSystem.NameType)NameTypeField.GetValue(name);
+        var nameID = (string)NameIDField.GetValue(name);
+        var nameArgs = (string[])NameArgsField.GetValue(name);
+
+        var localizationManager = GameManager.instance.localizationManager;
+
+        switch (nameType)
+        {
+            case NameSystem.NameType.Custom:
+                return nameID;
+            case NameSystem.NameType.Localized:
+            {
+                if (localizationManager
+                    .activeDictionary
+                    .TryGetValue(nameID, out var localized))
+                {
+                    return localized;
+                }
+
+                break;
+            }
+            case NameSystem.NameType.Formatted:
+            {
+                if (localizationManager
+                    .activeDictionary
+                    .TryGetValue(nameID, out var localized))
+                {
+                    return FormatName(nameID, nameArgs, localizationManager);
+                }
+
+                break;
+            }
+        }
+
+        return string.Empty;
+    }
+
+
+    private const string KeyNumber = "NUMBER";
+
+    /**
+     * Formats a localized name with arguments.
+     */
+    private static string FormatName(
+        string nameID,
+        string[] nameArgs,
+        LocalizationManager localizationManager)
+    {
+        if (!localizationManager.activeDictionary
+                .TryGetValue(nameID, out var localized))
+        {
+            return string.Empty;
+        }
+
+        if (nameArgs.Length % 2 != 0)
+        {
+            return localized;
+        }
+
+        // e.g.: nameID="{NAME}, {NUMBER}"
+        // nameArgs=["NAME", "ExampleName", "NUMBER", "1"]
+        // => "ExampleName, 1"
+        for (var i = 0; i < nameArgs.Length; i += 2)
+        {
+            if (i + 1 >= nameArgs.Length)
+            {
+                break;
+            }
+
+            var key = nameArgs[i];
+            var value = GetNameArgLocalized(
+                localizationManager, key, nameArgs[i + 1]
+            );
+
+            localized = localized.Replace($"{{{key}}}", value);
+        }
+
+        return localized;
+    }
+
+    private static string GetNameArgLocalized(
+        LocalizationManager localizationManager,
+        string key,
+        string value)
+    {
+        if (key == KeyNumber)
+        {
+            return value;
+        }
+
+        return localizationManager.GetLocalized(value);
+    }
+
+    public static string GetLocalized(
+        this LocalizationManager localizationManager,
+        string key)
+    {
+        return localizationManager.activeDictionary
+            .TryGetValue(key, out var localized)
+            ? localized
+            : key;
     }
 }

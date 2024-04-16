@@ -127,7 +127,7 @@ public struct NameSourceRefer : IEquatable<NameSourceRefer>,
     {
         if (!entityManager.HasComponent<Aggregated>(Refer))
         {
-            return nameSystem.GetRenderedLabelName(Refer);
+            return nameSystem.TryGetRealRenderedName(Refer);
         }
         var aggregate = entityManager.GetComponentData<Aggregated>(Refer).m_Aggregate;
         return nameSystem.GetRenderedLabelName(aggregate);
