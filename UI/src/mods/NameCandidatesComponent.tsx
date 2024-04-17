@@ -12,6 +12,7 @@ import toNameCandidate = StationNaming.toNameCandidate;
 import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 import combineNameSource = StationNaming.combineNameSource;
+import NameSource = StationNaming.NameSource;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -36,22 +37,23 @@ const getNameCandidates = async (): Promise<any> => {
 
 const CandidatesFoldout = (props: {
     name: string | null,
-    candidates: SerializedNameCandidate[]
+    candidates: SerializedNameCandidate[],
+    initialExpanded?: boolean | undefined
 }) => {
     const {translate} = useLocalization();
 
     return (
-        <PanelFoldout initialExpanded={false} header={
+        <PanelFoldout initialExpanded={props.initialExpanded || false} header={
             <PanelSectionRow left={props.name}/>
         }>
             {(props.candidates || []).map(candidate =>
                 <PanelSectionRow
                     left={candidate.Name + " [" +
                         translate(getTranslationKeyOf(
-                            nameSourceToString(combineNameSource(candidate.Refers)),
+                            nameSourceToString(combineNameSource(candidate)),
                             "NameSource"
                         ))
-                        +"]"}
+                        + "]"}
                     link={
                         <div onClick={() => {
                             setSelectedCandidate(toNameCandidate(candidate))
@@ -70,6 +72,12 @@ const CandidatesComponent = () => {
     const [nameCandidates, setNameCandidates] =
         useState<SerializedNameCandidate[]>([])
 
+    const [generalCandidates, setGeneralCandidates] =
+        useState<SerializedNameCandidate[]>([])
+
+    const [spawnableCandidates, setSpawnableCandidates] =
+        useState<SerializedNameCandidate[]>([])
+
     useEffect(() => {
         async function fetchCandidates() {
             const candidates = await getNameCandidates();
@@ -78,6 +86,21 @@ const CandidatesComponent = () => {
 
         fetchCandidates();
     }, [selectedEntity])
+
+    useEffect(() => {
+        const generalCandidates = nameCandidates.filter(
+            candidate =>
+                combineNameSource(candidate) !== NameSource.SpawnableBuilding
+        )
+
+        const spawnableCandidates = nameCandidates.filter(
+            candidate =>
+                combineNameSource(candidate) === NameSource.SpawnableBuilding
+        )
+
+        setGeneralCandidates(generalCandidates);
+        setSpawnableCandidates(spawnableCandidates);
+    }, [nameCandidates]);
 
     const {translate} = useLocalization();
 
@@ -96,14 +119,29 @@ const CandidatesComponent = () => {
                 }
                 uppercase={true}
                 right={
-                    (nameCandidates || []).length
+                    (generalCandidates || []).length
                 }
             />
 
             <CandidatesFoldout
                 name={translate(getTranslationKeyOf("Candidates"))}
-                candidates={nameCandidates}
+                candidates={generalCandidates}
             />
+
+            <PanelSectionRow
+                left={translate(
+                    getTranslationKeyOf("SpawnableCandidates"),
+                    "Spawnable Candidates")
+                }
+                uppercase={true}
+                right={
+                    (spawnableCandidates || []).length
+                }
+            />
+
+            <CandidatesFoldout
+                name={translate(getTranslationKeyOf("Candidates"))}
+                candidates={spawnableCandidates}/>
         </PanelSection>
     )
 }

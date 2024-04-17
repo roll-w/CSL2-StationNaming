@@ -65,13 +65,16 @@ export namespace StationNaming {
         District,
         TransportStation,
         TransportDepot,
-        ZoneBuilding,
+        SpawnableBuilding,
         SignatureBuilding,
         School,
         FireStation,
         PoliceStation,
         Hospital,
         Park,
+        Electricity,
+        Water,
+        Sewage,
 
         /**
          * Other city service buildings not listed
@@ -100,8 +103,8 @@ export namespace StationNaming {
                 return "TransportStation";
             case NameSource.TransportDepot:
                 return "TransportDepot";
-            case NameSource.ZoneBuilding:
-                return "ZoneBuilding";
+            case NameSource.SpawnableBuilding:
+                return "SpawnableBuilding";
             case NameSource.SignatureBuilding:
                 return "SignatureBuilding";
             case NameSource.School:
@@ -114,6 +117,12 @@ export namespace StationNaming {
                 return "Hospital";
             case NameSource.Park:
                 return "Park";
+            case NameSource.Electricity:
+                return "Electricity";
+            case NameSource.Water:
+                return "Water";
+            case NameSource.Sewage:
+                return "Sewage";
             case NameSource.CityService:
                 return "CityService";
             case NameSource.Building:
@@ -173,8 +182,9 @@ export namespace StationNaming {
         return `StationNaming.${type}[${key}]`;
     }
 
-    export const combineNameSource = (refers: SerializedNameSourceRefer[])
+    export const combineNameSource = (candidate: SerializedNameCandidate)
         : NameSource => {
+        const refers = candidate.Refers;
         if (refers.length === 0) {
             return NameSource.None;
         }
