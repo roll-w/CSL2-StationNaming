@@ -108,6 +108,18 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Auto Naming")
                 .AddTranslation(LocaleCode.ZhHans, "自动命名")
                 .AddTranslation(LocaleCode.ZhHant, "自動命名"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ResetSettings]")
+                .AddTranslation(LocaleCode.EnUs, "Reset Settings")
+                .AddTranslation(LocaleCode.ZhHans, "重置设置")
+                .AddTranslation(LocaleCode.ZhHant, "重置設置"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ResetSettings]")
+                .AddTranslation(LocaleCode.EnUs, "Reset all settings to default values.")
+                .AddTranslation(LocaleCode.ZhHans, "重置所有设置为默认值。")
+                .AddTranslation(LocaleCode.ZhHant, "重置所有設置為默認值。"),
+            new Translation("Options.WARNING[StationNaming.StationNaming.Mod.StationNamingSettings.ResetSettings]")
+                .AddTranslation(LocaleCode.EnUs, "Are you sure you want to reset all settings?")
+                .AddTranslation(LocaleCode.ZhHans, "你确定要重置所有设置吗？")
+                .AddTranslation(LocaleCode.ZhHant, "你確定要重置所有設置嗎？"),
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoNaming]")
                 .AddTranslation(LocaleCode.EnUs,
@@ -169,14 +181,14 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "General")
                 .AddTranslation(LocaleCode.ZhHans, "常规")
                 .AddTranslation(LocaleCode.ZhHant, "常規"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Other]")
+                .AddTranslation(LocaleCode.EnUs, "Other")
+                .AddTranslation(LocaleCode.ZhHans, "其他")
+                .AddTranslation(LocaleCode.ZhHant, "其他"),
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.Building]")
                 .AddTranslation(LocaleCode.EnUs, "Building")
                 .AddTranslation(LocaleCode.ZhHans, "建筑")
                 .AddTranslation(LocaleCode.ZhHant, "建築"),
-            new Translation("Options.GROUP_DESCRIPTION[StationNaming.StationNaming.Mod.Experimental]")
-                .AddTranslation(LocaleCode.EnUs, "Experimental features, may cause game instability")
-                .AddTranslation(LocaleCode.ZhHans, "实验性功能，可能会导致游戏不稳定")
-                .AddTranslation(LocaleCode.ZhHant, "實驗性功能，可能會導致遊戲不穩定"),
 
 
             new Translation("StationNaming.NameCandidates")

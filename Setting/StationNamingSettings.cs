@@ -28,8 +28,8 @@ namespace StationNaming.Setting;
 [FileLocation(Mod.Name)]
 [SettingsUITabOrder(SectionGeneral, SectionBuilding)]
 [SettingsUISection(SectionGeneral, SectionBuilding)]
-[SettingsUIShowGroupName(GroupExperimental, GroupSpawnable)]
-[SettingsUIGroupOrder(GroupStable, GroupExperimental)]
+[SettingsUIShowGroupName(GroupExperimental, GroupSpawnable, GroupOther)]
+[SettingsUIGroupOrder(GroupStable, GroupSpawnable, GroupExperimental, GroupOther)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
     public const string GroupStable = "Stable";
@@ -69,6 +69,18 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     [SettingsUISection(SectionGeneral, GroupExperimental)]
     public bool AutoNaming { get; set; } = true;
+
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
+    [SettingsUISection(SectionGeneral, GroupOther)]
+    public bool ResetSettings
+    {
+        set
+        {
+            SetDefaults();
+            ApplyAndSave();
+        }
+    }
 
     [SettingsUISection(SectionBuilding, GroupStable)]
     public bool BuildingName { get; set; } = true;
