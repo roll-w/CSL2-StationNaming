@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using Colossal.UI.Binding;
 using Game.UI;
+using StationNaming.System.Utils;
 using Unity.Entities;
 
 namespace StationNaming.System;
@@ -68,6 +69,7 @@ public partial class UIBindingSystem : UISystemBase
             EntityManager.HasComponent<Selected>(_selectedEntity))
         {
             EntityManager.RemoveComponent<Selected>(_selectedEntity);
+            SystemUtils.TryRemoveBuffer<NameCandidate>(EntityManager, _selectedEntity);
         }
 
         if (entity != Entity.Null || entity != default)
@@ -157,6 +159,7 @@ public partial class UIBindingSystem : UISystemBase
             buffer.Add(new NamingAssociation(entity));
             return;
         }
+
         foreach (var naming in buffer)
         {
             if (naming.Target == entity)
@@ -164,6 +167,7 @@ public partial class UIBindingSystem : UISystemBase
                 return;
             }
         }
+
         buffer.Add(new NamingAssociation(entity));
     }
 }
