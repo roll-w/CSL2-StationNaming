@@ -34,13 +34,17 @@ public enum NameSource : uint
     District,
     TransportStation,
     TransportDepot,
-    ZoneBuilding,
+    SpawnableBuilding,
     SignatureBuilding,
     School,
     FireStation,
     PoliceStation,
     Hospital,
     Park,
+
+    Electricity,
+    Water,
+    Sewage,
 
     /**
      * Other city service buildings not listed

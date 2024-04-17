@@ -38,6 +38,7 @@ public class StopNameHelper(
 {
     public bool BuildingName { get; set; } = true;
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
+    public bool SpawnableBuildingName { get; set; } = true;
 
     private readonly StationNamingSettings _settings = Mod.GetInstance().GetSettings();
 
@@ -45,6 +46,7 @@ public class StopNameHelper(
     {
         BuildingName = nameOptions.BuildingName;
         BuildingNameWithCurrentRoad = nameOptions.BuildingNameWithCurrentRoad;
+        SpawnableBuildingName = nameOptions.SpawnableBuildingName;
     }
 
     public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
@@ -248,23 +250,28 @@ public class StopNameHelper(
         bool includeSelf,
         ConnectedBuilding connectedBuilding)
     {
-        if (connectedBuilding.m_Building == self && !includeSelf)
+        var building = connectedBuilding.m_Building;
+        if (building == self && !includeSelf)
         {
             return;
         }
 
         var source = NameUtils.TryGetBuildingSource(
-            connectedBuilding.m_Building,
+            building,
             entityManager
         );
-        var buildingName = nameSystem.GetRenderedLabelName(
-            connectedBuilding.m_Building
-        );
+
+        if (source == NameSource.SpawnableBuilding && !SpawnableBuildingName)
+        {
+            return;
+        }
+
+        var buildingName = nameSystem.TryGetRealRenderedName(building);
         var name = _settings.FormatCandidateName(buildingName);
 
         candidates.Add(NameCandidate.Of(
             name, roadEdge.Direction, roadEdge.EdgeType,
-            connectedBuilding.m_Building,
+            building,
             source
         ));
 
@@ -282,7 +289,7 @@ public class StopNameHelper(
             NameCandidate.Of(
                 name, roadEdge.Direction, roadEdge.EdgeType,
                 roadEdgeRoot, NameSource.Road,
-                connectedBuilding.m_Building, source
+                building, source
             )
         );
     }

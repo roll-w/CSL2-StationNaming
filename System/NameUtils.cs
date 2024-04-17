@@ -57,6 +57,7 @@ public static class NameUtils
         { typeof(DisasterFacility), NameSource.CityService },
         { typeof(DeathcareFacility), NameSource.CityService },
         { typeof(TelecomFacility), NameSource.CityService },
+        { typeof(ElectricityProducer), NameSource.CityService },
         { typeof(Building), NameSource.Building }
     };
 
@@ -180,14 +181,7 @@ public static class NameUtils
             }
             case NameSystem.NameType.Formatted:
             {
-                if (localizationManager
-                    .activeDictionary
-                    .TryGetValue(nameID, out var localized))
-                {
-                    return FormatName(nameID, nameArgs, localizationManager);
-                }
-
-                break;
+                return FormatName(nameID, nameArgs, localizationManager);
             }
         }
 

@@ -28,4 +28,5 @@ public struct NameOptions
 
     public bool BuildingName { get; set; } = true;
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
+    public bool SpawnableBuildingName { get; set; } = true;
 }

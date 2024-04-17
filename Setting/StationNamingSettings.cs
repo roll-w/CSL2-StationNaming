@@ -28,52 +28,60 @@ namespace StationNaming.Setting;
 [FileLocation(Mod.Name)]
 [SettingsUITabOrder(SectionGeneral, SectionBuilding)]
 [SettingsUISection(SectionGeneral, SectionBuilding)]
-[SettingsUIShowGroupName(Experimental)]
-[SettingsUIGroupOrder(Stable, Experimental)]
+[SettingsUIShowGroupName(GroupExperimental, GroupSpawnable)]
+[SettingsUIGroupOrder(GroupStable, GroupExperimental)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
-    public const string Stable = "Stable";
+    public const string GroupStable = "Stable";
 
-    public const string Experimental = "Experimental";
+    public const string GroupExperimental = "Experimental";
+
+    public const string GroupOther = "Other";
+
+    public const string GroupSpawnable = "Spawnable";
 
     public const string SectionGeneral = "General";
 
     public const string SectionBuilding = "Building";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool Enable { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
     public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool ReverseRoadOrder { get; set; } = false;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUISlider(max = 5, min = 1)]
     public int SearchDepth { get; set; } = 2;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public string Prefix { get; set; } = "";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public string Suffix { get; set; } = "";
 
-    [SettingsUISection(SectionGeneral, Experimental)]
+    [SettingsUISection(SectionGeneral, GroupExperimental)]
     public bool AutoUpdate { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, Experimental)]
+    [SettingsUISection(SectionGeneral, GroupExperimental)]
     public bool AutoNaming { get; set; } = true;
 
-    [SettingsUISection(SectionBuilding, Stable)]
+    [SettingsUISection(SectionBuilding, GroupStable)]
     public bool BuildingName { get; set; } = true;
 
     public bool IsBuildingNameDisabled() => !BuildingName;
 
-    [SettingsUISection(SectionBuilding, Stable)]
+    [SettingsUISection(SectionBuilding, GroupStable)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool SpawnableBuildingName { get; set; } = false;
 
     public override void SetDefaults()
     {
@@ -87,6 +95,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         AutoNaming = true;
         BuildingName = true;
         BuildingNameWithCurrentRoad = true;
+        SpawnableBuildingName = false;
     }
 
     public string FormatRoadName(string first, string second)
@@ -106,7 +115,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         return new NameOptions
         {
             BuildingName = BuildingName,
-            BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad
+            BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad,
+            SpawnableBuildingName = BuildingName && SpawnableBuildingName,
         };
     }
 

@@ -192,6 +192,10 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "候选列表")
                 .AddTranslation(LocaleCode.ZhHant, "候選列表"),
+            new Translation("StationNaming.SpawnableCandidates")
+                .AddTranslation(LocaleCode.EnUs, "Spawnable Building Candidates")
+                .AddTranslation(LocaleCode.ZhHans, "自长建筑来源候选列表")
+                .AddTranslation(LocaleCode.ZhHant, "自長建築來源候選列表"),
 
             new Translation("StationNaming.NameSource[Building]")
                 .AddTranslation(LocaleCode.EnUs, "Building")
@@ -249,6 +253,18 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Park")
                 .AddTranslation(LocaleCode.ZhHans, "公园")
                 .AddTranslation(LocaleCode.ZhHant, "公園"),
+            new Translation("StationNaming.NameSource[Electricity]")
+                .AddTranslation(LocaleCode.EnUs, "Electricity Service")
+                .AddTranslation(LocaleCode.ZhHans, "电力服务")
+                .AddTranslation(LocaleCode.ZhHant, "電力服務"),
+            new Translation("StationNaming.NameSource[Water]")
+                .AddTranslation(LocaleCode.EnUs, "Water Service")
+                .AddTranslation(LocaleCode.ZhHans, "水服务")
+                .AddTranslation(LocaleCode.ZhHant, "水服務"),
+            new Translation("StationNaming.NameSource[Sewage]")
+                .AddTranslation(LocaleCode.EnUs, "Sewage Service")
+                .AddTranslation(LocaleCode.ZhHans, "污水服务")
+                .AddTranslation(LocaleCode.ZhHant, "污水服務"),
             new Translation("StationNaming.NameSource[CityService]")
                 .AddTranslation(LocaleCode.EnUs, "City Service")
                 .AddTranslation(LocaleCode.ZhHans, "城市服务")
