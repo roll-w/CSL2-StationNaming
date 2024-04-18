@@ -26,6 +26,7 @@ using Game.Buildings;
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.UI;
+using StationNaming.Setting;
 using Unity.Entities;
 using DeathcareFacility = Game.Buildings.DeathcareFacility;
 using DisasterFacility = Game.Buildings.DisasterFacility;
@@ -188,6 +189,17 @@ public static class NameUtils
         return string.Empty;
     }
 
+    private static string GetFormatOf(string nameKey)
+    {
+        var settings = Mod.GetInstance().GetSettings();
+        return nameKey switch
+        {
+            GameLocalizationKeys.AddressNameFormat => settings.AddressNameFormat,
+            GameLocalizationKeys.NamedAddressNameFormat => settings.NamedAddressNameFormat,
+            _ => nameKey
+        };
+    }
+
 
     private const string KeyNumber = "NUMBER";
 
@@ -209,6 +221,8 @@ public static class NameUtils
         {
             return localized;
         }
+
+        localized = GetFormatOf(localized);
 
         // e.g.: nameID="{NAME}, {NUMBER}"
         // nameArgs=["NAME", "ExampleName", "NUMBER", "1"]
