@@ -19,7 +19,9 @@
 // SOFTWARE.
 
 using Colossal.IO.AssetDatabase;
+using Colossal.Localization;
 using Game.Modding;
+using Game.SceneFlow;
 using Game.Settings;
 using Game.UI.Widgets;
 
@@ -95,10 +97,92 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool SpawnableBuildingName { get; set; } = false;
 
+    private string _addressNameFormat = "{NUMBER} {ROAD}";
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider),
+        nameof(RoadNamingProvider.GetAddressNameFormatOptions))]
+    public string AddressNameFormat
+    {
+        get => _addressNameFormat;
+        set
+        {
+            _addressNameFormat = value;
+            ApplyAddressFormats();
+        }
+    }
+
+    private string _namedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider),
+        nameof(RoadNamingProvider.GetNamedAddressNameFormatOptions))]
+    public string NamedAddressNameFormat
+    {
+        get => _namedAddressNameFormat;
+        set
+        {
+            _namedAddressNameFormat = value;
+            ApplyAddressFormats();
+        }
+    }
+
+    private bool _overrideVanillaAddress = true;
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    public bool OverrideVanillaAddress
+    {
+        get => _overrideVanillaAddress;
+        set
+        {
+            _overrideVanillaAddress = value;
+            if (!value)
+            {
+                ApplyAddressFormats(true);
+            }
+            else
+            {
+                ApplyAddressFormats();
+            }
+        }
+    }
+
+    public void ApplyAddressFormats(bool resetVanilla = false)
+    {
+        var localizationManager = GameManager.instance.localizationManager;
+        if (resetVanilla)
+        {
+            localizationManager.activeDictionary.Add(
+                GameLocalizationKeys.AddressNameFormat,
+                "{NUMBER} {ROAD}", true
+            );
+            localizationManager.activeDictionary.Add(
+                GameLocalizationKeys.NamedAddressNameFormat,
+                "{NAME}, {NUMBER} {ROAD}", true
+            );
+            return;
+        }
+
+        if (!OverrideVanillaAddress)
+        {
+            return;
+        }
+
+        localizationManager.activeDictionary.Add(
+            GameLocalizationKeys.AddressNameFormat,
+            AddressNameFormat, true
+        );
+        localizationManager.activeDictionary.Add(
+            GameLocalizationKeys.NamedAddressNameFormat,
+            NamedAddressNameFormat, true
+        );
+    }
+
+
     public override void SetDefaults()
     {
         Enable = true;
-        IntersectionNamingFormat = "{0}{1}";
+        IntersectionNamingFormat = "{0} & {1}";
         ReverseRoadOrder = false;
         SearchDepth = 2;
         Prefix = "";
@@ -108,6 +192,9 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         BuildingName = true;
         BuildingNameWithCurrentRoad = true;
         SpawnableBuildingName = false;
+        AddressNameFormat = "{NUMBER} {ROAD}";
+        NamedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
+        OverrideVanillaAddress = true;
     }
 
     public string FormatRoadName(string first, string second)
@@ -149,6 +236,32 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                 new DropdownItem<string> { value = "{0}_{1}", displayName = "{0}_{1}" },
                 new DropdownItem<string> { value = "{0}:{1}", displayName = "{0}:{1}" },
                 new DropdownItem<string> { value = "{0}.{1}", displayName = "{0}.{1}" }
+            ];
+        }
+
+
+        public static DropdownItem<string>[] GetAddressNameFormatOptions()
+        {
+            return
+            [
+                new DropdownItem<string> { value = "{NUMBER} {ROAD}", displayName = "{NUMBER} {ROAD}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER}", displayName = "{ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{ROAD}{NUMBER}", displayName = "{ROAD}{NUMBER}" },
+                new DropdownItem<string> { value = "{NUMBER}{ROAD}", displayName = "{NUMBER}{ROAD}" },
+                new DropdownItem<string> { value = "{ROAD} - {NUMBER}", displayName = "{ROAD} - {NUMBER}" },
+            ];
+        }
+
+        public static DropdownItem<string>[] GetNamedAddressNameFormatOptions()
+        {
+            return
+            [
+                new DropdownItem<string> { value = "{NAME}, {NUMBER} {ROAD}", displayName = "{NAME}, {ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{NAME}, {ROAD} {NUMBER}", displayName = "{NAME}, {ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER}, {NAME}", displayName = "{ROAD} {NUMBER}, {NAME}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER} {NAME}", displayName = "{ROAD} {NUMBER} {NAME}" },
+                new DropdownItem<string> { value = "{NUMBER} {ROAD} {NAME}", displayName = "{NUMBER} {ROAD} {NAME}" },
+                new DropdownItem<string> { value = "{NUMBER} {ROAD}, {NAME}", displayName = "{NUMBER} {ROAD}, {NAME}" }
             ];
         }
 

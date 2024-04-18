@@ -112,7 +112,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Reset Settings")
                 .AddTranslation(LocaleCode.ZhHans, "重置设置")
                 .AddTranslation(LocaleCode.ZhHant, "重置設置"),
-            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ResetSettings]")
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ResetSettings]")
                 .AddTranslation(LocaleCode.EnUs, "Reset all settings to default values.")
                 .AddTranslation(LocaleCode.ZhHans, "重置所有设置为默认值。")
                 .AddTranslation(LocaleCode.ZhHant, "重置所有設置為默認值。"),
@@ -168,6 +169,50 @@ namespace StationNaming.Setting
                                                    "修改后，可能需要过一段时间才能生效。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍自長建築中生成名稱候選。[但可能造成資源消耗增加，請按需開啟。]" +
                                                    "修改後，可能需要過一段時間才能生效。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AddressNameFormat]")
+                .AddTranslation(LocaleCode.EnUs, "Address Format")
+                .AddTranslation(LocaleCode.ZhHans, "地址格式")
+                .AddTranslation(LocaleCode.ZhHant, "地址格式"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AddressNameFormat]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "Set the in-game address format, {ROAD} represents the current road, {NUMBER} represents the number. " +
+                    "The game defaults to \"{NUMBER} {ROAD}\".")
+                .AddTranslation(LocaleCode.ZhHans, "设置游戏内地址格式，{ROAD} 表示当前道路，{NUMBER} 表示编号。" +
+                                                   "游戏默认为 \"{NUMBER} {ROAD}\"。")
+                .AddTranslation(LocaleCode.ZhHant, "設置遊戲內地址格式，{ROAD} 表示當前道路，{NUMBER} 表示編號。" +
+                                                   "遊戲默認為 \"{NUMBER} {ROAD}\"。"),
+
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.NamedAddressNameFormat]")
+                .AddTranslation(LocaleCode.EnUs, "Named Address Format")
+                .AddTranslation(LocaleCode.ZhHans, "名称地址格式")
+                .AddTranslation(LocaleCode.ZhHant, "名稱地址格式"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.NamedAddressNameFormat]")
+                .AddTranslation(LocaleCode.EnUs, "Set the in-game address format with name (usually company name), " +
+                                                 "{ROAD} represents the current road, {NUMBER} represents the number, {NAME} represents the name. " +
+                                                 "The game defaults to \"{NAME}, {NUMBER} {ROAD}\".")
+                .AddTranslation(LocaleCode.ZhHans, "设置游戏内带有名称（通常是企业名）的地址格式，" +
+                                                   "{ROAD} 表示当前道路，{NUMBER} 表示编号，{NAME} 表示名称。" +
+                                                   "游戏默认为 \"{NAME}, {NUMBER} {ROAD}\"。")
+                .AddTranslation(LocaleCode.ZhHant, "設置遊戲內帶有名稱（通常是企業名）的地址格式，" +
+                                                   "{ROAD} 表示當前道路，{NUMBER} 表示編號，{NAME} 表示名稱。" +
+                                                   "遊戲默認為 \"{NAME}, {NUMBER} {ROAD}\"。"),
+
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.OverrideVanillaAddress]")
+                .AddTranslation(LocaleCode.EnUs, "Override Vanilla Address Format")
+                .AddTranslation(LocaleCode.ZhHans, "覆盖原版地址格式")
+                .AddTranslation(LocaleCode.ZhHant, "覆蓋原版地址格式"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.OverrideVanillaAddress]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, the above two formats will be applied to the vanilla address at the same time.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，将同时应用上述两项格式覆盖到原版地址中。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，將同時應用上述兩項格式覆蓋到原版地址中。"),
+
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")
@@ -177,14 +222,14 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Spawnable Building")
                 .AddTranslation(LocaleCode.ZhHans, "自长建筑")
                 .AddTranslation(LocaleCode.ZhHant, "自長建築"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Other]")
+                .AddTranslation(LocaleCode.EnUs, "Other")
+                .AddTranslation(LocaleCode.ZhHans, "其他")
+                .AddTranslation(LocaleCode.ZhHant, "其他"),
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.General]")
                 .AddTranslation(LocaleCode.EnUs, "General")
                 .AddTranslation(LocaleCode.ZhHans, "常规")
                 .AddTranslation(LocaleCode.ZhHant, "常規"),
-            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Other]")
-                .AddTranslation(LocaleCode.EnUs, "Other")
-                .AddTranslation(LocaleCode.ZhHans, "其他")
-                .AddTranslation(LocaleCode.ZhHant, "其他"),
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.Building]")
                 .AddTranslation(LocaleCode.EnUs, "Building")
                 .AddTranslation(LocaleCode.ZhHans, "建筑")
