@@ -19,7 +19,9 @@
 // SOFTWARE.
 
 using Colossal.IO.AssetDatabase;
+using Colossal.Localization;
 using Game.Modding;
+using Game.SceneFlow;
 using Game.Settings;
 using Game.UI.Widgets;
 
@@ -28,57 +30,159 @@ namespace StationNaming.Setting;
 [FileLocation(Mod.Name)]
 [SettingsUITabOrder(SectionGeneral, SectionBuilding)]
 [SettingsUISection(SectionGeneral, SectionBuilding)]
-[SettingsUIShowGroupName(Experimental)]
-[SettingsUIGroupOrder(Stable, Experimental)]
+[SettingsUIShowGroupName(GroupExperimental, GroupSpawnable, GroupOther)]
+[SettingsUIGroupOrder(GroupStable, GroupSpawnable, GroupExperimental, GroupOther)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
-    public const string Stable = "Stable";
+    public const string GroupStable = "Stable";
 
-    public const string Experimental = "Experimental";
+    public const string GroupExperimental = "Experimental";
+
+    public const string GroupOther = "Other";
+
+    public const string GroupSpawnable = "Spawnable";
 
     public const string SectionGeneral = "General";
 
     public const string SectionBuilding = "Building";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool Enable { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
     public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool ReverseRoadOrder { get; set; } = false;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUISlider(max = 5, min = 1)]
     public int SearchDepth { get; set; } = 2;
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public string Prefix { get; set; } = "";
 
-    [SettingsUISection(SectionGeneral, Stable)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public string Suffix { get; set; } = "";
 
-    [SettingsUISection(SectionGeneral, Experimental)]
+    [SettingsUISection(SectionGeneral, GroupExperimental)]
     public bool AutoUpdate { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, Experimental)]
+    [SettingsUISection(SectionGeneral, GroupExperimental)]
     public bool AutoNaming { get; set; } = true;
 
-    [SettingsUISection(SectionBuilding, Stable)]
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
+    [SettingsUISection(SectionGeneral, GroupOther)]
+    public bool ResetSettings
+    {
+        set
+        {
+            SetDefaults();
+            ApplyAndSave();
+        }
+    }
+
+    [SettingsUISection(SectionBuilding, GroupStable)]
     public bool BuildingName { get; set; } = true;
 
     public bool IsBuildingNameDisabled() => !BuildingName;
 
-    [SettingsUISection(SectionBuilding, Stable)]
+    [SettingsUISection(SectionBuilding, GroupStable)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool SpawnableBuildingName { get; set; } = false;
+
+    private string _addressNameFormat = "{NUMBER} {ROAD}";
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider),
+        nameof(RoadNamingProvider.GetAddressNameFormatOptions))]
+    public string AddressNameFormat
+    {
+        get => _addressNameFormat;
+        set
+        {
+            _addressNameFormat = value;
+            ApplyAddressFormats();
+        }
+    }
+
+    private string _namedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider),
+        nameof(RoadNamingProvider.GetNamedAddressNameFormatOptions))]
+    public string NamedAddressNameFormat
+    {
+        get => _namedAddressNameFormat;
+        set
+        {
+            _namedAddressNameFormat = value;
+            ApplyAddressFormats();
+        }
+    }
+
+    private bool _overrideVanillaAddress = true;
+
+    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    public bool OverrideVanillaAddress
+    {
+        get => _overrideVanillaAddress;
+        set
+        {
+            _overrideVanillaAddress = value;
+            if (!value)
+            {
+                ApplyAddressFormats(true);
+            }
+            else
+            {
+                ApplyAddressFormats();
+            }
+        }
+    }
+
+    public void ApplyAddressFormats(bool resetVanilla = false)
+    {
+        var localizationManager = GameManager.instance.localizationManager;
+        if (resetVanilla)
+        {
+            localizationManager.activeDictionary.Add(
+                GameLocalizationKeys.AddressNameFormat,
+                "{NUMBER} {ROAD}", true
+            );
+            localizationManager.activeDictionary.Add(
+                GameLocalizationKeys.NamedAddressNameFormat,
+                "{NAME}, {NUMBER} {ROAD}", true
+            );
+            return;
+        }
+
+        if (!OverrideVanillaAddress)
+        {
+            return;
+        }
+
+        localizationManager.activeDictionary.Add(
+            GameLocalizationKeys.AddressNameFormat,
+            AddressNameFormat, true
+        );
+        localizationManager.activeDictionary.Add(
+            GameLocalizationKeys.NamedAddressNameFormat,
+            NamedAddressNameFormat, true
+        );
+    }
+
 
     public override void SetDefaults()
     {
         Enable = true;
-        IntersectionNamingFormat = "{0}{1}";
+        IntersectionNamingFormat = "{0} & {1}";
         ReverseRoadOrder = false;
         SearchDepth = 2;
         Prefix = "";
@@ -87,6 +191,10 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         AutoNaming = true;
         BuildingName = true;
         BuildingNameWithCurrentRoad = true;
+        SpawnableBuildingName = false;
+        AddressNameFormat = "{NUMBER} {ROAD}";
+        NamedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
+        OverrideVanillaAddress = true;
     }
 
     public string FormatRoadName(string first, string second)
@@ -106,7 +214,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         return new NameOptions
         {
             BuildingName = BuildingName,
-            BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad
+            BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad,
+            SpawnableBuildingName = BuildingName && SpawnableBuildingName,
         };
     }
 
@@ -127,6 +236,32 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                 new DropdownItem<string> { value = "{0}_{1}", displayName = "{0}_{1}" },
                 new DropdownItem<string> { value = "{0}:{1}", displayName = "{0}:{1}" },
                 new DropdownItem<string> { value = "{0}.{1}", displayName = "{0}.{1}" }
+            ];
+        }
+
+
+        public static DropdownItem<string>[] GetAddressNameFormatOptions()
+        {
+            return
+            [
+                new DropdownItem<string> { value = "{NUMBER} {ROAD}", displayName = "{NUMBER} {ROAD}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER}", displayName = "{ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{ROAD}{NUMBER}", displayName = "{ROAD}{NUMBER}" },
+                new DropdownItem<string> { value = "{NUMBER}{ROAD}", displayName = "{NUMBER}{ROAD}" },
+                new DropdownItem<string> { value = "{ROAD} - {NUMBER}", displayName = "{ROAD} - {NUMBER}" },
+            ];
+        }
+
+        public static DropdownItem<string>[] GetNamedAddressNameFormatOptions()
+        {
+            return
+            [
+                new DropdownItem<string> { value = "{NAME}, {NUMBER} {ROAD}", displayName = "{NAME}, {ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{NAME}, {ROAD} {NUMBER}", displayName = "{NAME}, {ROAD} {NUMBER}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER}, {NAME}", displayName = "{ROAD} {NUMBER}, {NAME}" },
+                new DropdownItem<string> { value = "{ROAD} {NUMBER} {NAME}", displayName = "{ROAD} {NUMBER} {NAME}" },
+                new DropdownItem<string> { value = "{NUMBER} {ROAD} {NAME}", displayName = "{NUMBER} {ROAD} {NAME}" },
+                new DropdownItem<string> { value = "{NUMBER} {ROAD}, {NAME}", displayName = "{NUMBER} {ROAD}, {NAME}" }
             ];
         }
 

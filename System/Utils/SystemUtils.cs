@@ -18,7 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Game.Prefabs;
 using Unity.Entities;
 
 namespace StationNaming.System.Utils;
@@ -32,6 +31,18 @@ public static class SystemUtils
         return entityManager.HasBuffer<T>(entity)
             ? entityManager.GetBuffer<T>(entity)
             : entityManager.AddBuffer<T>(entity);
+    }
+
+    public static void TryRemoveBuffer<T>(
+        EntityManager entityManager,
+        Entity entity) where T : unmanaged, IBufferElementData
+    {
+        if (!entityManager.HasBuffer<T>(entity))
+        {
+          return;
+        }
+        var buffer = entityManager.GetBuffer<T>(entity);
+        buffer.Clear();
     }
 
 }

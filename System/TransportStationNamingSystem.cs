@@ -30,7 +30,7 @@ using TransportStation = Game.Buildings.TransportStation;
 
 namespace StationNaming.System;
 
-public partial class StationNamingSystem : GameSystemBase
+public partial class TransportStationNamingSystem : GameSystemBase
 {
     private EntityQuery _stationQuery;
 

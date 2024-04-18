@@ -67,6 +67,8 @@ public partial class AutoNamingSystem : GameSystemBase
 
             EntityManager.AddComponentData(entity, entityNaming);
             AddAssociations(association, candidate.Refers);
+
+            candidates.Clear();
         }
     }
 
