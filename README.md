@@ -22,10 +22,14 @@ You could change the naming format for the different types and set your own pref
 and suffix for the station names.
 
 ```json lines
+RollW_StationNaming
 {
   "Prefix": " ", // Set the global prefix here
   "Suffix": " ", // Set the global suffix here
   // You can use the {PREFAB} in the prefix or suffix to insert the prefab name
+  "NamingSeparator": " ", // Set the default separator between names 
+  "NamedAddressNameFormat": "{NAME}, {NUMBER} {ROAD}", // Set the format for the named address name
+  "AddressNameFormat": "{NUMBER} {ROAD}",
   "RoadFormat": {
     "Separator": " ", // Set the separator after the road name
     "Prefix": "", // Set the prefix for the road name only
@@ -35,7 +39,7 @@ and suffix for the station names.
     "Separator": " ", // Set the separator after the district name
     "Prefix": "", // Set the prefix for the district name only
     "Suffix": "" // Set the suffix for the district name only
-  }
+  },
 }
 ```
 
