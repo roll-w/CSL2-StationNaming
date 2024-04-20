@@ -24,7 +24,13 @@ namespace StationNaming.Setting;
 
 public struct NameFormat : IEquatable<NameFormat>
 {
+    public static readonly NameFormat Invalid = new()
+    {
+        Separator = None
+    };
+
     public const string Prefab = "{PREFAB}";
+    public const string None = "{NONE}";
 
     public string Separator { get; set; } = " ";
     public string NextFormat { get; set; } = "{0}";
@@ -40,6 +46,11 @@ public struct NameFormat : IEquatable<NameFormat>
         Separator = separator;
         Prefix = prefix;
         Suffix = suffix;
+    }
+
+    public bool IsValid()
+    {
+        return Separator != None;
     }
 
     public bool IsAnyPrefab()

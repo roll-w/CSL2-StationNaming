@@ -19,19 +19,25 @@
 // SOFTWARE.
 
 using Colossal.IO.AssetDatabase;
-using Colossal.Localization;
 using Game.Modding;
 using Game.SceneFlow;
 using Game.Settings;
 using Game.UI.Widgets;
+using StationNaming.System;
 
 namespace StationNaming.Setting;
 
 [FileLocation(Mod.Name)]
-[SettingsUITabOrder(SectionGeneral, SectionBuilding)]
-[SettingsUISection(SectionGeneral, SectionBuilding)]
-[SettingsUIShowGroupName(GroupExperimental, GroupSpawnable, GroupOther)]
-[SettingsUIGroupOrder(GroupStable, GroupSpawnable, GroupExperimental, GroupOther)]
+[SettingsUITabOrder(SectionGeneral, SectionBuilding, SectionOther)]
+//[SettingsUISection(SectionGeneral, SectionBuilding, SectionOther)]
+[SettingsUIShowGroupName(
+    GroupExperimental, GroupSpawnable,
+    GroupDistrict, GroupOther
+)]
+[SettingsUIGroupOrder(
+    GroupStable, GroupSpawnable, GroupDistrict,
+    GroupExperimental, GroupOther
+)]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
 {
     public const string GroupStable = "Stable";
@@ -42,9 +48,13 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public const string GroupSpawnable = "Spawnable";
 
+    public const string GroupDistrict = "District";
+
     public const string SectionGeneral = "General";
 
     public const string SectionBuilding = "Building";
+
+    public const string SectionOther = "OtherSource";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
     public bool Enable { get; set; } = true;
@@ -52,6 +62,14 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
     public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
+
+    [SettingsUISection(SectionGeneral, GroupStable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetSeparatorOptions))]
+    public string NamingSeparator { get; set; } = " & ";
+
+    [SettingsUISection(SectionOther, GroupStable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
+    public NameFormat RoadFormat { get; set; } = NameFormat.Invalid;
 
     [SettingsUISection(SectionGeneral, GroupStable)]
     public bool ReverseRoadOrder { get; set; } = false;
@@ -64,13 +82,25 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     public string Prefix { get; set; } = "";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider),
+        nameof(RoadNamingProvider.GetSuffixOptions))]
     public string Suffix { get; set; } = "";
 
-    [SettingsUISection(SectionGeneral, GroupExperimental)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool AutoUpdate { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, GroupExperimental)]
+    [SettingsUISection(SectionGeneral, GroupStable)]
     public bool AutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionOther, GroupDistrict)]
+    public bool EnableDistrict { get; set; } = false;
+
+    [SettingsUISection(SectionOther, GroupDistrict)]
+    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictDisabled))]
+    public NameFormat DistrictFormat { get; set; } = NameFormat.Invalid;
+
+    public bool IsDistrictDisabled() => !EnableDistrict;
 
     [SettingsUIButton]
     [SettingsUIConfirmation]
@@ -183,6 +213,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     {
         Enable = true;
         IntersectionNamingFormat = "{0} & {1}";
+        NamingSeparator = " & ";
+        RoadFormat = NameFormat.Invalid;
         ReverseRoadOrder = false;
         SearchDepth = 2;
         Prefix = "";
@@ -195,18 +227,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         AddressNameFormat = "{NUMBER} {ROAD}";
         NamedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
         OverrideVanillaAddress = true;
-    }
-
-    public string FormatRoadName(string first, string second)
-    {
-        return ReverseRoadOrder
-            ? string.Format(IntersectionNamingFormat, second, first)
-            : string.Format(IntersectionNamingFormat, first, second);
-    }
-
-    public string FormatCandidateName(string name)
-    {
-        return $"{Prefix}{name}{Suffix}";
+        EnableDistrict = false;
+        DistrictFormat = NameFormat.Invalid;
     }
 
     public NameOptions ToNameOptions()
@@ -216,6 +238,26 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             BuildingName = BuildingName,
             BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad,
             SpawnableBuildingName = BuildingName && SpawnableBuildingName,
+            EnableDistrict = EnableDistrict,
+            SourceFormats =
+            {
+                DefaultFormat = new NameFormat
+                {
+                    Separator = NamingSeparator
+                },
+                [NameSource.District] = DistrictFormat,
+                [NameSource.Road] = RoadFormat
+            },
+
+            TargetFormats =
+            {
+                DefaultFormat = new NameFormat
+                {
+                    Suffix = Suffix,
+                    Prefix = Prefix,
+                    Separator = ""
+                }
+            }
         };
     }
 
@@ -227,18 +269,29 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             [
                 new DropdownItem<string> { value = "{0} & {1}", displayName = "{0} & {1}" },
                 new DropdownItem<string> { value = "{0}{1}", displayName = "{0}{1}" },
-                new DropdownItem<string> { value = "{0}-{1}", displayName = "{0}-{1}" },
                 new DropdownItem<string> { value = "{0} @{1}", displayName = "{0} @{1}" },
                 new DropdownItem<string> { value = "{0} {1}", displayName = "{0} {1}" },
                 new DropdownItem<string> { value = "{0}, {1}", displayName = "{0}, {1}" },
-                new DropdownItem<string> { value = "{0} ({1})", displayName = "{0} ({1})" },
-                new DropdownItem<string> { value = "{0}[{1}]", displayName = "{0}[{1}]" },
                 new DropdownItem<string> { value = "{0}_{1}", displayName = "{0}_{1}" },
                 new DropdownItem<string> { value = "{0}:{1}", displayName = "{0}:{1}" },
                 new DropdownItem<string> { value = "{0}.{1}", displayName = "{0}.{1}" }
             ];
         }
 
+        public static DropdownItem<string>[] GetSeparatorOptions()
+        {
+            return
+            [
+                new DropdownItem<string> { value = "", displayName = "None" },
+                new DropdownItem<string> { value = " ", displayName = "Space" },
+                new DropdownItem<string> { value = " & ", displayName = " & " },
+                new DropdownItem<string> { value = " - ", displayName = " - " },
+                new DropdownItem<string> { value = " @", displayName = " @" },
+                new DropdownItem<string> { value = ", ", displayName = ", " },
+                new DropdownItem<string> { value = " : ", displayName = " : " },
+                new DropdownItem<string> { value = " . ", displayName = " . " },
+            ];
+        }
 
         public static DropdownItem<string>[] GetAddressNameFormatOptions()
         {
@@ -265,13 +318,13 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             ];
         }
 
-        public static DropdownItem<string>[] GetPrefixOptions()
+        public static DropdownItem<NameFormat>[] GetNameFormatOptions()
         {
             return
             [
-                new DropdownItem<string> { value = "", displayName = "No Prefix" },
-                new DropdownItem<string> { value = "Station ", displayName = "Station " },
-                new DropdownItem<string> { value = "Stop ", displayName = "Stop " },
+                new DropdownItem<NameFormat> { value = NameFormat.Invalid, displayName = "None" },
+                new DropdownItem<NameFormat> { value = new NameFormat { Separator = " " }, displayName = "Space" },
+                new DropdownItem<NameFormat> { value = new NameFormat { Separator = " - " }, displayName = "Hyphen" },
             ];
         }
 
@@ -280,8 +333,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             return
             [
                 new DropdownItem<string> { value = "", displayName = "No Suffix" },
-                new DropdownItem<string> { value = " Station", displayName = " Station" },
-                new DropdownItem<string> { value = " Stop", displayName = " Stop" },
+                new DropdownItem<string> { value = " {PREFAB}", displayName = " {PREFAB}" },
+                new DropdownItem<string> { value = "{PREFAB}", displayName = "{PREFAB}" },
             ];
         }
     }

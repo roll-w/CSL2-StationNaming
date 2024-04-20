@@ -44,6 +44,7 @@ public class NameFormatter(
         TargetType targetType = TargetType.None)
     {
         var count = refers.Count;
+        string referFormat;
         switch (count)
         {
             case 0:
@@ -51,9 +52,25 @@ public class NameFormatter(
             case 1 when refers[0].Source == NameSource.Owner:
                 return refers[0].GetName(entityManager, nameSystem);
             case 2:
-                return LegacyFormatRefers(refers[0], refers[1]);
+                referFormat = LegacyFormatRefers(refers[0], refers[1]);
+                break;
+            default:
+                referFormat = StdRefersFormat(refers);
+                break;
         }
 
+        var targetFormat = Options.TargetFormats[targetType];
+        var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
+
+        return targetFormat.Format(
+            referFormat,
+            prefabName: prefabName,
+            hasNext: false
+        );
+    }
+
+    private string StdRefersFormat(IList<NameSourceRefer> refers)
+    {
         StringBuilder builder = new();
 
         ForeachRefers(refers, Options.Reverse, (refer, hasNext) =>
@@ -63,16 +80,7 @@ public class NameFormatter(
             builder.Append(format.Format(name, hasNext: hasNext));
         });
 
-        var referFormat = builder.ToString();
-        var targetFormat = Options.TargetFormats[targetType];
-
-        var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
-
-        return targetFormat.Format(
-            referFormat,
-            prefabName: prefabName,
-            hasNext: false
-        );
+        return builder.ToString();
     }
 
     private static void ForeachRefers(

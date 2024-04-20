@@ -18,7 +18,11 @@ public class FormatDictionary<TKey> where TKey : notnull
 
     public NameFormat GetFormat(TKey source)
     {
-        return _formats.TryGetValue(source, out var format)
+        if (!_formats.TryGetValue(source, out var format))
+        {
+            return DefaultFormat;
+        }
+        return format.IsValid()
             ? format
             : DefaultFormat;
     }
