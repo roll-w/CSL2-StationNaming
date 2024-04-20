@@ -14,8 +14,8 @@ check the mod settings to avoid conflicts.
 
 ## Settings
 
-Except the showing settings, you could also customize the naming rules in the
-mod setting file where is located at 
+Except the displayed settings, you could also customize the naming rules in the
+mod setting file where it is located at 
 `AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
 
 You could change the naming format for the different types and set your own prefix
@@ -42,6 +42,8 @@ RollW_StationNaming
   },
 }
 ```
+
+> Note: Remember to remove the comments ("//") after you modify the settings.
 
 ## Translations
 
