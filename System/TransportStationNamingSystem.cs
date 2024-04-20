@@ -21,11 +21,12 @@
 using System;
 using Game;
 using Game.Common;
-using Game.Objects;
+using Game.Prefabs;
 using Game.Tools;
 using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
+using OutsideConnection = Game.Objects.OutsideConnection;
 using TransportStation = Game.Buildings.TransportStation;
 
 namespace StationNaming.System;
@@ -35,19 +36,21 @@ public partial class TransportStationNamingSystem : GameSystemBase
     private EntityQuery _stationQuery;
 
     private NameSystem _nameSystem;
+    private PrefabSystem _prefabSystem;
     private StopNameHelper _stopNameHelper;
 
     protected override void OnUpdate()
     {
-        if (!Mod.GetInstance().GetSettings().Enable)
+        var settings = Mod.GetInstance().GetSettings();
+        if (!settings.Enable)
         {
             return;
         }
 
-        var options = Mod.GetInstance().GetSettings().ToNameOptions();
+        var options = settings.ToNameOptions();
         _stopNameHelper.ApplyTo(options);
 
-        var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
+        var searchDepth = settings.SearchDepth;
         try
         {
             var stations = _stationQuery.ToEntityArray(Allocator.Temp);
@@ -70,7 +73,9 @@ public partial class TransportStationNamingSystem : GameSystemBase
 
         _nameSystem = World.DefaultGameObjectInjectionWorld
             .GetOrCreateSystemManaged<NameSystem>();
-        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem);
+        _prefabSystem = World.DefaultGameObjectInjectionWorld
+            .GetExistingSystemManaged<PrefabSystem>();
+        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
 
         _stationQuery = GetEntityQuery(new EntityQueryDesc
         {

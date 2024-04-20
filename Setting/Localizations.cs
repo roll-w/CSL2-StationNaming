@@ -60,24 +60,22 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.IntersectionNamingFormat]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "The format used when generating the name of the intersection source, " +
-                    "in addition to the dropdown items, the format can be changed by modifying the settings file. " +
-                    "{0} represents the current road, {1} represents the intersecting road/building. " +
-                    "The road order can be reversed by setting.")
+                    "The format used when generating the name of the intersection source. " +
+                    "[Please use the Name Separator option instead, this setting will be removed in the next version]")
                 .AddTranslation(LocaleCode.ZhHans,
-                    "在生成交叉口来源的名称时使用的格式，除下拉项以外还可通过修改设置文件变更格式。{0} 表示当前道路，{1} 表示交叉道路/建筑。可通过设置反转道路顺序。")
+                    "在生成交叉口来源的名称时使用的格式。[请使用名称分隔符选项代替，下个版本将移除此设置]")
                 .AddTranslation(LocaleCode.ZhHant,
-                    "在生成交叉口來源的名稱時使用的格式，除下拉項以外還可通過修改設置文件變更格式。{0} 表示當前道路，{1} 表示交叉道路/建築。可通過設置反轉道路順序。"),
+                    "在生成交叉口來源的名稱時使用的格式。[請使用名稱分隔符選項代替，下個版本將移除此設置]"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
-                .AddTranslation(LocaleCode.EnUs, "Reverse Road Order")
-                .AddTranslation(LocaleCode.ZhHans, "反转道路顺序")
-                .AddTranslation(LocaleCode.ZhHant, "反轉道路順序"),
+                .AddTranslation(LocaleCode.EnUs, "Reverse Name Order")
+                .AddTranslation(LocaleCode.ZhHans, "反转名称顺序")
+                .AddTranslation(LocaleCode.ZhHant, "反轉名稱順序"),
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "Reverse the order of the road, swap {0} and {1} in the intersection naming format.")
-                .AddTranslation(LocaleCode.ZhHans, "反转道路顺序，使交叉口命名格式中的 {0} 和 {1} 交换位置。")
-                .AddTranslation(LocaleCode.ZhHant, "反轉道路順序，使交叉口命名格式中的 {0} 和 {1} 交換位置。"),
+                    "Reverse the order of the name parts, reverse the order of the different parts of the name. The default order is District->Road->Building.")
+                .AddTranslation(LocaleCode.ZhHans, "反转名称顺序，将名称的不同部分的顺序进行反转。默认顺序为 地区->道路->建筑。")
+                .AddTranslation(LocaleCode.ZhHant, "反轉名稱順序，將名稱的不同部分的順序進行反轉。默認順序為 地區->道路->建築。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Prefix]")
                 .AddTranslation(LocaleCode.EnUs, "Prefix")
                 .AddTranslation(LocaleCode.ZhHans, "前缀")
@@ -91,9 +89,24 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "后缀")
                 .AddTranslation(LocaleCode.ZhHant, "後綴"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Suffix]")
-                .AddTranslation(LocaleCode.EnUs, "The suffix to be added to the station name.")
-                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。")
-                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。"),
+                .AddTranslation(LocaleCode.EnUs,
+                    "The suffix to be added to the station name. {PREFAB} represents the target building name, such as \"Train Station\".")
+                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。{PREFAB} 表示目标建筑名称，如\"火车站\"等。")
+                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。{PREFAB} 表示目標建築名稱，如\"火車站\"等。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.NamingSeparator]")
+                .AddTranslation(LocaleCode.EnUs, "Default Name Separator")
+                .AddTranslation(LocaleCode.ZhHans, "默认名称间分隔符")
+                .AddTranslation(LocaleCode.ZhHant, "默認名稱間分隔符"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.NamingSeparator]")
+                .AddTranslation(LocaleCode.EnUs, "Set the separator between the names under the default.")
+                .AddTranslation(LocaleCode.ZhHans, "设置默认下的名称之间的分隔符。")
+                .AddTranslation(LocaleCode.ZhHant, "設置默認下的名稱之間的分隔符。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFormat]")
+                .AddTranslation(LocaleCode.EnUs, "Road Format"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFormat]")
+                .AddTranslation(LocaleCode.EnUs, "Road format."),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoUpdate]")
                 .AddTranslation(LocaleCode.EnUs, "Auto Update Name")
                 .AddTranslation(LocaleCode.ZhHans, "自动更新站名")
@@ -213,11 +226,26 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "启用后，将同时应用上述两项格式覆盖到原版地址中。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，將同時應用上述兩項格式覆蓋到原版地址中。"),
 
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrict]")
+                .AddTranslation(LocaleCode.EnUs, "Enable District Name Source")
+                .AddTranslation(LocaleCode.ZhHans, "启用地区名称来源")
+                .AddTranslation(LocaleCode.ZhHant, "啟用地區名稱來源"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrict]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, add the district name as a prefix/suffix for each name candidate (controlled by the reverse order option).")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，为每个名称候选都添加地区名称作为前缀/后缀（受到反转顺序控制）。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，為每個名稱候選都添加地區名稱作為前綴/後綴（受到反轉順序控制）。"),
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")
                 .AddTranslation(LocaleCode.ZhHans, "实验性")
                 .AddTranslation(LocaleCode.ZhHant, "實驗性"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.District]")
+                .AddTranslation(LocaleCode.EnUs, "District")
+                .AddTranslation(LocaleCode.ZhHans, "区域")
+                .AddTranslation(LocaleCode.ZhHant, "區域"),
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Spawnable]")
                 .AddTranslation(LocaleCode.EnUs, "Spawnable Building")
                 .AddTranslation(LocaleCode.ZhHans, "自长建筑")
@@ -234,6 +262,10 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Building")
                 .AddTranslation(LocaleCode.ZhHans, "建筑")
                 .AddTranslation(LocaleCode.ZhHant, "建築"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.OtherSource]")
+                .AddTranslation(LocaleCode.EnUs, "Other")
+                .AddTranslation(LocaleCode.ZhHans, "其他")
+                .AddTranslation(LocaleCode.ZhHant, "其他"),
 
 
             new Translation("StationNaming.NameCandidates")

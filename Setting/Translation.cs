@@ -39,7 +39,15 @@ public readonly struct Translation(string key)
 
     public string GetTranslation(LocaleCode locale)
     {
-        return _translations[locale];
+        if (_translations.TryGetValue(locale, out var translation))
+        {
+            return translation;
+        }
+
+        return _translations.TryGetValue(LocaleCode.EnUs,
+            out var defaultTranslation)
+            ? defaultTranslation
+            : Key;
     }
 
     public static Dictionary<string, string> ToDictionary(

@@ -21,11 +21,12 @@
 using System;
 using Game;
 using Game.Common;
-using Game.Objects;
+using Game.Prefabs;
 using Game.Tools;
 using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
+using OutsideConnection = Game.Objects.OutsideConnection;
 using TransportStop = Game.Routes.TransportStop;
 
 namespace StationNaming.System;
@@ -35,19 +36,21 @@ public partial class TransportStopNamingSystem : GameSystemBase
     private EntityQuery _stopQuery;
 
     private NameSystem _nameSystem;
+    private PrefabSystem _prefabSystem;
     private StopNameHelper _stopNameHelper;
 
     protected override void OnUpdate()
     {
-        if (!Mod.GetInstance().GetSettings().Enable)
+        var settings = Mod.GetInstance().GetSettings();
+        if (!settings.Enable)
         {
             return;
         }
 
-        var options = Mod.GetInstance().GetSettings().ToNameOptions();
+        var options = settings.ToNameOptions();
         _stopNameHelper.ApplyTo(options);
 
-        var searchDepth = Mod.GetInstance().GetSettings().SearchDepth;
+        var searchDepth = settings.SearchDepth;
         try
         {
             var stops = _stopQuery.ToEntityArray(Allocator.Temp);
@@ -70,7 +73,9 @@ public partial class TransportStopNamingSystem : GameSystemBase
         base.OnCreate();
         _nameSystem = World.DefaultGameObjectInjectionWorld
             .GetOrCreateSystemManaged<NameSystem>();
-        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem);
+        _prefabSystem = World.DefaultGameObjectInjectionWorld
+            .GetExistingSystemManaged<PrefabSystem>();
+        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
 
         _stopQuery = GetEntityQuery(new EntityQueryDesc
         {

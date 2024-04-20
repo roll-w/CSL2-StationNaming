@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using StationNaming.System;
+
 namespace StationNaming.Setting;
 
 public struct NameOptions
@@ -25,8 +27,13 @@ public struct NameOptions
     public NameOptions()
     {
     }
-
+    public bool Reverse { get; set; } = false;
     public bool BuildingName { get; set; } = true;
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
     public bool SpawnableBuildingName { get; set; } = true;
+    public bool EnableDistrict { get; set; } = true;
+
+    public FormatDictionary<NameSource> SourceFormats { get; private set; } = new();
+
+    public FormatDictionary<TargetType> TargetFormats { get; private set; } = new();
 }
