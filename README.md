@@ -18,15 +18,24 @@ Except the showing settings, you could also customize the naming rules in the
 mod setting file where is located at 
 `AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
 
-You could change the naming format for the intersection and set your own prefix
+You could change the naming format for the different types and set your own prefix
 and suffix for the station names.
 
 ```json lines
-RollW_StationNaming
 {
-    "IntersectionNamingFormat": "{0} & {1}", // The naming format for intersection
-    "Prefix": " ", // Set your own prefix here
-    "Suffix": " ", // Set your own suffix here
+  "Prefix": " ", // Set the global prefix here
+  "Suffix": " ", // Set the global suffix here
+  // You can use the {PREFAB} in the prefix or suffix to insert the prefab name
+  "RoadFormat": {
+    "Separator": " ", // Set the separator after the road name
+    "Prefix": "", // Set the prefix for the road name only
+    "Suffix": "" // Set the suffix for the road name only
+  },
+  "DistrictFormat": {
+    "Separator": " ", // Set the separator after the district name
+    "Prefix": "", // Set the prefix for the district name only
+    "Suffix": "" // Set the suffix for the district name only
+  }
 }
 ```
 
@@ -38,14 +47,13 @@ RollW_StationNaming
 
 ## Planned Features
 
-- Supports district name as prefix/suffix.
 - Allow setting the naming format for different name sources.
-- Supports naming Schools, Hospitals...
+- Allow naming Schools, Hospitals...
 
 ## Support
 
 If you have any problems during using this mod, please open an issue or discussion
-on Github.
+on GitHub.
 
 ## License
 
