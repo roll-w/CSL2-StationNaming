@@ -45,9 +45,9 @@ public struct NameCandidate : IBufferElementData,
         {
             case 0:
                 throw new ArgumentException("NameCandidate must have at least 1 refer");
-            case > 2:
-                // currently we only support 2 refers max
-                throw new ArgumentException("NameCandidate can only have 2 refers");
+            case > 5:
+                // currently we only support 5 refers max
+                throw new ArgumentException("NameCandidate can only have 5 refers max");
         }
 
         Name = name;
@@ -63,25 +63,7 @@ public struct NameCandidate : IBufferElementData,
 
     public bool Equals(NameCandidate other)
     {
-        if (!Name.Equals(other.Name))
-        {
-            return false;
-        }
-
-        if (Refers.Length != other.Refers.Length)
-        {
-            return false;
-        }
-
-        for (var i = 0; i < Refers.Length; i++)
-        {
-            if (Refers[i].Source != other.Refers[i].Source)
-            {
-                return false;
-            }
-        }
-
-        return true;
+        return Name.Equals(other.Name) && Refers.SequenceEqual(other.Refers);
     }
 
     public override bool Equals(object obj)
@@ -94,11 +76,7 @@ public struct NameCandidate : IBufferElementData,
         unchecked
         {
             var hashCode = Name.GetHashCode();
-            foreach (var refer in Refers)
-            {
-                hashCode = (hashCode * 397) ^ refer.Source.GetHashCode();
-            }
-
+            hashCode = (hashCode * 397) ^ Refers.GetHashCode();
             return hashCode;
         }
     }
@@ -300,6 +278,48 @@ public struct NameCandidate : IBufferElementData,
 
         return new NameCandidate(
             name, refers, direction, edgeType
+        );
+    }
+
+    public static NameCandidate Of(
+        string name,
+        Direction direction, EdgeType edgeType,
+        params NameSourceRefer[] refers
+    )
+    {
+        var refersList = new NativeList<NameSourceRefer>(
+            refers.Length,
+            Allocator.Persistent
+        );
+        foreach (var refer in refers)
+        {
+            refersList.Add(refer);
+        }
+
+        return new NameCandidate(
+            name, refersList, direction, edgeType
+        );
+    }
+
+
+    public static NameCandidate Of(
+        string name,
+        Direction direction, EdgeType edgeType,
+        ICollection<NameSourceRefer> refers
+    )
+    {
+        var refersList = new NativeList<NameSourceRefer>(
+            refers.Count,
+            Allocator.Persistent
+        );
+
+        foreach (var refer in refers)
+        {
+            refersList.Add(refer);
+        }
+
+        return new NameCandidate(
+            name, refersList, direction, edgeType
         );
     }
 
