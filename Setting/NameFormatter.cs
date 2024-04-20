@@ -18,19 +18,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Game.Prefabs;
+using Game.SceneFlow;
 using Game.UI;
 using StationNaming.System;
 using Unity.Collections;
 using Unity.Entities;
+using static System.String;
 
 namespace StationNaming.Setting;
 
 public class NameFormatter(
     EntityManager entityManager,
-    NameSystem nameSystem)
+    NameSystem nameSystem,
+    PrefabSystem prefabSystem)
 {
     public NameOptions Options { get; set; } = new();
 
@@ -46,18 +50,18 @@ public class NameFormatter(
                 return "";
             case 1 when refers[0].Source == NameSource.Owner:
                 return refers[0].GetName(entityManager, nameSystem);
+            case 2:
+                return LegacyFormatRefers(refers[0], refers[1]);
         }
 
         StringBuilder builder = new();
 
-        for (var i = 0; i < count; i++)
+        ForeachRefers(refers, Options.Reverse, (refer, hasNext) =>
         {
-            var refer = refers[i];
             var format = Options.SourceFormats[refer.Source];
             var name = refer.GetName(entityManager, nameSystem);
-            var hasNext = i < count - 1;
             builder.Append(format.Format(name, hasNext: hasNext));
-        }
+        });
 
         var referFormat = builder.ToString();
         var targetFormat = Options.TargetFormats[targetType];
@@ -71,6 +75,35 @@ public class NameFormatter(
         );
     }
 
+    private static void ForeachRefers(
+        IList<NameSourceRefer> refers,
+        bool reverse,
+        Action<NameSourceRefer, bool> action)
+    {
+        var count = refers.Count;
+        for (var i = 0; i < count; i++)
+        {
+            var refer = reverse ? refers[count - i - 1] : refers[i];
+            var hasNext = i < count - 1;
+            action(refer, hasNext);
+        }
+    }
+
+    private string LegacyFormatRefers(
+        NameSourceRefer refer1, NameSourceRefer refer2)
+    {
+        var settings = Mod.GetInstance().GetSettings();
+
+        var first = refer1.GetName(entityManager, nameSystem);
+        var second = refer2.GetName(entityManager, nameSystem);
+
+        var namingFormat = settings.IntersectionNamingFormat;
+
+        return settings.ReverseRoadOrder
+            ? Format(namingFormat, second, first)
+            : Format(namingFormat, first, second);
+    }
+
     private string GetPrefabName(Entity entity, bool prefab)
     {
         if (!prefab)
@@ -79,9 +112,19 @@ public class NameFormatter(
         }
 
         var prefabEntity = GetPrefabEntity(entity);
-        return prefabEntity == Entity.Null
-            ? ""
-            : nameSystem.GetRenderedLabelName(prefabEntity);
+        if (prefabEntity == Entity.Null)
+        {
+            return "";
+        }
+
+        var prefabName = prefabSystem.GetPrefabName(prefabEntity);
+        var prefabKey = "Assets.NAME[" + prefabName + "]";
+
+        var localizationManager = GameManager.instance.localizationManager;
+
+        return localizationManager.activeDictionary.TryGetValue(prefabKey, out var localized)
+            ? localized
+            : prefabName;
     }
 
     private Entity GetPrefabEntity(Entity entity)
@@ -94,7 +137,8 @@ public class NameFormatter(
     public string FormatRefers(
         INativeList<NameSourceRefer> refers,
         Entity targetEntity,
-        TargetType targetType = TargetType.None)
+        TargetType targetType = TargetType.None
+    )
     {
         List<NameSourceRefer> copy = [];
         for (var i = 0; i < refers.Length; i++)

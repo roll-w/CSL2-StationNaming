@@ -18,13 +18,16 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+
 namespace StationNaming.Setting;
 
-public struct NameFormat
+public struct NameFormat : IEquatable<NameFormat>
 {
-    public const string Prefab = "[Prefab]";
+    public const string Prefab = "{PREFAB}";
 
     public string Separator { get; set; } = " ";
+    public string NextFormat { get; set; } = "{0}";
     public string Prefix { get; set; } = "";
     public string Suffix { get; set; } = "";
 
@@ -41,17 +44,17 @@ public struct NameFormat
 
     public bool IsAnyPrefab()
     {
-        return Prefix == Prefab || Suffix == Prefab;
+        return Prefix.Contains("{PREFAB}") || Suffix.Contains("{PREFAB}");
     }
 
     private string GetPrefix(string prefab)
     {
-        return Prefix == Prefab ? prefab : Prefix;
+        return Prefix.Replace(Prefab, prefab);
     }
 
     private string GetSuffix(string prefab)
     {
-        return Suffix == Prefab ? prefab : Suffix;
+        return Suffix.Replace(Prefab, prefab);
     }
 
     public string Format(
@@ -62,5 +65,40 @@ public struct NameFormat
         return GetPrefix(prefabName) + name +
                GetSuffix(prefabName) +
                (hasNext ? Separator : "");
+    }
+
+    public bool Equals(NameFormat other)
+    {
+        return Separator == other.Separator &&
+               NextFormat == other.NextFormat &&
+               Prefix == other.Prefix &&
+               Suffix == other.Suffix;
+    }
+
+    public override bool Equals(object obj)
+    {
+        return obj is NameFormat other && Equals(other);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hashCode = (Separator != null ? Separator.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (NextFormat != null ? NextFormat.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (Prefix != null ? Prefix.GetHashCode() : 0);
+            hashCode = (hashCode * 397) ^ (Suffix != null ? Suffix.GetHashCode() : 0);
+            return hashCode;
+        }
+    }
+
+    public static bool operator ==(NameFormat left, NameFormat right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(NameFormat left, NameFormat right)
+    {
+        return !left.Equals(right);
     }
 }

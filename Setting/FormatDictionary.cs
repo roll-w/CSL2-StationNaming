@@ -6,9 +6,7 @@ public class FormatDictionary<TKey> where TKey : notnull
 {
     public NameFormat DefaultFormat { get; set; } = new();
 
-    private readonly Dictionary<TKey, NameFormat> _formats = new()
-    {
-    };
+    private readonly Dictionary<TKey, NameFormat> _formats = new();
 
     public void ApplyFormats(Dictionary<TKey, NameFormat> formats)
     {

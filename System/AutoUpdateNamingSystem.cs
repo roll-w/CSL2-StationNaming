@@ -21,7 +21,9 @@
 using System.Collections.Generic;
 using Game;
 using Game.Common;
+using Game.Prefabs;
 using Game.UI;
+using StationNaming.Setting;
 using Unity.Collections;
 using Unity.Entities;
 
@@ -30,19 +32,25 @@ namespace StationNaming.System;
 public partial class AutoUpdateNamingSystem : GameSystemBase
 {
     private NameSystem _nameSystem;
+    private PrefabSystem _prefabSystem;
     private EntityQuery _associationQuery;
+
+    private NameFormatter _nameFormatter;
 
     protected override void OnUpdate()
     {
-        if (!Mod.GetInstance().GetSettings().Enable)
+        var settings = Mod.GetInstance().GetSettings();
+        if (!settings.Enable)
         {
             return;
         }
 
-        if (!Mod.GetInstance().GetSettings().AutoUpdate)
+        if (!settings.AutoUpdate)
         {
             return;
         }
+
+        _nameFormatter.Options = settings.ToNameOptions();
 
         var entities = _associationQuery.ToEntityArray(Allocator.Temp);
 
@@ -76,13 +84,13 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
             var currentName = _nameSystem.GetRenderedLabelName(target);
             if (!nameCandidate.IsValid() || currentName != nameCandidate.Name)
             {
-                // it probably means the name has been changed by user,
+                // it probably means user has changed the name,
                 // we should not update it
                 EntityManager.RemoveComponent<ManualSelectNaming>(target);
                 continue;
             }
 
-            var updatedName = GetUpdatedName(selectNaming);
+            var updatedName = GetUpdatedName(selectNaming, target);
 
             var copy = nameCandidate;
             copy.Name = updatedName;
@@ -102,13 +110,12 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
         }
     }
 
-    private string GetUpdatedName(ManualSelectNaming selectNaming)
+    private string GetUpdatedName(ManualSelectNaming selectNaming, Entity entity)
     {
         var selectedName = selectNaming.SelectedName;
         var refers = selectedName.Refers;
 
-        var name = StopNameHelper
-            .FormatRefers(refers, EntityManager, _nameSystem);
+        var name = _nameFormatter.FormatRefers(refers, entity);
         return name;
     }
 
@@ -118,6 +125,9 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
 
         _nameSystem = World.DefaultGameObjectInjectionWorld
             .GetExistingSystemManaged<NameSystem>();
+        _prefabSystem = World.DefaultGameObjectInjectionWorld
+            .GetExistingSystemManaged<PrefabSystem>();
+        _nameFormatter = new NameFormatter(EntityManager, _nameSystem, _prefabSystem);
 
         _associationQuery = GetEntityQuery(new EntityQueryDesc
         {
