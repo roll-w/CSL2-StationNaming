@@ -55,7 +55,7 @@ public class NameFormatter(
                 referFormat = LegacyFormatRefers(refers[0], refers[1]);
                 break;
             default:
-                referFormat = StdRefersFormat(refers);
+                referFormat = StdFormatRefers(refers);
                 break;
         }
 
@@ -69,7 +69,7 @@ public class NameFormatter(
         );
     }
 
-    private string StdRefersFormat(IList<NameSourceRefer> refers)
+    private string StdFormatRefers(IList<NameSourceRefer> refers)
     {
         StringBuilder builder = new();
 

@@ -303,6 +303,16 @@ public class StopNameHelper(
             var postProcessed = PostProcessNameCandidate(nameCandidate, target);
             nameCandidates.Add(postProcessed);
         }
+
+        if (!NameOptions.EnableDistrict)
+        {
+            return;
+        }
+
+        if (GenerateDistrictNameCandidate(target, out var districtCandidate))
+        {
+            nameCandidates.Add(districtCandidate);
+        }
     }
 
     private NameCandidate PostProcessNameCandidate(
@@ -347,6 +357,31 @@ public class StopNameHelper(
             candidate.EdgeType,
             newRefers
         );
+    }
+
+    private bool GenerateDistrictNameCandidate(
+        Entity target,
+        out NameCandidate candidate
+    )
+    {
+        var districtEntity = GetDistrictEntity(target, entityManager);
+        if (districtEntity == Entity.Null)
+        {
+            candidate = default;
+            return false;
+        }
+
+        var districtRefer = new NameSourceRefer(districtEntity, NameSource.District);
+        List<NameSourceRefer> refers = [districtRefer];
+        var name = _nameFormatter.FormatRefers(refers, target);
+
+        candidate = NameCandidate.Of(
+            name,
+            Direction.Init,
+            EdgeType.Same,
+            districtRefer
+        );
+        return true;
     }
 
     private NameCandidate GenerateNameCandidate(
