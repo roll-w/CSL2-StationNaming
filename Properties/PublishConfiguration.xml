@@ -24,26 +24,15 @@ check the mod settings to avoid conflicts.
 
 ## Settings
 
-Except the showing settings, you could also customize the naming rules in the
-mod setting file where is located at
+Except the displayed settings, you could also customize the naming rules in the
+mod setting file where it is located at
 `AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
 
-You could change the naming format for the intersection and set your own prefix
+You could change the naming format for the different types and set your own prefix
 and suffix for the station names.
 
-
-RollW_StationNaming
-
-{
-
-"IntersectionNamingFormat": "{0} &amp; {1}", // The naming format for intersection
-
-"Prefix": " ", // Set your own prefix here
-
-"Suffix": " ", // Set your own suffix here
-
-}
-
+For more information on how to set the name format in the setting file,
+please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNaming).
 
 ## Translations
 
@@ -53,14 +42,14 @@ RollW_StationNaming
 
 ## Planned Features
 
-- Supports district name as prefix/suffix.
 - Allow setting the naming format for different name sources.
+- Allow adding a sequential number to the names. E.g., Station 1, Station 2...
 - Supports naming Schools, Hospitals...
 
 ## Support
 
 If you have any problems during using this mod, please open an issue or discussion
-on Github.
+on GitHub.
 	</LongDescription>
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
@@ -69,21 +58,22 @@ on Github.
 	<Screenshot Value="Properties/Screenshots/2.jpg" />
 	<Screenshot Value="Properties/Screenshots/3.jpg" />
 	<Screenshot Value="Properties/Screenshots/4.jpg" />
-	<Screenshot Value="Properties/Screenshots/5.jpg" />
-	<Screenshot Value="Properties/Screenshots/6.jpg" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.2.1" />
+	<ModVersion Value="0.3.0" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Fix: Mod not loading the save properly.
+- Feature: Support get the real name of spawnable building.
+- Feature: Support custom the address format and allow overriding the vanilla address format.
+- Feature: New name format: {PREFAB} to insert the asset name in prefix/suffix.
+- Feature: Support district name as prefix/suffix.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />
