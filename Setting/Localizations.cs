@@ -348,8 +348,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "電力服務"),
             new Translation("StationNaming.NameSource[Water]")
                 .AddTranslation(LocaleCode.EnUs, "Water Service")
-                .AddTranslation(LocaleCode.ZhHans, "水服务")
-                .AddTranslation(LocaleCode.ZhHant, "水服務"),
+                .AddTranslation(LocaleCode.ZhHans, "净水服务")
+                .AddTranslation(LocaleCode.ZhHant, "淨水服務"),
             new Translation("StationNaming.NameSource[Sewage]")
                 .AddTranslation(LocaleCode.EnUs, "Sewage Service")
                 .AddTranslation(LocaleCode.ZhHans, "污水服务")

@@ -34,11 +34,15 @@ using FireStation = Game.Buildings.FireStation;
 using GarbageFacility = Game.Buildings.GarbageFacility;
 using Hospital = Game.Buildings.Hospital;
 using Park = Game.Buildings.Park;
+using ParkingFacility = Game.Buildings.ParkingFacility;
 using PoliceStation = Game.Buildings.PoliceStation;
+using PostFacility = Game.Buildings.PostFacility;
 using School = Game.Buildings.School;
+using SewageOutlet = Game.Buildings.SewageOutlet;
 using TelecomFacility = Game.Buildings.TelecomFacility;
 using TransportDepot = Game.Buildings.TransportDepot;
 using TransportStation = Game.Buildings.TransportStation;
+using WaterPumpingStation = Game.Buildings.WaterPumpingStation;
 
 namespace StationNaming.System;
 
@@ -54,11 +58,15 @@ public static class NameUtils
         { typeof(PoliceStation), NameSource.PoliceStation },
         { typeof(Hospital), NameSource.Hospital },
         { typeof(TransportStation), NameSource.TransportStation },
+        { typeof(ElectricityProducer), NameSource.Electricity },
+        { typeof(SewageOutlet), NameSource.Sewage },
+        { typeof(WaterPumpingStation), NameSource.Water },
         { typeof(GarbageFacility), NameSource.CityService },
         { typeof(DisasterFacility), NameSource.CityService },
         { typeof(DeathcareFacility), NameSource.CityService },
         { typeof(TelecomFacility), NameSource.CityService },
-        { typeof(ElectricityProducer), NameSource.CityService },
+        { typeof(PostFacility), NameSource.CityService },
+        { typeof(ParkingFacility), NameSource.CityService },
         { typeof(Building), NameSource.Building }
     };
 
@@ -199,7 +207,6 @@ public static class NameUtils
             _ => nameKey
         };
     }
-
 
     private const string KeyNumber = "NUMBER";
 
