@@ -54,6 +54,7 @@ RollW_StationNaming
 ## Planned Features
 
 - Allow setting the naming format for different name sources.
+- Allow adding a sequential number to the names. E.g., Station 1, Station 2...
 - Allow naming Schools, Hospitals...
 
 ## Support
