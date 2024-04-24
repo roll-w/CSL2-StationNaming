@@ -26,10 +26,6 @@ public enum NameSource : uint
 {
     Owner = 0,
     Road,
-    /**
-     * Not used in the current version. But reserved for compatibility.
-     */
-    [Obsolete("Not used in the current version. But reserved for compatibility.")]
     Intersection,
     District,
     TransportStation,
