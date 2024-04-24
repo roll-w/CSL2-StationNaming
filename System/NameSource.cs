@@ -32,6 +32,7 @@ public enum NameSource : uint
     [Obsolete("Not used in the current version. But reserved for compatibility.")]
     Intersection,
     District,
+    Sequence,
     TransportStation,
     TransportDepot,
     SpawnableBuilding,
