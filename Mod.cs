@@ -60,6 +60,7 @@ namespace StationNaming
             );
 
             LOG.Info($"Load settings: {_settings.ToJSONString()}");
+            _settings.ApplyAddressFormats();
 
             updateSystem.UpdateAt<UIBindingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<AutoTaggingSystem>(SystemUpdatePhase.UIUpdate);
