@@ -64,7 +64,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
-    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetSeparatorOptions))]
+    [SettingsUITextInput]
     public string NamingSeparator { get; set; } = " & ";
 
     [SettingsUISection(SectionOther, GroupStable)]
@@ -79,11 +79,11 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     public int SearchDepth { get; set; } = 2;
 
     [SettingsUISection(SectionGeneral, GroupStable)]
+    [SettingsUITextInput]
     public string Prefix { get; set; } = "";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
-    [SettingsUIDropdown(typeof(RoadNamingProvider),
-        nameof(RoadNamingProvider.GetSuffixOptions))]
+    [SettingsUITextInput]
     public string Suffix { get; set; } = "";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
@@ -130,8 +130,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     private string _addressNameFormat = "{NUMBER} {ROAD}";
 
     [SettingsUISection(SectionBuilding, GroupSpawnable)]
-    [SettingsUIDropdown(typeof(RoadNamingProvider),
-        nameof(RoadNamingProvider.GetAddressNameFormatOptions))]
+    [SettingsUITextInput]
     public string AddressNameFormat
     {
         get => _addressNameFormat;
@@ -145,8 +144,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     private string _namedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
 
     [SettingsUISection(SectionBuilding, GroupSpawnable)]
-    [SettingsUIDropdown(typeof(RoadNamingProvider),
-        nameof(RoadNamingProvider.GetNamedAddressNameFormatOptions))]
+    [SettingsUITextInput]
     public string NamedAddressNameFormat
     {
         get => _namedAddressNameFormat;
@@ -278,46 +276,6 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             ];
         }
 
-        public static DropdownItem<string>[] GetSeparatorOptions()
-        {
-            return
-            [
-                new DropdownItem<string> { value = "", displayName = "None" },
-                new DropdownItem<string> { value = " ", displayName = "Space" },
-                new DropdownItem<string> { value = " & ", displayName = " & " },
-                new DropdownItem<string> { value = " - ", displayName = " - " },
-                new DropdownItem<string> { value = " @", displayName = " @" },
-                new DropdownItem<string> { value = ", ", displayName = ", " },
-                new DropdownItem<string> { value = " : ", displayName = " : " },
-                new DropdownItem<string> { value = " . ", displayName = " . " },
-            ];
-        }
-
-        public static DropdownItem<string>[] GetAddressNameFormatOptions()
-        {
-            return
-            [
-                new DropdownItem<string> { value = "{NUMBER} {ROAD}", displayName = "{NUMBER} {ROAD}" },
-                new DropdownItem<string> { value = "{ROAD} {NUMBER}", displayName = "{ROAD} {NUMBER}" },
-                new DropdownItem<string> { value = "{ROAD}{NUMBER}", displayName = "{ROAD}{NUMBER}" },
-                new DropdownItem<string> { value = "{NUMBER}{ROAD}", displayName = "{NUMBER}{ROAD}" },
-                new DropdownItem<string> { value = "{ROAD} - {NUMBER}", displayName = "{ROAD} - {NUMBER}" },
-            ];
-        }
-
-        public static DropdownItem<string>[] GetNamedAddressNameFormatOptions()
-        {
-            return
-            [
-                new DropdownItem<string> { value = "{NAME}, {NUMBER} {ROAD}", displayName = "{NAME}, {ROAD} {NUMBER}" },
-                new DropdownItem<string> { value = "{NAME}, {ROAD} {NUMBER}", displayName = "{NAME}, {ROAD} {NUMBER}" },
-                new DropdownItem<string> { value = "{ROAD} {NUMBER}, {NAME}", displayName = "{ROAD} {NUMBER}, {NAME}" },
-                new DropdownItem<string> { value = "{ROAD} {NUMBER} {NAME}", displayName = "{ROAD} {NUMBER} {NAME}" },
-                new DropdownItem<string> { value = "{NUMBER} {ROAD} {NAME}", displayName = "{NUMBER} {ROAD} {NAME}" },
-                new DropdownItem<string> { value = "{NUMBER} {ROAD}, {NAME}", displayName = "{NUMBER} {ROAD}, {NAME}" }
-            ];
-        }
-
         public static DropdownItem<NameFormat>[] GetNameFormatOptions()
         {
             return
@@ -325,16 +283,6 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                 new DropdownItem<NameFormat> { value = NameFormat.Invalid, displayName = "None" },
                 new DropdownItem<NameFormat> { value = new NameFormat { Separator = " " }, displayName = "Space" },
                 new DropdownItem<NameFormat> { value = new NameFormat { Separator = " - " }, displayName = "Hyphen" },
-            ];
-        }
-
-        public static DropdownItem<string>[] GetSuffixOptions()
-        {
-            return
-            [
-                new DropdownItem<string> { value = "", displayName = "No Suffix" },
-                new DropdownItem<string> { value = " {PREFAB}", displayName = " {PREFAB}" },
-                new DropdownItem<string> { value = "{PREFAB}", displayName = "{PREFAB}" },
             ];
         }
     }
