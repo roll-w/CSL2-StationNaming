@@ -90,9 +90,9 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "後綴"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Suffix]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "The suffix to be added to the station name. {PREFAB} represents the target building name, such as \"Train Station\".")
-                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。{PREFAB} 表示目标建筑名称，如\"火车站\"等。")
-                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。{PREFAB} 表示目標建築名稱，如\"火車站\"等。"),
+                    "The suffix to be added to the station name. Enter {PREFAB} to replace with the target asset name, such as \"Train Station\".")
+                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。输入 {PREFAB} 以替换为目标资产名称，如\"火车站\"等。")
+                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。輸入 {PREFAB} 以替換為目標資產名稱，如\"火車站\"等。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.NamingSeparator]")
                 .AddTranslation(LocaleCode.EnUs, "Default Name Separator")
                 .AddTranslation(LocaleCode.ZhHans, "默认名称间分隔符")
@@ -148,10 +148,9 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingName]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "When enabled, allow generate name candidates from surrounding buildings. " +
-                    "After setting, it may take some time to take effect.")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成名称候选。修改后，可能需要过一段时间才能生效。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成名稱候選。修改後，可能需要過一段時間才能生效。"),
+                    "When enabled, allow generate name candidates from surrounding buildings. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成名称候选。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成名稱候選。"),
 
             new Translation(
                     "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingNameWithCurrentRoad]")
@@ -162,10 +161,9 @@ namespace StationNaming.Setting
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingNameWithCurrentRoad]")
                 .AddTranslation(LocaleCode.EnUs,
                     "When enabled, allow generate name candidates from surrounding buildings with current road name, " +
-                    "the format will be the same as the intersection naming format. " +
-                    "After setting, it may take some time to take effect.")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成包含当前道路的名称候选，格式将与交叉口命名格式相同。修改后，可能需要过一段时间才能生效。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成包含當前道路的名稱候選，格式將與交叉口命名格式相同。修改後，可能需要過一段時間才能生效。"),
+                    "the format will be the same as the intersection naming format. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围建筑中生成包含当前道路的名称候选，格式将与交叉口命名格式相同。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍建築中生成包含當前道路的名稱候選，格式將與交叉口命名格式相同。"),
 
             new Translation(
                     "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SpawnableBuildingName]")
@@ -176,12 +174,9 @@ namespace StationNaming.Setting
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SpawnableBuildingName]")
                 .AddTranslation(LocaleCode.EnUs,
                     "When enabled, allow generate name candidates from surrounding spawnable buildings. " +
-                    "[May cause increased resource consumption, please enable as needed. ] " +
-                    "After setting, it may take some time to take effect.")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围自长建筑中生成名称候选。[但可能造成资源消耗增加，请按需开启。]" +
-                                                   "修改后，可能需要过一段时间才能生效。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍自長建築中生成名稱候選。[但可能造成資源消耗增加，請按需開啟。]" +
-                                                   "修改後，可能需要過一段時間才能生效。"),
+                    "[May cause increased resource consumption, please enable as needed. ]")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围自长建筑中生成名称候选。[但可能造成资源消耗增加，请按需开启。]")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍自長建築中生成名稱候選。[但可能造成資源消耗增加，請按需開啟。]"),
             new Translation(
                     "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AddressNameFormat]")
                 .AddTranslation(LocaleCode.EnUs, "Address Format")

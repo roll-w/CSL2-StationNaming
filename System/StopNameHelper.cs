@@ -212,6 +212,13 @@ public class StopNameHelper(
             roadEdge.EdgeType,
             refers
         ));
+
+        nameCandidates.Add(NameCandidate.Of(
+            string.Empty,
+            roadEdge.Direction,
+            roadEdge.EdgeType,
+            root, NameSource.Intersection
+        ));
     }
 
     private void CollectBuildingNames(
