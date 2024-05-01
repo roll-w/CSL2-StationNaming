@@ -18,9 +18,9 @@ check the mod settings to avoid conflicts.
 
 ## Features
 
-- Automatically name your transport stations and stops.
+- Automatically name your transport stations, stops.
 - Customizable naming rules.
-- Generate names from surrounding buildings or roads.
+- Generate names from surrounding buildings, roads, or the current district.
 
 ## Settings
 
@@ -44,7 +44,6 @@ please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNamin
 
 - Allow setting the naming format for different name sources.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
-- Supports naming Schools, Hospitals...
 
 ## Support
 
@@ -58,20 +57,23 @@ on GitHub.
 	<Screenshot Value="Properties/Screenshots/2.jpg" />
 	<Screenshot Value="Properties/Screenshots/3.jpg" />
 	<Screenshot Value="Properties/Screenshots/4.jpg" />
+	<Screenshot Value="Properties/Screenshots/5.jpg" />
 	<!--Tag, can be set multiple times-->
 	<Tag Value="Code Mod" />
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.3.1" />
+	<ModVersion Value="0.3.2" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Support input custom prefix/suffix in settings.
-- Fix: Compatibility issues in some rare cases.
+- Feature: Supports naming Schools, Hospitals and other city service buildings.
+  - Note: Auto Naming are currently not available for city service buildings.
+- Feature: The name can be automatically updated after the name is modified.
+- Feature: Add temporary setting options for stops.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />
