@@ -8,9 +8,9 @@ check the mod settings to avoid conflicts.
 
 ## Features
 
-- Automatically name your transport stations and stops.
+- Automatically name your transport stations, stops.
 - Customizable naming rules.
-- Generate names from surrounding buildings or roads.
+- Generate names from surrounding buildings, roads, or the current district.
 
 ## Settings
 
@@ -55,7 +55,6 @@ RollW_StationNaming
 
 - Allow setting the naming format for different name sources.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
-- Allow naming Schools, Hospitals...
 
 ## Support
 
