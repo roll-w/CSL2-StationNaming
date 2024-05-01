@@ -304,7 +304,7 @@ namespace StationNaming.Setting
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]")
                 .AddTranslation(LocaleCode.EnUs,
                     "Here are the options specifically for the stops, " +
-                    "which may be replaced by more detailed settings in the future.")
+                    "and may be replaced by more detailed settings in the future.")
                 .AddTranslation(LocaleCode.ZhHans,
                     "这是为站牌单独设置的选项，之后可能会被更详细的设置取代。")
                 .AddTranslation(LocaleCode.ZhHant,
