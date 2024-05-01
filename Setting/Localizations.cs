@@ -303,7 +303,7 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "This is the options specifically set for the stops, " +
+                    "Here are the options specifically for the stops, " +
                     "which may be replaced by more detailed settings in the future.")
                 .AddTranslation(LocaleCode.ZhHans,
                     "这是为站牌单独设置的选项，之后可能会被更详细的设置取代。")
