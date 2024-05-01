@@ -22,6 +22,7 @@ using Colossal.IO.AssetDatabase;
 using Game.Modding;
 using Game.SceneFlow;
 using Game.Settings;
+using Game.UI.Localization;
 using Game.UI.Widgets;
 using StationNaming.System;
 
@@ -98,7 +99,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     [SettingsUISection(SectionGeneral, GroupStops)]
     [SettingsUIMultilineText]
-    public string StopsDescription { get; set; } = string.Empty;
+    public LocalizedString StopsDescription => LocalizedString.Id(
+        "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]");
 
     /// <summary>
     /// Should apply prefix and suffix to stops.
