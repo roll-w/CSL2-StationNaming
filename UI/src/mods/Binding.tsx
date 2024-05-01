@@ -1,11 +1,24 @@
-﻿import {Entity, selectedInfo} from "cs2/bindings";
+﻿import {selectedInfo} from "cs2/bindings";
 import {CandidatesSectionKey} from "./NameCandidatesComponent";
+import {bindValue, useValue} from "cs2/api";
+import {StationNaming} from "./base";
+import ModName = StationNaming.ModName;
+import {ModuleRegistryAppend} from "cs2/modding";
 
 let currentEntity: any = null;
 const selectedEntity$ = selectedInfo.selectedEntity$;
 const middleSections$ = selectedInfo.middleSections$;
 
-export const InfoPanelBinding = () => {
+const isShowCandidates$ = bindValue<boolean>(
+    ModName, "IsShowCandidates", false);
+
+const isShowCandidates = () => {
+    return useValue(isShowCandidates$);
+}
+
+export const InfoPanelBinding: ModuleRegistryAppend = () => {
+    const showCandidates = isShowCandidates();
+
     selectedEntity$.subscribe((entity) => {
         if (!entity.index) {
             currentEntity = null;
@@ -19,9 +32,7 @@ export const InfoPanelBinding = () => {
 
     middleSections$.subscribe(value => {
         if (currentEntity && value.every(item => item?.__Type !== CandidatesSectionKey as any)) {
-            // if (value.find(item => item?.__Type == SectionType.Lines)) {
-            // SectionType.Lines is undefined here so we use the string value instead
-            if (value.find(item => item?.__Type === "Game.UI.InGame.LinesSection" as any)) {
+            if (showCandidates) {
                 value.unshift({
                     __Type: CandidatesSectionKey,
                     group: "DescriptionSection"
@@ -32,7 +43,6 @@ export const InfoPanelBinding = () => {
                 value[0] = desc
             }
         }
-
     })
     return <></>
 }

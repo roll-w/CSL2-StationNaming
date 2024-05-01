@@ -20,6 +20,7 @@
 
 using System.Collections.Generic;
 using Colossal.UI.Binding;
+using Game.Routes;
 using Game.UI;
 using StationNaming.System.Utils;
 using Unity.Entities;
@@ -41,6 +42,11 @@ public partial class UIBindingSystem : UISystemBase
             Mod.Name,
             nameof(SetSelectedEntity),
             SetSelectedEntity
+        ));
+
+        AddUpdateBinding(new GetterValueBinding<bool>(
+            Mod.Name, "IsShowCandidates",
+            IsShowCandidates
         ));
 
         AddBinding(new CallBinding<Entity, ManagedNameCandidate, bool>(
@@ -106,6 +112,46 @@ public partial class UIBindingSystem : UISystemBase
         return result;
     }
 
+    private bool IsShowCandidates()
+    {
+        var entity = _selectedEntity;
+
+        if (entity == Entity.Null)
+        {
+            return false;
+        }
+
+        if (EntityManager.HasComponent<TransportStop>(entity))
+        {
+            return true;
+        }
+
+        var buildingSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
+
+        return buildingSource switch
+        {
+            NameSource.TransportStation
+                or NameSource.TransportDepot
+                or NameSource.FireStation
+                or NameSource.PoliceStation
+                or NameSource.School
+                or NameSource.Hospital
+                or NameSource.Park
+                or NameSource.Electricity
+                or NameSource.Water
+                or NameSource.Sewage
+                or NameSource.CityService
+                => true,
+            NameSource.District or
+                NameSource.Owner or
+                NameSource.None or
+                NameSource.Road or
+                NameSource.Intersection or
+                NameSource.SignatureBuilding or
+                NameSource.SpawnableBuilding => false,
+            _ => false
+        };
+    }
 
     private bool SetCandidateFor(Entity entity, ManagedNameCandidate candidate)
     {

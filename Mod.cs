@@ -66,6 +66,7 @@ namespace StationNaming
             updateSystem.UpdateAt<AutoTaggingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<TransportStationNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<TransportStopNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAt<GeneralBuildingNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateBefore<AutoUpdateNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAfter<AutoNamingSystem>(SystemUpdatePhase.UIUpdate);
         }

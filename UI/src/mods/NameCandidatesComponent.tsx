@@ -1,7 +1,7 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
 import React, {useEffect, useState} from "react";
 import {PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
-import {call, trigger} from "cs2/api";
+import {bindValue, call, trigger, useValue} from "cs2/api";
 import {selectedInfo, Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
 import NameCandidate = StationNaming.NameCandidate;
@@ -147,7 +147,7 @@ const CandidatesComponent = () => {
 }
 
 export const InfoPanelExtComponent: ModuleRegistryExtend = (components: any): any => {
-    selectedInfo.selectedEntity$.subscribe(selectedEntityChanged);
+    selectedInfo.selectedEntity$.subscribe(selectedEntityChanged)
 
     components[CandidatesSectionKey] = () =>
         <CandidatesComponent/>
