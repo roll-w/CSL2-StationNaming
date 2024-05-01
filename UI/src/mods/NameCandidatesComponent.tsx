@@ -153,7 +153,11 @@ const CandidatesComponent = () => {
 }
 
 export const InfoPanelExtComponent: ModuleRegistryExtend = (components: any): any => {
-    selectedInfo.selectedEntity$.subscribe(selectedEntityChanged)
+    try {
+        selectedInfo.selectedEntity$.subscribe(selectedEntityChanged)
+    } catch (e) {
+        console.log("[StationNaming] There was an error subscribing to selectedEntity$, this shouldn't have happened.", e)
+    }
 
     components[CandidatesSectionKey] = () =>
         <CandidatesComponent/>
