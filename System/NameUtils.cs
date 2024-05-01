@@ -42,6 +42,7 @@ using SewageOutlet = Game.Buildings.SewageOutlet;
 using TelecomFacility = Game.Buildings.TelecomFacility;
 using TransportDepot = Game.Buildings.TransportDepot;
 using TransportStation = Game.Buildings.TransportStation;
+using TransportStop = Game.Routes.TransportStop;
 using WaterPumpingStation = Game.Buildings.WaterPumpingStation;
 
 namespace StationNaming.System;
@@ -124,6 +125,17 @@ public static class NameUtils
         }
 
         return NameSource.None;
+    }
+
+    public static TargetType GetTargetType(Entity target, EntityManager entityManager)
+    {
+        if (entityManager.HasComponent<TransportStop>(target))
+        {
+            return TargetType.Stop;
+        }
+
+        // TODO: add more target types
+        return TargetType.None;
     }
 
     private static readonly FieldInfo NameTypeField = typeof(NameSystem.Name)

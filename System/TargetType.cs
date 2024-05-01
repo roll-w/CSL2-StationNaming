@@ -16,8 +16,11 @@ public enum TargetType
     Airport,
     TaxiStand,
     TaxiStation,
+    Stop,
+    Station,
     Custom,
-    None
+    None,
+    Unknown
 }
 
 public static class TargetTypeExtensions
@@ -33,6 +36,7 @@ public static class TargetTypeExtensions
             TargetType.ShipStop => true,
             TargetType.AirplaneStop => true,
             TargetType.TaxiStand => true,
+            TargetType.Stop => true,
             _ => false
         };
     }
@@ -48,6 +52,7 @@ public static class TargetTypeExtensions
             TargetType.Harbor => true,
             TargetType.Airport => true,
             TargetType.TaxiStation => true,
+            TargetType.Station => true,
             _ => false
         };
     }
