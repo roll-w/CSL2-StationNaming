@@ -40,8 +40,7 @@ public class NameFormatter(
 
     public string FormatRefers(
         IList<NameSourceRefer> refers,
-        Entity targetEntity,
-        TargetType targetType = TargetType.None)
+        Entity targetEntity)
     {
         var count = refers.Count;
         string referFormat;
@@ -58,6 +57,8 @@ public class NameFormatter(
                 referFormat = StdFormatRefers(refers);
                 break;
         }
+
+        var targetType = NameUtils.GetTargetType(targetEntity, entityManager);
 
         var targetFormat = Options.TargetFormats[targetType];
         var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
@@ -144,8 +145,7 @@ public class NameFormatter(
 
     public string FormatRefers(
         INativeList<NameSourceRefer> refers,
-        Entity targetEntity,
-        TargetType targetType = TargetType.None
+        Entity targetEntity
     )
     {
         List<NameSourceRefer> copy = [];
@@ -154,6 +154,6 @@ public class NameFormatter(
             copy.Add(refers[i]);
         }
 
-        return FormatRefers(copy, targetEntity, targetType);
+        return FormatRefers(copy, targetEntity);
     }
 }
