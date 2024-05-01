@@ -110,6 +110,11 @@ public static class EdgeUtils
                 continue;
             }
 
+            if (IsTrack(connectedEdge.m_Edge, entityManager))
+            {
+                continue;
+            }
+
             var edgeAggregated =
                 entityManager.GetComponentData<Aggregated>(connectedEdge.m_Edge);
             if (edgeAggregated.m_Aggregate != aggregate)
@@ -126,6 +131,22 @@ public static class EdgeUtils
                 );
             }
         }
+    }
+
+    private static bool IsTrack(Entity edge, EntityManager entityManager)
+    {
+        if (entityManager.HasComponent<Road>(edge))
+        {
+            return false;
+        }
+
+        if (entityManager.HasComponent<TrainTrack>(edge))
+        {
+            return true;
+        }
+
+        return entityManager.HasComponent<TramTrack>(edge) ||
+               entityManager.HasComponent<SubwayTrack>(edge);
     }
 }
 
