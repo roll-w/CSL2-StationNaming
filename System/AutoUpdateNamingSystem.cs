@@ -80,9 +80,11 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
 
             var selectNaming =
                 EntityManager.GetComponentData<ManualSelectNaming>(target);
-            var nameCandidate = selectNaming.SelectedName;
+            var rawNameCandidate = selectNaming.SelectedName;
             var currentName = _nameSystem.GetRenderedLabelName(target);
-            if (!nameCandidate.IsValid() || currentName != nameCandidate.Name)
+            var rawCandidateName = rawNameCandidate.Name.ToString();
+            if (!rawNameCandidate.IsValid() ||
+                !currentName.Contains(rawCandidateName))
             {
                 // it probably means user has changed the name,
                 // we should not update it
@@ -92,7 +94,7 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
 
             var updatedName = GetUpdatedName(selectNaming, target);
 
-            var copy = nameCandidate;
+            var copy = rawNameCandidate;
             copy.Name = updatedName;
 
             valid.Add(naming);
@@ -100,7 +102,9 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
                 target,
                 new ManualSelectNaming(copy)
             );
-            _nameSystem.SetCustomName(target, updatedName);
+
+            var targetName = currentName.Replace(rawCandidateName, updatedName);
+            _nameSystem.SetCustomName(target, targetName);
         }
 
         namingAssociations.Clear();
