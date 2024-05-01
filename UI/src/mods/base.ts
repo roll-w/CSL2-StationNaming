@@ -1,7 +1,15 @@
 ﻿import {Entity} from "cs2/input";
+import {bindValue, useValue} from "cs2/api";
 
 export namespace StationNaming {
     export const ModName = "RollW_StationNaming";
+
+    export const isShowCandidates$ = bindValue<boolean>(
+        ModName, "IsShowCandidates", false);
+
+    export const isShowCandidates = () => {
+        return useValue(isShowCandidates$);
+    }
 
     export type NameSourceRefer = {
         source: string;

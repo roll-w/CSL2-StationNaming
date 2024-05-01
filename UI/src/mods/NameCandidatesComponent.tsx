@@ -1,7 +1,7 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
 import React, {useEffect, useState} from "react";
 import {PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
-import {bindValue, call, trigger, useValue} from "cs2/api";
+import {call, trigger} from "cs2/api";
 import {selectedInfo, Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
 import NameCandidate = StationNaming.NameCandidate;
@@ -13,6 +13,7 @@ import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 import combineNameSource = StationNaming.combineNameSource;
 import NameSource = StationNaming.NameSource;
+import isShowCandidates = StationNaming.isShowCandidates;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
@@ -69,6 +70,11 @@ const CandidatesFoldout = (props: {
 
 
 const CandidatesComponent = () => {
+    const showCandidates = isShowCandidates();
+    if (!showCandidates) {
+        return <></>
+    }
+
     const [nameCandidates, setNameCandidates] =
         useState<SerializedNameCandidate[]>([])
 
