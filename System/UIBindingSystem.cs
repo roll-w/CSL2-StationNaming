@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using Colossal.UI.Binding;
 using Game.Routes;
@@ -142,13 +143,6 @@ public partial class UIBindingSystem : UISystemBase
                 or NameSource.Sewage
                 or NameSource.CityService
                 => true,
-            NameSource.District or
-                NameSource.Owner or
-                NameSource.None or
-                NameSource.Road or
-                NameSource.Intersection or
-                NameSource.SignatureBuilding or
-                NameSource.SpawnableBuilding => false,
             _ => false
         };
     }
