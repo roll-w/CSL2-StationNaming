@@ -44,6 +44,7 @@ using TransportDepot = Game.Buildings.TransportDepot;
 using TransportStation = Game.Buildings.TransportStation;
 using TransportStop = Game.Routes.TransportStop;
 using WaterPumpingStation = Game.Buildings.WaterPumpingStation;
+using WelfareOffice = Game.Buildings.WelfareOffice;
 
 namespace StationNaming.System;
 
@@ -62,6 +63,8 @@ public static class NameUtils
         { typeof(ElectricityProducer), NameSource.Electricity },
         { typeof(SewageOutlet), NameSource.Sewage },
         { typeof(WaterPumpingStation), NameSource.Water },
+        { typeof(AdminBuilding), NameSource.CityService },
+        { typeof(WelfareOffice), NameSource.CityService },
         { typeof(GarbageFacility), NameSource.CityService },
         { typeof(DisasterFacility), NameSource.CityService },
         { typeof(DeathcareFacility), NameSource.CityService },
