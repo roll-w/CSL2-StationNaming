@@ -121,7 +121,11 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     public string StopSuffix { get; set; } = "";
 
     [SettingsUISection(SectionOther, GroupDistrict)]
-    public bool EnableDistrict { get; set; } = false;
+    public bool EnableDistrict { get; set; } = true;
+
+    [SettingsUISection(SectionOther, GroupDistrict)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictDisabled))]
+    public bool EnableDistrictPrefix { get; set; } = false;
 
     [SettingsUISection(SectionOther, GroupDistrict)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
@@ -260,7 +264,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         NamedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
         OverrideVanillaAddress = true;
 
-        EnableDistrict = false;
+        EnableDistrict = true;
+        EnableDistrictPrefix = false;
 
         RoadFormat = NameFormat.Invalid;
         DistrictFormat = NameFormat.Invalid;
@@ -274,6 +279,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             BuildingNameWithCurrentRoad = BuildingName && BuildingNameWithCurrentRoad,
             SpawnableBuildingName = BuildingName && SpawnableBuildingName,
             EnableDistrict = EnableDistrict,
+            EnableDistrictPrefix = EnableDistrict && EnableDistrictPrefix,
             SourceFormats =
             {
                 DefaultFormat = new NameFormat

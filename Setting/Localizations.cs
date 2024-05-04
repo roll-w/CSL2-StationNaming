@@ -260,9 +260,20 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrict]")
                 .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, allow the district name to be added as a source to the name candidates.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许将区域名称作为来源添加到名称候选列表中。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許將區域名稱作為來源添加到名稱候選列表中。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrictPrefix]")
+                .AddTranslation(LocaleCode.EnUs, "Enable District Name Prefix")
+                .AddTranslation(LocaleCode.ZhHans, "启用地区名称前缀")
+                .AddTranslation(LocaleCode.ZhHant, "啟用地區名稱前綴"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrictPrefix]")
+                .AddTranslation(LocaleCode.EnUs,
                     "When enabled, add the district name as a prefix/suffix for each name candidate (controlled by the reverse order option).")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，为每个名称候选都添加地区名称作为前缀/后缀（受到反转顺序控制）。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，為每個名稱候選都添加地區名稱作為前綴/後綴（受到反轉順序控制）。"),
+                .AddTranslation(LocaleCode.ZhHans, "启用后，为每个名称候选都添加区域名称作为前缀/后缀（受到反转顺序控制）。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，為每個名稱候選都添加區域名稱作為前綴/後綴（受到反轉順序控制）。"),
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")

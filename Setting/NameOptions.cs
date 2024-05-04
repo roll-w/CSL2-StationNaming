@@ -32,6 +32,7 @@ public struct NameOptions
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
     public bool SpawnableBuildingName { get; set; } = true;
     public bool EnableDistrict { get; set; } = true;
+    public bool EnableDistrictPrefix { get; set; } = false;
 
     public FormatDictionary<NameSource> SourceFormats { get; private set; } = new();
 
