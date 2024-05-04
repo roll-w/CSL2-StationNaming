@@ -156,8 +156,12 @@ public class StopNameHelper(
             roadRefer
         ));
 
-        bool hasStart = false, hasEnd = false;
-        foreach (var roadEdge in collectEdges)
+        var roadEdges = collectEdges.ToList();
+
+        AddRoadCandidate(Direction.End, roadEdges, nameCandidates, currentRoad);
+        AddRoadCandidate(Direction.Start, roadEdges, nameCandidates, currentRoad);
+
+        foreach (var roadEdge in roadEdges)
         {
             if (NameOptions.BuildingName)
             {
@@ -167,30 +171,32 @@ public class StopNameHelper(
                     nameCandidates, includeSelf
                 );
             }
-
-            if (roadEdge.EdgeType != EdgeType.Other)
-            {
-                continue;
-            }
-
-            switch (roadEdge.Direction)
-            {
-                case Direction.Start when !hasStart:
-                    hasStart = true;
-                    AddRoadCandidate(roadEdge, root, nameCandidates);
-                    break;
-                case Direction.End when !hasEnd:
-                    hasEnd = true;
-                    AddRoadCandidate(roadEdge, root, nameCandidates);
-                    break;
-                case Direction.Init:
-                default:
-                    continue;
-            }
         }
 
         SetCandidates(nameCandidates, target);
         return nameCandidates;
+    }
+
+    private void AddRoadCandidate(
+        Direction direction,
+        IEnumerable<RoadEdge> roadEdges,
+        ICollection<NameCandidate> nameCandidates,
+        RoadEdge currentRoad
+    )
+    {
+        var edges = roadEdges
+            .Where(e => e.Direction == direction
+                        && e.EdgeType == EdgeType.Other)
+            .OrderBy(it => -it.Depth)
+            .ToList();
+        if (edges.Count == 0)
+        {
+            return;
+        }
+
+        var first = edges.FirstOrDefault();
+
+        AddRoadCandidate(first, currentRoad.Edge, nameCandidates);
     }
 
     private void AddRoadCandidate(
@@ -327,7 +333,7 @@ public class StopNameHelper(
         Entity target
     )
     {
-        if (!NameOptions.EnableDistrict || candidate.Refers.Length == 0)
+        if (!NameOptions.EnableDistrictPrefix || candidate.Refers.Length == 0)
         {
             return GenerateNameCandidate(candidate, target);
         }

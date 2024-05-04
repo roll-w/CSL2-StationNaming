@@ -21,7 +21,6 @@
 using System;
 using System.Collections.Generic;
 using Game.Net;
-using Game.UI;
 using Unity.Entities;
 
 namespace StationNaming.System;
@@ -119,11 +118,11 @@ public static class EdgeUtils
                 entityManager.GetComponentData<Aggregated>(connectedEdge.m_Edge);
             if (edgeAggregated.m_Aggregate != aggregate)
             {
-                edges.Add(new RoadEdge(direction, EdgeType.Other, connectedEdge.m_Edge));
+                edges.Add(new RoadEdge(direction, EdgeType.Other, connectedEdge.m_Edge, depth));
                 continue;
             }
 
-            if (edges.Add(new RoadEdge(direction, EdgeType.Same, connectedEdge.m_Edge)))
+            if (edges.Add(new RoadEdge(direction, EdgeType.Same, connectedEdge.m_Edge, depth)))
             {
                 CollectEdges(
                     entityManager, connectedEdge.m_Edge, depth - 1,
@@ -153,29 +152,19 @@ public static class EdgeUtils
 public readonly struct RoadEdge(
     Direction direction,
     EdgeType edgeType,
-    Entity edge
+    Entity edge,
+    int depth = 1
 ) : IEquatable<RoadEdge>
 {
     public readonly Direction Direction = direction;
     public readonly EdgeType EdgeType = edgeType;
     public readonly Entity Edge = edge;
-
-    public string GetRoadName(
-        EntityManager entityManager,
-        NameSystem nameSystem)
-    {
-        if (!entityManager.HasComponent<Aggregated>(Edge))
-        {
-            return string.Empty;
-        }
-
-        var aggregate = entityManager.GetComponentData<Aggregated>(Edge).m_Aggregate;
-        return nameSystem.GetRenderedLabelName(aggregate);
-    }
+    public readonly int Depth = depth;
 
     public bool Equals(RoadEdge other)
     {
-        return Direction == other.Direction && Edge.Equals(other.Edge) && EdgeType == other.EdgeType;
+        return Direction == other.Direction && Edge.Equals(other.Edge) &&
+               EdgeType == other.EdgeType && Depth == other.Depth;
     }
 
     public override bool Equals(object obj)
@@ -187,7 +176,10 @@ public readonly struct RoadEdge(
     {
         unchecked
         {
-            return ((int)Direction * 397) ^ Edge.GetHashCode() ^ ((int)EdgeType * 397);
+            return ((int)Direction * 397)
+                   ^ Edge.GetHashCode()
+                   ^ ((int)EdgeType * 397)
+                   ^ Depth;
         }
     }
 }
