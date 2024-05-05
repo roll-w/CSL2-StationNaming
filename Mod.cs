@@ -48,7 +48,7 @@ namespace StationNaming
 
             if (GameManager.instance.modManager.TryGetExecutableAsset(this, out var asset))
             {
-                LOG.Info($"Current mod asset at {asset.path}");
+                LOG.Info($"MOD loaded: {asset.path} ({asset.version})");
             }
 
             _settings = new StationNamingSettings(this);
