@@ -4,7 +4,7 @@ import {StationNaming} from "./base";
 import {ModuleRegistryAppend} from "cs2/modding";
 import isShowCandidates = StationNaming.isShowCandidates;
 
-let currentEntity: any = null;
+let currentEntityIndex: number = 0;
 const selectedEntity$ = selectedInfo.selectedEntity$;
 const middleSections$ = selectedInfo.middleSections$;
 
@@ -13,22 +13,22 @@ export const InfoPanelBinding: ModuleRegistryAppend = () => {
 
     selectedEntity$.subscribe((entity) => {
         if (!entity.index) {
-            currentEntity = null;
+            currentEntityIndex = 0
             return entity
         }
-        if (currentEntity != entity.index) {
-            currentEntity = entity.index
+        if (currentEntityIndex != entity.index) {
+            currentEntityIndex = entity.index
         }
-        return entity;
+        return entity
     })
 
     middleSections$.subscribe(value => {
-        if (currentEntity && value.every(item => item?.__Type !== CandidatesSectionKey as any)) {
+        if (currentEntityIndex && value.every(item => item?.__Type !== CandidatesSectionKey as any)) {
             if (showCandidates) {
                 value.unshift({
                     __Type: CandidatesSectionKey,
                     group: "DescriptionSection"
-                } as any);
+                } as any)
 
                 const desc = value[1]
                 value[1] = value[0]

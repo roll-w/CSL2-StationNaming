@@ -13,14 +13,14 @@ import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 import combineNameSource = StationNaming.combineNameSource;
 import NameSource = StationNaming.NameSource;
-import isShowCandidates = StationNaming.isShowCandidates;
+import isShowCandidates$ = StationNaming.isShowCandidates$;
 import selectedEntity$ = StationNaming.selectedEntity$;
 
-export const CandidatesSectionKey = "StationNaming.NameCandidates";
+export const CandidatesSectionKey = "StationNaming.NameCandidates"
 
 const setSelectedCandidate = (candidate: NameCandidate, selectedEntity: Entity) => {
     call(ModName, "setCandidateFor", selectedEntity, candidate).then(r => {
-    });
+    })
 }
 
 const getNameCandidates = async (selectedEntity: Entity): Promise<any> => {
@@ -65,11 +65,7 @@ const CandidatesFoldout = (props: {
 
 
 const CandidatesComponent = () => {
-    const showCandidates = isShowCandidates();
-    if (!showCandidates) {
-        return <></>
-    }
-
+    const showCandidates =  useValue(isShowCandidates$)
     const selectedEntity = useValue(selectedEntity$)
 
     const [nameCandidates, setNameCandidates] =
@@ -83,8 +79,12 @@ const CandidatesComponent = () => {
 
     useEffect(() => {
         async function fetchCandidates() {
-            const candidates = await getNameCandidates(selectedEntity);
-            setNameCandidates(candidates);
+            if (!showCandidates) {
+                return
+            }
+
+            const candidates = await getNameCandidates(selectedEntity)
+            setNameCandidates(candidates)
         }
 
         fetchCandidates();
@@ -101,11 +101,15 @@ const CandidatesComponent = () => {
                 combineNameSource(candidate) === NameSource.SpawnableBuilding
         )
 
-        setGeneralCandidates(generalCandidates);
-        setSpawnableCandidates(spawnableCandidates);
-    }, [nameCandidates]);
+        setGeneralCandidates(generalCandidates)
+        setSpawnableCandidates(spawnableCandidates)
+    }, [nameCandidates])
 
-    const {translate} = useLocalization();
+    const {translate} = useLocalization()
+
+    if (!showCandidates) {
+        return <></>
+    }
 
     return (
         <PanelSection tooltip={
