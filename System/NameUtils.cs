@@ -28,6 +28,7 @@ using Game.SceneFlow;
 using Game.UI;
 using StationNaming.Setting;
 using Unity.Entities;
+using Battery = Game.Buildings.Battery;
 using DeathcareFacility = Game.Buildings.DeathcareFacility;
 using DisasterFacility = Game.Buildings.DisasterFacility;
 using FireStation = Game.Buildings.FireStation;
@@ -61,6 +62,7 @@ public static class NameUtils
         { typeof(Hospital), NameSource.Hospital },
         { typeof(TransportStation), NameSource.TransportStation },
         { typeof(ElectricityProducer), NameSource.Electricity },
+        { typeof(Battery), NameSource.Electricity },
         { typeof(SewageOutlet), NameSource.Sewage },
         { typeof(WaterPumpingStation), NameSource.Water },
         { typeof(AdminBuilding), NameSource.CityService },
