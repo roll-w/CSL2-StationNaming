@@ -5,11 +5,15 @@ export namespace StationNaming {
     export const ModName = "RollW_StationNaming";
 
     export const isShowCandidates$ = bindValue<boolean>(
-        ModName, "IsShowCandidates", false);
+        ModName, "isShowCandidates", false);
 
     export const isShowCandidates = () => {
         return useValue(isShowCandidates$);
     }
+
+    export const selectedEntity$ = bindValue<Entity>(
+        ModName, "selectedEntity", {index: 0, version: 0}
+    );
 
     export type NameSourceRefer = {
         source: string;

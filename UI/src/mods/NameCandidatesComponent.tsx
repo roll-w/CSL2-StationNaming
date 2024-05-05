@@ -1,8 +1,8 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
 import React, {useEffect, useState} from "react";
 import {PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
-import {call, trigger} from "cs2/api";
-import {selectedInfo, Entity} from "cs2/bindings";
+import {call, useValue} from "cs2/api";
+import {Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
 import NameCandidate = StationNaming.NameCandidate;
 import SerializedNameCandidate = StationNaming.SerializedNameCandidate;
@@ -14,30 +14,25 @@ import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 import combineNameSource = StationNaming.combineNameSource;
 import NameSource = StationNaming.NameSource;
 import isShowCandidates = StationNaming.isShowCandidates;
+import selectedEntity$ = StationNaming.selectedEntity$;
 
 export const CandidatesSectionKey = "StationNaming.NameCandidates";
 
-let selectedEntity: Entity;
-
-const selectedEntityChanged = (newEntity: Entity) => {
-    selectedEntity = newEntity;
-    trigger(ModName, "SetSelectedEntity", newEntity);
-}
-
-const setSelectedCandidate = (candidate: NameCandidate) => {
-    call(ModName, "SetCandidateFor", selectedEntity, candidate).then(r => {
+const setSelectedCandidate = (candidate: NameCandidate, selectedEntity: Entity) => {
+    call(ModName, "setCandidateFor", selectedEntity, candidate).then(r => {
     });
 }
 
-const getNameCandidates = async (): Promise<any> => {
+const getNameCandidates = async (selectedEntity: Entity): Promise<any> => {
     return await call(
         ModName,
-        "GetCandidates",
+        "getCandidates",
         selectedEntity) as unknown as Promise<SerializedNameCandidate[]>
 }
 
 const CandidatesFoldout = (props: {
     name: string | null,
+    selectedEntity: Entity,
     candidates: SerializedNameCandidate[],
     initialExpanded?: boolean | undefined
 }) => {
@@ -57,7 +52,7 @@ const CandidatesFoldout = (props: {
                         + "]"}
                     link={
                         <div onClick={() => {
-                            setSelectedCandidate(toNameCandidate(candidate))
+                            setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)
                         }}>
                             ✓
                         </div>
@@ -75,6 +70,8 @@ const CandidatesComponent = () => {
         return <></>
     }
 
+    const selectedEntity = useValue(selectedEntity$)
+
     const [nameCandidates, setNameCandidates] =
         useState<SerializedNameCandidate[]>([])
 
@@ -86,7 +83,7 @@ const CandidatesComponent = () => {
 
     useEffect(() => {
         async function fetchCandidates() {
-            const candidates = await getNameCandidates();
+            const candidates = await getNameCandidates(selectedEntity);
             setNameCandidates(candidates);
         }
 
@@ -131,6 +128,7 @@ const CandidatesComponent = () => {
 
             <CandidatesFoldout
                 name={translate(getTranslationKeyOf("Candidates"))}
+                selectedEntity={selectedEntity}
                 candidates={generalCandidates}
             />
 
@@ -147,18 +145,13 @@ const CandidatesComponent = () => {
 
             <CandidatesFoldout
                 name={translate(getTranslationKeyOf("Candidates"))}
+                selectedEntity={selectedEntity}
                 candidates={spawnableCandidates}/>
         </PanelSection>
     )
 }
 
 export const InfoPanelExtComponent: ModuleRegistryExtend = (components: any): any => {
-    try {
-        selectedInfo.selectedEntity$.subscribe(selectedEntityChanged)
-    } catch (e) {
-        console.log("[StationNaming] There was an error subscribing to selectedEntity$, this shouldn't have happened.", e)
-    }
-
     components[CandidatesSectionKey] = () =>
         <CandidatesComponent/>
 

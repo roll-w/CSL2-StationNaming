@@ -18,11 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using Colossal.UI.Binding;
+using Game;
 using Game.Routes;
 using Game.UI;
+using Game.UI.InGame;
 using StationNaming.System.Utils;
 using Unity.Entities;
 
@@ -32,6 +33,11 @@ public partial class UIBindingSystem : UISystemBase
 {
     private Entity _selectedEntity;
     private NameSystem _nameSystem;
+    private SelectedInfoUISystem _selectedInfoUISystem;
+
+    private ValueBinding<Entity> _selectedEntityBinding;
+
+    public override GameMode gameMode => GameMode.Game;
 
     protected override void OnCreate()
     {
@@ -39,29 +45,48 @@ public partial class UIBindingSystem : UISystemBase
         _nameSystem = World.DefaultGameObjectInjectionWorld
             .GetOrCreateSystemManaged<NameSystem>();
 
+        _selectedInfoUISystem = World.DefaultGameObjectInjectionWorld
+            .GetOrCreateSystemManaged<SelectedInfoUISystem>();
+
         AddBinding(new TriggerBinding<Entity>(
             Mod.Name,
-            nameof(SetSelectedEntity),
+            "setSelectedEntity",
             SetSelectedEntity
         ));
 
+        AddBinding(
+            _selectedEntityBinding = new ValueBinding<Entity>(
+                Mod.Name,
+                "selectedEntity",
+                Entity.Null
+            )
+        );
+
         AddUpdateBinding(new GetterValueBinding<bool>(
-            Mod.Name, "IsShowCandidates",
+            Mod.Name, "isShowCandidates",
             IsShowCandidates
         ));
 
         AddBinding(new CallBinding<Entity, ManagedNameCandidate, bool>(
             Mod.Name,
-            nameof(SetCandidateFor),
+            "setCandidateFor",
             SetCandidateFor
         ));
 
         AddBinding(new CallBinding<Entity, List<ManagedNameCandidate>>(
-            Mod.Name, "GetCandidates",
+            Mod.Name, "getCandidates",
             GetNameCandidates
         ));
 
         Mod.GetLogger().Info("UI binding system initialized.");
+    }
+
+    protected override void OnUpdate()
+    {
+        base.OnUpdate();
+
+        // delegate from SelectedInfoUISystem
+        _selectedEntityBinding.Update(_selectedInfoUISystem.selectedEntity);
     }
 
     private void SetSelectedEntity(Entity entity)
@@ -115,7 +140,8 @@ public partial class UIBindingSystem : UISystemBase
 
     private bool IsShowCandidates()
     {
-        var entity = _selectedEntity;
+        var entity = _selectedInfoUISystem.selectedEntity;
+        SetSelectedEntity(entity);
 
         if (entity == Entity.Null)
         {
