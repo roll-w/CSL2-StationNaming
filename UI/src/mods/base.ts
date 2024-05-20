@@ -87,6 +87,14 @@ export namespace StationNaming {
         Electricity,
         Water,
         Sewage,
+        Admin,
+        RoadFacility,
+        Garbage,
+        Disaster,
+        Deathcare,
+        Telecom,
+        Post,
+        Parking,
 
         /**
          * Other city service buildings not listed
@@ -98,6 +106,10 @@ export namespace StationNaming {
          */
         Building,
         Unknown,
+
+        /**
+         * Used for scope, not a real source.
+         */
         None
     }
 
@@ -135,6 +147,22 @@ export namespace StationNaming {
                 return "Water";
             case NameSource.Sewage:
                 return "Sewage";
+            case NameSource.Admin:
+                return "Admin";
+            case NameSource.RoadFacility:
+                return "RoadFacility";
+            case NameSource.Garbage:
+                return "Garbage";
+            case NameSource.Disaster:
+                return "Disaster";
+            case NameSource.Deathcare:
+                return "Deathcare";
+            case NameSource.Telecom:
+                return "Telecom";
+            case NameSource.Post:
+                return "Post";
+            case NameSource.Parking:
+                return "Parking";
             case NameSource.CityService:
                 return "CityService";
             case NameSource.Building:

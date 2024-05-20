@@ -35,10 +35,17 @@ public enum NameSource : uint
     PoliceStation,
     Hospital,
     Park,
-
     Electricity,
     Water,
     Sewage,
+    Admin,
+    RoadFacility,
+    Garbage,
+    Disaster,
+    Deathcare,
+    Telecom,
+    Post,
+    Parking,
 
     /**
      * Other city service buildings not listed
@@ -73,6 +80,14 @@ public static class NameSourceExtensions
                 or NameSource.Electricity
                 or NameSource.Water
                 or NameSource.Sewage
+                or NameSource.Admin
+                or NameSource.RoadFacility
+                or NameSource.Garbage
+                or NameSource.Disaster
+                or NameSource.Deathcare
+                or NameSource.Telecom
+                or NameSource.Post
+                or NameSource.Parking
                 or NameSource.CityService
                 => true,
             _ => false
