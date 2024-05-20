@@ -46,9 +46,25 @@ public partial class AutoTaggingSystem : GameSystemBase
 
         foreach (var entity in entities)
         {
+            if (!CouldNaming(entity))
+            {
+                continue;
+            }
+
             EntityManager.AddComponent<ToAutoNaming>(entity);
             EntityManager.AddComponent<Selected>(entity);
         }
+    }
+
+    private bool CouldNaming(Entity entity)
+    {
+        if (EntityManager.HasComponent<TransportStop>(entity))
+        {
+            return true;
+        }
+
+        var nameSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
+        return nameSource.CouldNaming();
     }
 
     protected override void OnCreate()
@@ -65,6 +81,7 @@ public partial class AutoTaggingSystem : GameSystemBase
             [
                 ComponentType.ReadOnly<TransportStop>(),
                 ComponentType.ReadOnly<TransportStation>(),
+                ComponentType.ReadOnly<Building>()
             ],
             None =
             [

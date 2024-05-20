@@ -155,22 +155,7 @@ public partial class UIBindingSystem : UISystemBase
 
         var buildingSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
 
-        return buildingSource switch
-        {
-            NameSource.TransportStation
-                or NameSource.TransportDepot
-                or NameSource.FireStation
-                or NameSource.PoliceStation
-                or NameSource.School
-                or NameSource.Hospital
-                or NameSource.Park
-                or NameSource.Electricity
-                or NameSource.Water
-                or NameSource.Sewage
-                or NameSource.CityService
-                => true,
-            _ => false
-        };
+        return buildingSource.CouldNaming();
     }
 
     private bool SetCandidateFor(Entity entity, ManagedNameCandidate candidate)

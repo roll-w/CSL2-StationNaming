@@ -56,3 +56,26 @@ public enum NameSource : uint
      */
     None
 }
+
+public static class NameSourceExtensions
+{
+    public static bool CouldNaming(this NameSource source)
+    {
+        return source switch
+        {
+            NameSource.TransportStation
+                or NameSource.TransportDepot
+                or NameSource.FireStation
+                or NameSource.PoliceStation
+                or NameSource.School
+                or NameSource.Hospital
+                or NameSource.Park
+                or NameSource.Electricity
+                or NameSource.Water
+                or NameSource.Sewage
+                or NameSource.CityService
+                => true,
+            _ => false
+        };
+    }
+}

@@ -34,6 +34,7 @@ using DisasterFacility = Game.Buildings.DisasterFacility;
 using FireStation = Game.Buildings.FireStation;
 using GarbageFacility = Game.Buildings.GarbageFacility;
 using Hospital = Game.Buildings.Hospital;
+using MaintenanceDepot = Game.Buildings.MaintenanceDepot;
 using Park = Game.Buildings.Park;
 using ParkingFacility = Game.Buildings.ParkingFacility;
 using PoliceStation = Game.Buildings.PoliceStation;
@@ -67,6 +68,7 @@ public static class NameUtils
         { typeof(WaterPumpingStation), NameSource.Water },
         { typeof(AdminBuilding), NameSource.CityService },
         { typeof(WelfareOffice), NameSource.CityService },
+        { typeof(MaintenanceDepot), NameSource.CityService },
         { typeof(GarbageFacility), NameSource.CityService },
         { typeof(DisasterFacility), NameSource.CityService },
         { typeof(DeathcareFacility), NameSource.CityService },
