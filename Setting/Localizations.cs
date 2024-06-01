@@ -478,7 +478,7 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AdminAutoNaming]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "When enabled, administration buildings will be automatically named when created.")
+                    "When enabled, administrative buildings will be automatically named when created.")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的行政建筑命名。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的行政建築命名。"),
 
