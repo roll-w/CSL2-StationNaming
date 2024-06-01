@@ -27,7 +27,6 @@ using Game.UI;
 using StationNaming.System;
 using Unity.Collections;
 using Unity.Entities;
-using static System.String;
 
 namespace StationNaming.Setting;
 
@@ -50,9 +49,6 @@ public class NameFormatter(
                 return "";
             case 1 when refers[0].Source == NameSource.Owner:
                 return refers[0].GetName(entityManager, nameSystem);
-            case 2:
-                referFormat = LegacyFormatRefers(refers[0], refers[1]);
-                break;
             default:
                 referFormat = StdFormatRefers(refers);
                 break;
@@ -96,21 +92,6 @@ public class NameFormatter(
             var hasNext = i < count - 1;
             action(refer, hasNext);
         }
-    }
-
-    private string LegacyFormatRefers(
-        NameSourceRefer refer1, NameSourceRefer refer2)
-    {
-        var settings = Mod.GetInstance().GetSettings();
-
-        var first = refer1.GetName(entityManager, nameSystem);
-        var second = refer2.GetName(entityManager, nameSystem);
-
-        var namingFormat = settings.IntersectionNamingFormat;
-
-        return settings.ReverseRoadOrder
-            ? Format(namingFormat, second, first)
-            : Format(namingFormat, first, second);
     }
 
     private string GetPrefabName(Entity entity, bool prefab)
