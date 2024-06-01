@@ -8,7 +8,7 @@ check the mod settings to avoid conflicts.
 
 ## Features
 
-- Automatically name your transport stations, stops.
+- Automatically name your transport stations, stops and city service buildings.
 - Customizable naming rules.
 - Generate names from surrounding buildings, roads, or the current district.
 
@@ -26,7 +26,7 @@ RollW_StationNaming
 {
   "Prefix": " ", // Set the global prefix here
   "Suffix": " ", // Set the global suffix here
-  // You can use the {PREFAB} in the prefix or suffix to insert the prefab name
+  // You can use the {ASSET} in the prefix or suffix to insert the asset name
   "NamingSeparator": " ", // Set the default separator between names 
   "NamedAddressNameFormat": "{NAME}, {NUMBER} {ROAD}", // Set the format for the named address name
   "AddressNameFormat": "{NUMBER} {ROAD}",
@@ -54,6 +54,7 @@ RollW_StationNaming
 ## Planned Features
 
 - Allow setting the naming format for different name sources.
+- Allow naming vehicle to contain its owner, route, or depot name.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
 
 ## Support
