@@ -18,7 +18,7 @@ check the mod settings to avoid conflicts.
 
 ## Features
 
-- Automatically name your transport stations, stops.
+- Automatically name your transport stations, stops and city service buildings.
 - Customizable naming rules.
 - Generate names from surrounding buildings, roads, or the current district.
 
@@ -27,9 +27,6 @@ check the mod settings to avoid conflicts.
 Except the displayed settings, you could also customize the naming rules in the
 mod setting file where it is located at
 `AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
-
-You could change the naming format for the different types and set your own prefix
-and suffix for the station names.
 
 For more information on how to set the name format in the setting file,
 please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNaming).
@@ -43,6 +40,7 @@ please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNamin
 ## Planned Features
 
 - Allow setting the naming format for different name sources.
+- Allow naming vehicle to contain its owner, route, or depot name.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
 
 ## Support
@@ -63,15 +61,16 @@ on GitHub.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.3.6" />
+	<ModVersion Value="0.4.0" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Allow naming emergency battery stations.
-- Fix: UI crashes when displaying name candidates.
+- Feature: Allow auto naming city service buildings.
+- Feature: Allow naming maintenance depots.
+- Feature: use {ASSET} to insert the asset name in prefix/suffix.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />
