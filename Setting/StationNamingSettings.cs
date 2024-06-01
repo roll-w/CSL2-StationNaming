@@ -29,16 +29,27 @@ using StationNaming.System;
 namespace StationNaming.Setting;
 
 [FileLocation(Mod.Name)]
-[SettingsUITabOrder(SectionGeneral, SectionBuilding, SectionOther)]
-//[SettingsUISection(SectionGeneral, SectionBuilding, SectionOther)]
+[SettingsUITabOrder(
+    SectionGeneral, SectionSources, SectionTargets
+)]
 [SettingsUIShowGroupName(
-    GroupStops,
-    GroupExperimental, GroupSpawnable,
-    GroupDistrict, GroupOther
+    GroupStops, GroupExperimental, GroupBuilding,
+    GroupSpawnable, GroupDistrict, GroupTransport,
+    GroupSchool, GroupFireStation, GroupPoliceStation,
+    GroupHospital, GroupPark, GroupElectricity,
+    GroupWater, GroupSewage, GroupGarbage,
+    GroupDisaster, GroupDeathcare, GroupTelecom,
+    GroupPost, GroupParking, GroupCityService,
+    GroupOther
 )]
 [SettingsUIGroupOrder(
-    GroupStable, GroupStops,
-    GroupSpawnable, GroupDistrict,
+    GroupStable, GroupStops, GroupBuilding,
+    GroupSpawnable, GroupDistrict, GroupTransport,
+    GroupSchool, GroupFireStation, GroupPoliceStation,
+    GroupHospital, GroupPark, GroupElectricity,
+    GroupWater, GroupSewage, GroupGarbage,
+    GroupDisaster, GroupDeathcare, GroupTelecom,
+    GroupPost, GroupParking, GroupCityService,
     GroupExperimental, GroupOther
 )]
 public class StationNamingSettings(IMod mod) : ModSetting(mod)
@@ -49,30 +60,60 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public const string GroupOther = "Other";
 
+    public const string GroupBuilding = "Building";
+
     public const string GroupSpawnable = "Spawnable";
 
     public const string GroupDistrict = "District";
 
     public const string GroupStops = "Stops";
 
+    public const string GroupSchool = "School";
+
+    public const string GroupTransport = "Transport";
+
+    public const string GroupFireStation = "FireStation";
+
+    public const string GroupPoliceStation = "PoliceStation";
+
+    public const string GroupHospital = "Hospital";
+
+    public const string GroupPark = "Park";
+
+    public const string GroupElectricity = "Electricity";
+
+    public const string GroupWater = "Water";
+
+    public const string GroupSewage = "Sewage";
+
+    public const string GroupGarbage = "Garbage";
+
+    public const string GroupDisaster = "Disaster";
+
+    public const string GroupDeathcare = "Deathcare";
+
+    public const string GroupTelecom = "Telecom";
+
+    public const string GroupPost = "Post";
+
+    public const string GroupParking = "Parking";
+
+    public const string GroupCityService = "CityService";
+
     public const string SectionGeneral = "General";
 
-    public const string SectionBuilding = "Building";
+    public const string SectionSources = "Sources";
 
-    public const string SectionOther = "OtherSource";
+    public const string SectionTargets = "Targets";
 
     [SettingsUISection(SectionGeneral, GroupStable)]
     public bool Enable { get; set; } = true;
 
     [SettingsUISection(SectionGeneral, GroupStable)]
-    [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetFormatOptions))]
-    public string IntersectionNamingFormat { get; set; } = "{0} & {1}";
-
-    [SettingsUISection(SectionGeneral, GroupStable)]
     [SettingsUITextInput]
     public string NamingSeparator { get; set; } = " & ";
 
-    [SettingsUISection(SectionOther, GroupStable)]
+    [SettingsUISection(SectionSources, GroupStable)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
     public NameFormat RoadFormat { get; set; } = NameFormat.Invalid;
 
@@ -97,37 +138,32 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUISection(SectionGeneral, GroupStable)]
     public bool AutoNaming { get; set; } = true;
 
-    [SettingsUISection(SectionGeneral, GroupStops)]
-    [SettingsUIMultilineText]
-    public LocalizedString StopsDescription => LocalizedString.Id(
-        "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]");
-
     /// <summary>
     /// Should apply prefix and suffix to stops.
     /// </summary>
-    [SettingsUISection(SectionGeneral, GroupStops)]
+    [SettingsUISection(SectionTargets, GroupTransport)]
     public bool ApplyXfixToStops { get; set; } = false;
 
     public bool IsNotApplyXfixToStops() => !ApplyXfixToStops;
 
     [SettingsUITextInput]
-    [SettingsUISection(SectionGeneral, GroupStops)]
+    [SettingsUISection(SectionTargets, GroupTransport)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
     public string StopPrefix { get; set; } = "";
 
     [SettingsUITextInput]
-    [SettingsUISection(SectionGeneral, GroupStops)]
+    [SettingsUISection(SectionTargets, GroupTransport)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
     public string StopSuffix { get; set; } = "";
 
-    [SettingsUISection(SectionOther, GroupDistrict)]
+    [SettingsUISection(SectionSources, GroupDistrict)]
     public bool EnableDistrict { get; set; } = true;
 
-    [SettingsUISection(SectionOther, GroupDistrict)]
+    [SettingsUISection(SectionSources, GroupDistrict)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictDisabled))]
     public bool EnableDistrictPrefix { get; set; } = false;
 
-    [SettingsUISection(SectionOther, GroupDistrict)]
+    [SettingsUISection(SectionSources, GroupDistrict)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictDisabled))]
     public NameFormat DistrictFormat { get; set; } = NameFormat.Invalid;
@@ -146,22 +182,34 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         }
     }
 
-    [SettingsUISection(SectionBuilding, GroupStable)]
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
+    [SettingsUISection(SectionTargets, GroupOther)]
+    public bool DisableCityServiceAutoNaming
+    {
+        set
+        {
+            SetDisableCityServiceAutoNaming();
+            ApplyAndSave();
+        }
+    }
+
+    [SettingsUISection(SectionSources, GroupBuilding)]
     public bool BuildingName { get; set; } = true;
 
     public bool IsBuildingNameDisabled() => !BuildingName;
 
-    [SettingsUISection(SectionBuilding, GroupStable)]
+    [SettingsUISection(SectionSources, GroupBuilding)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
 
-    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUISection(SectionSources, GroupSpawnable)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool SpawnableBuildingName { get; set; } = false;
 
     private string _addressNameFormat = "{NUMBER} {ROAD}";
 
-    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUISection(SectionSources, GroupSpawnable)]
     [SettingsUITextInput]
     public string AddressNameFormat
     {
@@ -175,7 +223,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     private string _namedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
 
-    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUISection(SectionSources, GroupSpawnable)]
     [SettingsUITextInput]
     public string NamedAddressNameFormat
     {
@@ -189,7 +237,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     private bool _overrideVanillaAddress = true;
 
-    [SettingsUISection(SectionBuilding, GroupSpawnable)]
+    [SettingsUISection(SectionSources, GroupSpawnable)]
     public bool OverrideVanillaAddress
     {
         get => _overrideVanillaAddress;
@@ -238,11 +286,87 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         );
     }
 
+    public bool IsAutoNamingDisabled() => !AutoNaming;
+
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool TransportStopAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool TransportStationAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool TransportDepotAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupSchool)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool SchoolAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupFireStation)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool FireStationAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupPoliceStation)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool PoliceStationAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupHospital)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool HospitalAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupPark)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool ParkAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupElectricity)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool ElectricityAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupWater)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool WaterAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupSewage)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool SewageAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupGarbage)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool GarbageAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupDisaster)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool DisasterAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupDeathcare)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool DeathcareAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupTelecom)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool TelecomAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupPost)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool PostAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupParking)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool ParkingAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupCityService)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool RoadFacilityAutoNaming { get; set; } = true;
+
+    [SettingsUISection(SectionTargets, GroupCityService)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
+    public bool AdminAutoNaming { get; set; } = true;
 
     public override void SetDefaults()
     {
         Enable = true;
-        IntersectionNamingFormat = "{0} & {1}";
         NamingSeparator = " & ";
 
         ReverseRoadOrder = false;
@@ -269,6 +393,48 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
         RoadFormat = NameFormat.Invalid;
         DistrictFormat = NameFormat.Invalid;
+
+        TransportStopAutoNaming = true;
+        TransportStationAutoNaming = true;
+        TransportDepotAutoNaming = true;
+        SchoolAutoNaming = true;
+        FireStationAutoNaming = true;
+        PoliceStationAutoNaming = true;
+        HospitalAutoNaming = true;
+        ParkAutoNaming = true;
+        ElectricityAutoNaming = true;
+        WaterAutoNaming = true;
+        SewageAutoNaming = true;
+        GarbageAutoNaming = true;
+        DisasterAutoNaming = true;
+        DeathcareAutoNaming = true;
+        TelecomAutoNaming = true;
+        PostAutoNaming = true;
+        ParkingAutoNaming = true;
+        RoadFacilityAutoNaming = true;
+        AdminAutoNaming = true;
+    }
+
+    public void SetDisableCityServiceAutoNaming()
+    {
+        TransportStationAutoNaming = false;
+        TransportDepotAutoNaming = false;
+        SchoolAutoNaming = false;
+        FireStationAutoNaming = false;
+        PoliceStationAutoNaming = false;
+        HospitalAutoNaming = false;
+        ParkAutoNaming = false;
+        ElectricityAutoNaming = false;
+        WaterAutoNaming = false;
+        SewageAutoNaming = false;
+        GarbageAutoNaming = false;
+        DisasterAutoNaming = false;
+        DeathcareAutoNaming = false;
+        TelecomAutoNaming = false;
+        PostAutoNaming = false;
+        ParkingAutoNaming = false;
+        RoadFacilityAutoNaming = false;
+        AdminAutoNaming = false;
     }
 
     public NameOptions ToNameOptions()
@@ -315,21 +481,6 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public static class RoadNamingProvider
     {
-        public static DropdownItem<string>[] GetFormatOptions()
-        {
-            return
-            [
-                new DropdownItem<string> { value = "{0} & {1}", displayName = "{0} & {1}" },
-                new DropdownItem<string> { value = "{0}{1}", displayName = "{0}{1}" },
-                new DropdownItem<string> { value = "{0} @{1}", displayName = "{0} @{1}" },
-                new DropdownItem<string> { value = "{0} {1}", displayName = "{0} {1}" },
-                new DropdownItem<string> { value = "{0}, {1}", displayName = "{0}, {1}" },
-                new DropdownItem<string> { value = "{0}_{1}", displayName = "{0}_{1}" },
-                new DropdownItem<string> { value = "{0}:{1}", displayName = "{0}:{1}" },
-                new DropdownItem<string> { value = "{0}.{1}", displayName = "{0}.{1}" }
-            ];
-        }
-
         public static DropdownItem<NameFormat>[] GetNameFormatOptions()
         {
             return

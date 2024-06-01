@@ -25,7 +25,6 @@ namespace StationNaming.Setting
 {
     public static class Localizations
     {
-        // TODO: generate keys using ModSettings
         private static readonly Translation[] Translations =
         [
             new Translation("Options.SECTION[StationNaming.StationNaming.Mod]")
@@ -49,23 +48,10 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SearchDepth]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "The maximum depth to search for name candidates, setting too high is not recommended as it may affect game performance.")
-                .AddTranslation(LocaleCode.ZhHans, "搜索名称候选的最大深度，不建议设置过大，以免影响游戏性能。")
-                .AddTranslation(LocaleCode.ZhHant, "搜索名稱候選的最大深度，不建議設置過大，以免影響遊戲性能。"),
-            new Translation(
-                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.IntersectionNamingFormat]")
-                .AddTranslation(LocaleCode.EnUs, "Intersection Naming Format")
-                .AddTranslation(LocaleCode.ZhHans, "交叉口命名格式")
-                .AddTranslation(LocaleCode.ZhHant, "交叉口命名格式"),
-            new Translation(
-                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.IntersectionNamingFormat]")
-                .AddTranslation(LocaleCode.EnUs,
-                    "The format used when generating the name of the intersection source. " +
-                    "[Please use the Name Separator option instead, this setting will be removed in the next version]")
-                .AddTranslation(LocaleCode.ZhHans,
-                    "在生成交叉口来源的名称时使用的格式。[请使用名称分隔符选项代替，下个版本将移除此设置]")
-                .AddTranslation(LocaleCode.ZhHant,
-                    "在生成交叉口來源的名稱時使用的格式。[請使用名稱分隔符選項代替，下個版本將移除此設置]"),
+                    "The maximum depth to search for name candidates, affecting the generation of name sources for nearby buildings. " +
+                    "It is not recommended to set it too large to avoid affecting game performance.")
+                .AddTranslation(LocaleCode.ZhHans, "搜索名称候选的最大深度，影响附近建筑名称来源生成。不建议设置过大，以免影响游戏性能。")
+                .AddTranslation(LocaleCode.ZhHant, "搜索名稱候選的最大深度，影響附近建築名稱來源生成。不建議設置過大，以免影響遊戲性能。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
                 .AddTranslation(LocaleCode.EnUs, "Reverse Name Order")
                 .AddTranslation(LocaleCode.ZhHans, "反转名称顺序")
@@ -90,9 +76,9 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "後綴"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Suffix]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "The suffix to be added to the station name. Enter {PREFAB} to replace with the target asset name, such as \"Train Station\".")
-                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。输入 {PREFAB} 以替换为目标资产名称，如\"火车站\"等。")
-                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。輸入 {PREFAB} 以替換為目標資產名稱，如\"火車站\"等。"),
+                    "The suffix to be added to the station name. Enter {ASSET} to replace with the target asset name, such as \"Train Station\".")
+                .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的后缀。输入 {ASSET} 以替换为目标资产名称，如\"火车站\"等。")
+                .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的後綴。輸入 {ASSET} 以替換為目標資產名稱，如\"火車站\"等。"),
 
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ApplyXfixToStops]")
                 .AddTranslation(LocaleCode.EnUs, "Apply Prefix/Suffix to Stops")
@@ -168,10 +154,10 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoNaming]")
                 .AddTranslation(LocaleCode.EnUs,
-                    "When enabled, the station will be automatically named when created. " +
-                    "Named according to the order of the owner and the current road.")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的站点命名。按照所有者、当前道路的顺序命名。")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的站點命名。按照所有者、當前道路的順序命名。"),
+                    "When enabled, stations, stops, and buildings are automatically named when they are created, " +
+                    "based on other setting options. Named according to their owner, or their current road.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，根据不同的设置，自动为新建的站点、建筑命名。按照所有者、当前道路的顺序命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，根據不同的設置，自動為新建的站點、建築命名。按照所有者、當前道路的順序命名。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.BuildingName]")
                 .AddTranslation(LocaleCode.EnUs, "Enable Building Name Source")
                 .AddTranslation(LocaleCode.ZhHans, "启用建筑命名来源")
@@ -206,8 +192,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs,
                     "When enabled, allow generate name candidates from surrounding spawnable buildings. " +
                     "[May cause increased resource consumption, please enable as needed. ]")
-                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围自长建筑中生成名称候选。[但可能造成资源消耗增加，请按需开启。]")
-                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍自長建築中生成名稱候選。[但可能造成資源消耗增加，請按需開啟。]"),
+                .AddTranslation(LocaleCode.ZhHans, "启用后，允许从周围自长建筑中生成名称候选。[可能造成资源消耗增加，请按需开启。]")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從周圍自長建築中生成名稱候選。[可能造成資源消耗增加，請按需開啟。]"),
             new Translation(
                     "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AddressNameFormat]")
                 .AddTranslation(LocaleCode.EnUs, "Address Format")
@@ -265,15 +251,253 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，允許將區域名稱作為來源添加到名稱候選列表中。"),
             new Translation(
                     "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrictPrefix]")
-                .AddTranslation(LocaleCode.EnUs, "Enable District Name Prefix")
-                .AddTranslation(LocaleCode.ZhHans, "启用地区名称前缀")
-                .AddTranslation(LocaleCode.ZhHant, "啟用地區名稱前綴"),
+                .AddTranslation(LocaleCode.EnUs, "Add District Name Prefix")
+                .AddTranslation(LocaleCode.ZhHans, "添加地区名称前缀")
+                .AddTranslation(LocaleCode.ZhHant, "添加地區名稱前綴"),
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.EnableDistrictPrefix]")
                 .AddTranslation(LocaleCode.EnUs,
                     "When enabled, add the district name as a prefix/suffix for each name candidate (controlled by the reverse order option).")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，为每个名称候选都添加区域名称作为前缀/后缀（受到反转顺序控制）。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，為每個名稱候選都添加區域名稱作為前綴/後綴（受到反轉順序控制）。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStopAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Transport Stop Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用交通站点自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用交通站點自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStopAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, transport stops will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的交通站点命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的交通站點命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Transport Station Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用交通站自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用交通站自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, transport stations will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的交通站命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的交通站命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportDepotAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Transport Depot Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用交通车库自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用交通車庫自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportDepotAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, transport depots will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的交通车库命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的交通車庫命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SchoolAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable School Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用学校自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用學校自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SchoolAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, schools will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的学校命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的學校命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.FireStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Fire Station Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用消防站自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用消防站自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.FireStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, fire stations will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的消防站命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的消防站命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.PoliceStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Police Station Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用警察局自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用警察局自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.PoliceStationAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, police stations will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的警察局命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的警察局命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.HospitalAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Hospital Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用医院自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用醫院自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.HospitalAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, hospitals will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的医院命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的醫院命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ParkAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Park Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用公园自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用公園自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ParkAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, parks will be automatically named when created. ")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的公园命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的公園命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ElectricityAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Electricity Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用电力自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用電力自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ElectricityAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, electricity facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的电力设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的電力設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.WaterAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Water Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用净水自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用淨水自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.WaterAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, water facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的净水设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的淨水設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SewageAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Sewage Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用污水自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用污水自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SewageAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, sewage facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的污水设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的污水設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.GarbageAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Garbage Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用垃圾自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用垃圾自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.GarbageAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, garbage facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的垃圾设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的垃圾設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DisasterAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Disaster Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用灾害自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用災害自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DisasterAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, disaster facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的灾害设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的災害設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DeathcareAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Deathcare Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用殡仪自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用殯儀自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DeathcareAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, deathcare facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的殡仪设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的殯儀設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Telecom Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用电信自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用電信自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, telecom facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的电信设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的電信設施命名。"),
+
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.PostAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Post Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用邮政自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用郵政自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.PostAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, post facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的邮政设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的郵政設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ParkingAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Parking Lot Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用停车场自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用停車場自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ParkingAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, parking lots will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的停車場命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的停車場命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.CityServiceAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Other City Service Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用其他城市服务自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用其他城市服務自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.CityServiceAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, other city service buildings will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的其他城市服务建筑命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的其他城市服務建築命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFacilityAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Road Facility Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用道路设施自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用道路設施自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFacilityAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, road facilities will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的道路设施命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的道路設施命名。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AdminAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Enable Administration Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "启用行政自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "啟用行政自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AdminAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "When enabled, administration buildings will be automatically named when created.")
+                .AddTranslation(LocaleCode.ZhHans, "启用后，自动为新建的行政建筑命名。")
+                .AddTranslation(LocaleCode.ZhHant, "啟用後，自動為新建的行政建築命名。"),
+
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DisableCityServiceAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Disable All City Service Auto Naming")
+                .AddTranslation(LocaleCode.ZhHans, "禁用所有城市服务自动命名")
+                .AddTranslation(LocaleCode.ZhHant, "禁用所有城市服務自動命名"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DisableCityServiceAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs, "Disable all city service buildings auto naming.")
+                .AddTranslation(LocaleCode.ZhHans, "禁用所有城市服务建筑自动命名。")
+                .AddTranslation(LocaleCode.ZhHant, "禁用所有城市服務建築自動命名。"),
+            new Translation(
+                    "Options.WARNING[StationNaming.StationNaming.Mod.StationNamingSettings.DisableCityServiceAutoNaming]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "Are you sure you want to disable all city service buildings auto naming?")
+                .AddTranslation(LocaleCode.ZhHans, "你确定要禁用所有城市服务建筑自动命名吗？")
+                .AddTranslation(LocaleCode.ZhHant, "你確定要禁用所有城市服務建築自動命名嗎？"),
 
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Experimental]")
                 .AddTranslation(LocaleCode.EnUs, "Experimental")
@@ -283,43 +507,100 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Stops")
                 .AddTranslation(LocaleCode.ZhHans, "站牌")
                 .AddTranslation(LocaleCode.ZhHant, "站牌"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Transport]")
+                .AddTranslation(LocaleCode.EnUs, "Transport")
+                .AddTranslation(LocaleCode.ZhHans, "交通")
+                .AddTranslation(LocaleCode.ZhHant, "交通"),
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.District]")
                 .AddTranslation(LocaleCode.EnUs, "District")
                 .AddTranslation(LocaleCode.ZhHans, "区域")
                 .AddTranslation(LocaleCode.ZhHant, "區域"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Building]")
+                .AddTranslation(LocaleCode.EnUs, "Building")
+                .AddTranslation(LocaleCode.ZhHans, "建筑")
+                .AddTranslation(LocaleCode.ZhHant, "建築"),
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Spawnable]")
                 .AddTranslation(LocaleCode.EnUs, "Spawnable Building")
                 .AddTranslation(LocaleCode.ZhHans, "自长建筑")
                 .AddTranslation(LocaleCode.ZhHant, "自長建築"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.School]")
+                .AddTranslation(LocaleCode.EnUs, "School")
+                .AddTranslation(LocaleCode.ZhHans, "学校")
+                .AddTranslation(LocaleCode.ZhHant, "學校"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.FireStation]")
+                .AddTranslation(LocaleCode.EnUs, "Fire Station")
+                .AddTranslation(LocaleCode.ZhHans, "消防站")
+                .AddTranslation(LocaleCode.ZhHant, "消防站"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.PoliceStation]")
+                .AddTranslation(LocaleCode.EnUs, "Police Station")
+                .AddTranslation(LocaleCode.ZhHans, "警察局")
+                .AddTranslation(LocaleCode.ZhHant, "警察局"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Hospital]")
+                .AddTranslation(LocaleCode.EnUs, "Hospital")
+                .AddTranslation(LocaleCode.ZhHans, "医院")
+                .AddTranslation(LocaleCode.ZhHant, "醫院"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Park]")
+                .AddTranslation(LocaleCode.EnUs, "Park")
+                .AddTranslation(LocaleCode.ZhHans, "公园")
+                .AddTranslation(LocaleCode.ZhHant, "公園"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Electricity]")
+                .AddTranslation(LocaleCode.EnUs, "Electricity")
+                .AddTranslation(LocaleCode.ZhHans, "电力")
+                .AddTranslation(LocaleCode.ZhHant, "電力"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Water]")
+                .AddTranslation(LocaleCode.EnUs, "Water")
+                .AddTranslation(LocaleCode.ZhHans, "净水")
+                .AddTranslation(LocaleCode.ZhHant, "淨水"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Sewage]")
+                .AddTranslation(LocaleCode.EnUs, "Sewage")
+                .AddTranslation(LocaleCode.ZhHans, "污水")
+                .AddTranslation(LocaleCode.ZhHant, "污水"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Garbage]")
+                .AddTranslation(LocaleCode.EnUs, "Garbage")
+                .AddTranslation(LocaleCode.ZhHans, "垃圾")
+                .AddTranslation(LocaleCode.ZhHant, "垃圾"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Disaster]")
+                .AddTranslation(LocaleCode.EnUs, "Disaster")
+                .AddTranslation(LocaleCode.ZhHans, "灾害")
+                .AddTranslation(LocaleCode.ZhHant, "災害"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Deathcare]")
+                .AddTranslation(LocaleCode.EnUs, "Deathcare")
+                .AddTranslation(LocaleCode.ZhHans, "殡仪")
+                .AddTranslation(LocaleCode.ZhHant, "殯儀"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Telecom]")
+                .AddTranslation(LocaleCode.EnUs, "Telecom")
+                .AddTranslation(LocaleCode.ZhHans, "电信")
+                .AddTranslation(LocaleCode.ZhHant, "電信"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Post]")
+                .AddTranslation(LocaleCode.EnUs, "Post")
+                .AddTranslation(LocaleCode.ZhHans, "邮政")
+                .AddTranslation(LocaleCode.ZhHant, "郵政"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Parking]")
+                .AddTranslation(LocaleCode.EnUs, "Parking Lot")
+                .AddTranslation(LocaleCode.ZhHans, "停车场")
+                .AddTranslation(LocaleCode.ZhHant, "停車場"),
+            new Translation("Options.GROUP[StationNaming.StationNaming.Mod.CityService]")
+                .AddTranslation(LocaleCode.EnUs, "City Service")
+                .AddTranslation(LocaleCode.ZhHans, "城市服务")
+                .AddTranslation(LocaleCode.ZhHant, "城市服務"),
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Other]")
                 .AddTranslation(LocaleCode.EnUs, "Other")
                 .AddTranslation(LocaleCode.ZhHans, "其他")
                 .AddTranslation(LocaleCode.ZhHant, "其他"),
+
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.General]")
                 .AddTranslation(LocaleCode.EnUs, "General")
                 .AddTranslation(LocaleCode.ZhHans, "常规")
                 .AddTranslation(LocaleCode.ZhHant, "常規"),
-            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Building]")
-                .AddTranslation(LocaleCode.EnUs, "Building")
-                .AddTranslation(LocaleCode.ZhHans, "建筑")
-                .AddTranslation(LocaleCode.ZhHant, "建築"),
-            new Translation("Options.TAB[StationNaming.StationNaming.Mod.OtherSource]")
-                .AddTranslation(LocaleCode.EnUs, "Other")
-                .AddTranslation(LocaleCode.ZhHans, "其他")
-                .AddTranslation(LocaleCode.ZhHant, "其他"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Targets]")
+                .AddTranslation(LocaleCode.EnUs, "Targets")
+                .AddTranslation(LocaleCode.ZhHans, "目标")
+                .AddTranslation(LocaleCode.ZhHant, "目標"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Sources]")
+                .AddTranslation(LocaleCode.EnUs, "Sources")
+                .AddTranslation(LocaleCode.ZhHans, "来源")
+                .AddTranslation(LocaleCode.ZhHant, "來源"),
 
-            new Translation(
-                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]")
-                .AddTranslation(LocaleCode.EnUs, ""),
-            new Translation(
-                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopsDescription]")
-                .AddTranslation(LocaleCode.EnUs,
-                    "Here are the options specifically for the stops, " +
-                    "and may be replaced by more detailed settings in the future.")
-                .AddTranslation(LocaleCode.ZhHans,
-                    "这是为站牌单独设置的选项，之后可能会被更详细的设置取代。")
-                .AddTranslation(LocaleCode.ZhHant,
-                    "這是為站牌單獨設置的選項，之後可能會被更詳細的設置取代。"),
             new Translation("StationNaming.NameCandidates")
                 .AddTranslation(LocaleCode.EnUs, "Name Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "名称候选")
@@ -395,17 +676,49 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "公园")
                 .AddTranslation(LocaleCode.ZhHant, "公園"),
             new Translation("StationNaming.NameSource[Electricity]")
-                .AddTranslation(LocaleCode.EnUs, "Electricity Service")
-                .AddTranslation(LocaleCode.ZhHans, "电力服务")
-                .AddTranslation(LocaleCode.ZhHant, "電力服務"),
+                .AddTranslation(LocaleCode.EnUs, "Electricity")
+                .AddTranslation(LocaleCode.ZhHans, "电力")
+                .AddTranslation(LocaleCode.ZhHant, "電力"),
             new Translation("StationNaming.NameSource[Water]")
-                .AddTranslation(LocaleCode.EnUs, "Water Service")
-                .AddTranslation(LocaleCode.ZhHans, "净水服务")
-                .AddTranslation(LocaleCode.ZhHant, "淨水服務"),
+                .AddTranslation(LocaleCode.EnUs, "Water")
+                .AddTranslation(LocaleCode.ZhHans, "净水")
+                .AddTranslation(LocaleCode.ZhHant, "淨水"),
             new Translation("StationNaming.NameSource[Sewage]")
-                .AddTranslation(LocaleCode.EnUs, "Sewage Service")
-                .AddTranslation(LocaleCode.ZhHans, "污水服务")
-                .AddTranslation(LocaleCode.ZhHant, "污水服務"),
+                .AddTranslation(LocaleCode.EnUs, "Sewage")
+                .AddTranslation(LocaleCode.ZhHans, "污水")
+                .AddTranslation(LocaleCode.ZhHant, "污水"),
+            new Translation("StationNaming.NameSource[Admin]")
+                .AddTranslation(LocaleCode.EnUs, "Administration")
+                .AddTranslation(LocaleCode.ZhHans, "行政")
+                .AddTranslation(LocaleCode.ZhHant, "行政"),
+            new Translation("StationNaming.NameSource[RoadFacility]")
+                .AddTranslation(LocaleCode.EnUs, "Road Service")
+                .AddTranslation(LocaleCode.ZhHans, "道路服务")
+                .AddTranslation(LocaleCode.ZhHant, "道路服務"),
+            new Translation("StationNaming.NameSource[Garbage]")
+                .AddTranslation(LocaleCode.EnUs, "Garbage")
+                .AddTranslation(LocaleCode.ZhHans, "垃圾")
+                .AddTranslation(LocaleCode.ZhHant, "垃圾"),
+            new Translation("StationNaming.NameSource[Disaster]")
+                .AddTranslation(LocaleCode.EnUs, "Disaster")
+                .AddTranslation(LocaleCode.ZhHans, "灾害")
+                .AddTranslation(LocaleCode.ZhHant, "災害"),
+            new Translation("StationNaming.NameSource[Deathcare]")
+                .AddTranslation(LocaleCode.EnUs, "Deathcare")
+                .AddTranslation(LocaleCode.ZhHans, "殡仪")
+                .AddTranslation(LocaleCode.ZhHant, "殯儀"),
+            new Translation("StationNaming.NameSource[Telecom]")
+                .AddTranslation(LocaleCode.EnUs, "Telecom")
+                .AddTranslation(LocaleCode.ZhHans, "电信")
+                .AddTranslation(LocaleCode.ZhHant, "電信"),
+            new Translation("StationNaming.NameSource[Post]")
+                .AddTranslation(LocaleCode.EnUs, "Post")
+                .AddTranslation(LocaleCode.ZhHans, "邮政")
+                .AddTranslation(LocaleCode.ZhHant, "郵政"),
+            new Translation("StationNaming.NameSource[Parking]")
+                .AddTranslation(LocaleCode.EnUs, "Parking Lot")
+                .AddTranslation(LocaleCode.ZhHans, "停车场")
+                .AddTranslation(LocaleCode.ZhHant, "停車場"),
             new Translation("StationNaming.NameSource[CityService]")
                 .AddTranslation(LocaleCode.EnUs, "City Service")
                 .AddTranslation(LocaleCode.ZhHans, "城市服务")
@@ -420,7 +733,7 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHant, "None"),
         ];
 
-        public static void LoadTranslations()
+        public static void LoadTranslations(StationNamingSettings settings)
         {
             foreach (var supportedLocale in GameManager.instance
                          .localizationManager.GetSupportedLocales())

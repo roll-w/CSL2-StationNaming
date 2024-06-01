@@ -37,6 +37,7 @@ public partial class AutoTaggingSystem : GameSystemBase
         {
             return;
         }
+
         if (!Mod.GetInstance().GetSettings().AutoNaming)
         {
             return;
@@ -58,13 +59,44 @@ public partial class AutoTaggingSystem : GameSystemBase
 
     private bool CouldNaming(Entity entity)
     {
+        var settings = Mod.GetInstance().GetSettings();
         if (EntityManager.HasComponent<TransportStop>(entity))
         {
-            return true;
+            return settings.TransportStopAutoNaming;
         }
 
         var nameSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
-        return nameSource.CouldNaming();
+        if (!nameSource.CouldNaming())
+        {
+            return false;
+        }
+
+        return CheckSetting(nameSource);
+    }
+
+    private bool CheckSetting(NameSource nameSource)
+    {
+        var settings = Mod.GetInstance().GetSettings();
+        return nameSource switch
+        {
+            NameSource.TransportStation => settings.TransportStationAutoNaming,
+            NameSource.TransportDepot => settings.TransportDepotAutoNaming,
+            NameSource.FireStation => settings.FireStationAutoNaming,
+            NameSource.PoliceStation => settings.PoliceStationAutoNaming,
+            NameSource.School => settings.SchoolAutoNaming,
+            NameSource.Hospital => settings.HospitalAutoNaming,
+            NameSource.Park => settings.ParkAutoNaming,
+            NameSource.Electricity => settings.ElectricityAutoNaming,
+            NameSource.Water => settings.WaterAutoNaming,
+            NameSource.Sewage => settings.SewageAutoNaming,
+            NameSource.Garbage => settings.GarbageAutoNaming,
+            NameSource.Deathcare => settings.DeathcareAutoNaming,
+            NameSource.Telecom => settings.TelecomAutoNaming,
+            NameSource.Parking => settings.ParkingAutoNaming,
+            NameSource.Admin => settings.AdminAutoNaming,
+            NameSource.RoadFacility => settings.RoadFacilityAutoNaming,
+            _ => false
+        };
     }
 
     protected override void OnCreate()
