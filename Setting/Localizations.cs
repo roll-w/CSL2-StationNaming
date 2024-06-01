@@ -583,25 +583,24 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "City Service")
                 .AddTranslation(LocaleCode.ZhHans, "城市服务")
                 .AddTranslation(LocaleCode.ZhHant, "城市服務"),
-
-
             new Translation("Options.GROUP[StationNaming.StationNaming.Mod.Other]")
                 .AddTranslation(LocaleCode.EnUs, "Other")
                 .AddTranslation(LocaleCode.ZhHans, "其他")
                 .AddTranslation(LocaleCode.ZhHant, "其他"),
+
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.General]")
                 .AddTranslation(LocaleCode.EnUs, "General")
                 .AddTranslation(LocaleCode.ZhHans, "常规")
                 .AddTranslation(LocaleCode.ZhHant, "常規"),
-
-            new Translation("Options.TAB[StationNaming.StationNaming.Mod.OtherSource]")
-                .AddTranslation(LocaleCode.EnUs, "Other")
-                .AddTranslation(LocaleCode.ZhHans, "其他")
-                .AddTranslation(LocaleCode.ZhHant, "其他"),
             new Translation("Options.TAB[StationNaming.StationNaming.Mod.Targets]")
                 .AddTranslation(LocaleCode.EnUs, "Targets")
                 .AddTranslation(LocaleCode.ZhHans, "目标")
                 .AddTranslation(LocaleCode.ZhHant, "目標"),
+            new Translation("Options.TAB[StationNaming.StationNaming.Mod.Sources]")
+                .AddTranslation(LocaleCode.EnUs, "Sources")
+                .AddTranslation(LocaleCode.ZhHans, "来源")
+                .AddTranslation(LocaleCode.ZhHant, "來源"),
+
             new Translation("StationNaming.NameCandidates")
                 .AddTranslation(LocaleCode.EnUs, "Name Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "名称候选")
