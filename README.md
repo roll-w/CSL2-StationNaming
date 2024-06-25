@@ -1,7 +1,7 @@
 ﻿# Station Naming
 
 This is a mod for `Cities: Skylines 2` that allows you naming your
-transport stations and stops automatically.
+transport stations, stops and city service buildings automatically.
 
 This mod should be compatible with other auto naming mods, but you should
 check the mod settings to avoid conflicts.
@@ -53,6 +53,7 @@ RollW_StationNaming
 
 ## Planned Features
 
+- Allow naming sub-buildings.
 - Allow setting the naming format for different name sources.
 - Allow naming vehicle to contain its owner, route, or depot name.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
