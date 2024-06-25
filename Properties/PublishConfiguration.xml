@@ -11,7 +11,7 @@
 # Station Naming
 
 This is a mod for `Cities: Skylines 2` that allows you naming your
-transport stations and stops automatically.
+transport stations, stops and city service buildings automatically.
 
 This mod should be compatible with other auto naming mods, but you should
 check the mod settings to avoid conflicts.
@@ -39,6 +39,7 @@ please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNamin
 
 ## Planned Features
 
+- Allow naming sub-buildings.
 - Allow setting the naming format for different name sources.
 - Allow naming vehicle to contain its owner, route, or depot name.
 - Allow adding a sequential number to the names. E.g., Station 1, Station 2...
@@ -61,16 +62,14 @@ on GitHub.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.4.0" />
+	<ModVersion Value="0.4.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Allow auto naming city service buildings.
-- Feature: Allow naming maintenance depots.
-- Feature: use {ASSET} to insert the asset name in prefix/suffix.
+- Feature: Support for Economy 2.0
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />
