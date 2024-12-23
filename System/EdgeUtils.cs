@@ -43,7 +43,7 @@ public static class EdgeUtils
     {
         HashSet<RoadEdge> edges =
         [
-            new RoadEdge(Direction.Init, EdgeType.Same, edgeEntity)
+            new(Direction.Init, EdgeType.Same, edgeEntity)
         ];
         var aggregated = entityManager.GetComponentData<Aggregated>(edgeEntity);
         CollectEdges(
@@ -109,7 +109,7 @@ public static class EdgeUtils
                 continue;
             }
 
-            if (IsTrack(connectedEdge.m_Edge, entityManager))
+            if (IsTrackOrPedestrian(connectedEdge.m_Edge, entityManager))
             {
                 continue;
             }
@@ -132,8 +132,13 @@ public static class EdgeUtils
         }
     }
 
-    private static bool IsTrack(Entity edge, EntityManager entityManager)
+    private static bool IsTrackOrPedestrian(Entity edge, EntityManager entityManager)
     {
+        if (entityManager.HasComponent<PedestrianLane>(edge))
+        {
+            return true;
+        }
+
         if (entityManager.HasComponent<Road>(edge))
         {
             return false;
