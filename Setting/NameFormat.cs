@@ -29,7 +29,6 @@ public struct NameFormat : IEquatable<NameFormat>
         Separator = None
     };
 
-    public const string Prefab = "{PREFAB}";
     public const string Asset = "{ASSET}";
     public const string None = "{NONE}";
 
@@ -56,22 +55,18 @@ public struct NameFormat : IEquatable<NameFormat>
 
     public bool IsAnyPrefab()
     {
-        return Prefix.Contains(Prefab)
-               || Suffix.Contains(Prefab)
-               || Prefix.Contains(Asset)
+        return Prefix.Contains(Asset)
                || Suffix.Contains(Asset);
     }
 
     private string GetPrefix(string prefab)
     {
-        return Prefix.Replace(Prefab, prefab)
-            .Replace(Asset, prefab);
+        return Prefix.Replace(Asset, prefab);
     }
 
     private string GetSuffix(string prefab)
     {
-        return Suffix.Replace(Prefab, prefab)
-            .Replace(Asset, prefab);
+        return Suffix.Replace(Asset, prefab);
     }
 
     public string Format(
