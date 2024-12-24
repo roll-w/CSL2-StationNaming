@@ -27,6 +27,13 @@ using Unity.Entities;
 
 namespace StationNaming.System;
 
+/// <summary>
+/// The system that automatically tags the newly created buildings.
+///
+/// When a building is created, this system will check if the building
+/// could be named automatically.
+/// If so, it will add the "ToAutoNaming" tag to the building.
+/// </summary>
 public partial class AutoTaggingSystem : GameSystemBase
 {
     private EntityQuery _createdQuery;
@@ -65,6 +72,8 @@ public partial class AutoTaggingSystem : GameSystemBase
             return settings.TransportStopAutoNaming;
         }
 
+        // Get the newly created building's type.
+        // (Although we still use "NameSource" here, it's not a good idea, but it works.)
         var nameSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
         if (!nameSource.CouldNaming())
         {

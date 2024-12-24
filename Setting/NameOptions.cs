@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using StationNaming.System;
 
 namespace StationNaming.Setting;
@@ -27,6 +30,7 @@ public struct NameOptions
     public NameOptions()
     {
     }
+
     public bool Reverse { get; set; } = false;
     public bool BuildingName { get; set; } = true;
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
@@ -34,7 +38,17 @@ public struct NameOptions
     public bool EnableDistrict { get; set; } = true;
     public bool EnableDistrictPrefix { get; set; } = false;
 
+    public List<NameSource> EnabledSources { get; set; } =
+        Enum.GetValues(typeof(NameSource))
+            .Cast<NameSource>()
+            .ToList();
+
     public FormatDictionary<NameSource> SourceFormats { get; private set; } = new();
 
     public FormatDictionary<TargetType> TargetFormats { get; private set; } = new();
+
+    public bool IsNameSourceEnabled(NameSource source)
+    {
+        return EnabledSources.Contains(source);
+    }
 }

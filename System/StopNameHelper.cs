@@ -41,6 +41,7 @@ public class StopNameHelper(
     private NameOptions NameOptions { get; set; } = new();
 
     private readonly NameFormatter _nameFormatter = new(entityManager, nameSystem, prefabSystem);
+    private EntityManager _entityManager = entityManager;
 
     public void ApplyTo(NameOptions nameOptions)
     {
@@ -50,14 +51,14 @@ public class StopNameHelper(
 
     public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
     {
-        var hasAttached = entityManager.HasComponent<Attached>(stop);
-        var hasOwner = entityManager.HasComponent<Owner>(stop);
+        var hasAttached = _entityManager.HasComponent<Attached>(stop);
+        var hasOwner = _entityManager.HasComponent<Owner>(stop);
 
         // if the stop has an owner, it could be an inner stop
         if (hasOwner)
         {
-            var owner = RetrieveOwner(entityManager, stop);
-            if (entityManager.HasComponent<Building>(owner))
+            var owner = RetrieveOwner(_entityManager, stop);
+            if (_entityManager.HasComponent<Building>(owner))
             {
                 return AddCandidatesIfBuildingStop(stop, owner, length);
             }
@@ -68,13 +69,13 @@ public class StopNameHelper(
             return [];
         }
 
-        var attached = entityManager.GetComponentData<Attached>(stop);
+        var attached = _entityManager.GetComponentData<Attached>(stop);
         if (attached.m_Parent == Entity.Null || attached.m_Parent == default)
         {
             return [];
         }
 
-        return entityManager.HasComponent<Edge>(attached.m_Parent)
+        return _entityManager.HasComponent<Edge>(attached.m_Parent)
             ? AddCandidatesIfRoadStop(stop, attached, length)
             : [];
     }
@@ -82,12 +83,12 @@ public class StopNameHelper(
     public IEnumerable<NameCandidate> SetCandidatesForStation(
         Entity station, int length = 2, bool includeSelf = false)
     {
-        if (!entityManager.HasComponent<Building>(station))
+        if (!_entityManager.HasComponent<Building>(station))
         {
             return [];
         }
 
-        var building = entityManager.GetComponentData<Building>(station);
+        var building = _entityManager.GetComponentData<Building>(station);
         if (building.m_RoadEdge == Entity.Null || building.m_RoadEdge == default)
         {
             return [];
@@ -101,7 +102,7 @@ public class StopNameHelper(
         Entity stop, Entity owner, int length)
     {
         // get the real owner, not the extension
-        if (!entityManager.HasComponent<Building>(owner))
+        if (!_entityManager.HasComponent<Building>(owner))
         {
             return [];
         }
@@ -144,9 +145,9 @@ public class StopNameHelper(
         HashSet<NameCandidate> nameCandidates = [];
 
         var collectEdges = EdgeUtils.CollectEdges(
-            entityManager, edge, length);
+            _entityManager, edge, length);
 
-        var root = EdgeUtils.GetRootEntityForEdge(edge, entityManager);
+        var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
         var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
         var roadRefer = new NameSourceRefer(root, NameSource.Road);
 
@@ -204,7 +205,7 @@ public class StopNameHelper(
         Entity currentRoadRoot,
         ICollection<NameCandidate> nameCandidates)
     {
-        var root = EdgeUtils.GetRootEntityForEdge(roadEdge.Edge, entityManager);
+        var root = EdgeUtils.GetRootEntityForEdge(roadEdge.Edge, _entityManager);
 
         List<NameSourceRefer> refers =
         [
@@ -234,13 +235,13 @@ public class StopNameHelper(
         ICollection<NameCandidate> candidates,
         bool includeSelf)
     {
-        if (!entityManager.HasBuffer<ConnectedBuilding>(roadEdge.Edge))
+        if (!_entityManager.HasBuffer<ConnectedBuilding>(roadEdge.Edge))
         {
             return;
         }
 
         var connectedBuildings =
-            entityManager.GetBuffer<ConnectedBuilding>(roadEdge.Edge);
+            _entityManager.GetBuffer<ConnectedBuilding>(roadEdge.Edge);
         foreach (var connectedBuilding in connectedBuildings)
         {
             GenerateBuildingSourceCandidates(
@@ -267,11 +268,10 @@ public class StopNameHelper(
 
         var source = NameUtils.TryGetBuildingSource(
             building,
-            entityManager
+            _entityManager
         );
 
-        if (source == NameSource.SpawnableBuilding &&
-            !NameOptions.SpawnableBuildingName)
+        if (!NameOptions.IsNameSourceEnabled(source))
         {
             return;
         }
@@ -289,13 +289,13 @@ public class StopNameHelper(
         }
 
         var roadEdgeRoot = EdgeUtils.GetRootEntityForEdge(
-            currentRoad.Edge, entityManager
+            currentRoad.Edge, _entityManager
         );
 
         List<NameSourceRefer> refers =
         [
-            new NameSourceRefer(roadEdgeRoot, NameSource.Road),
-            new NameSourceRefer(building, source)
+            new(roadEdgeRoot, NameSource.Road),
+            new(building, source)
         ];
 
         candidates.Add(NameCandidate.Of(
@@ -309,7 +309,7 @@ public class StopNameHelper(
         Entity target
     )
     {
-        var nameCandidates = entityManager.AddBuffer<NameCandidate>(target);
+        var nameCandidates = _entityManager.AddBuffer<NameCandidate>(target);
         nameCandidates.Clear();
         foreach (var nameCandidate in SortBySource(candidates))
         {
@@ -345,7 +345,7 @@ public class StopNameHelper(
             return GenerateNameCandidate(candidate, target);
         }
 
-        var districtEntity = GetDistrictEntity(target, entityManager);
+        var districtEntity = GetDistrictEntity(target, _entityManager);
         if (districtEntity == Entity.Null)
         {
             return GenerateNameCandidate(candidate, target);
@@ -377,7 +377,7 @@ public class StopNameHelper(
         out NameCandidate candidate
     )
     {
-        var districtEntity = GetDistrictEntity(target, entityManager);
+        var districtEntity = GetDistrictEntity(target, _entityManager);
         if (districtEntity == Entity.Null)
         {
             candidate = default;

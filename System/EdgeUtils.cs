@@ -109,7 +109,7 @@ public static class EdgeUtils
                 continue;
             }
 
-            if (IsTrackOrPedestrian(connectedEdge.m_Edge, entityManager))
+            if (!entityManager.HasComponent<Road>(connectedEdge.m_Edge))
             {
                 continue;
             }
@@ -130,27 +130,6 @@ public static class EdgeUtils
                 );
             }
         }
-    }
-
-    private static bool IsTrackOrPedestrian(Entity edge, EntityManager entityManager)
-    {
-        if (entityManager.HasComponent<PedestrianLane>(edge))
-        {
-            return true;
-        }
-
-        if (entityManager.HasComponent<Road>(edge))
-        {
-            return false;
-        }
-
-        if (entityManager.HasComponent<TrainTrack>(edge))
-        {
-            return true;
-        }
-
-        return entityManager.HasComponent<TramTrack>(edge) ||
-               entityManager.HasComponent<SubwayTrack>(edge);
     }
 }
 

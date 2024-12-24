@@ -18,11 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
 using Colossal.IO.AssetDatabase;
 using Game.Modding;
 using Game.SceneFlow;
 using Game.Settings;
-using Game.UI.Localization;
 using Game.UI.Widgets;
 using StationNaming.System;
 
@@ -184,12 +184,48 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     [SettingsUIButton]
     [SettingsUIConfirmation]
+    [SettingsUISection(SectionSources, GroupOther)]
+    public bool EnableAllSources
+    {
+        set
+        {
+            SetSources(true);
+            ApplyAndSave();
+        }
+    }
+
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
+    [SettingsUISection(SectionSources, GroupOther)]
+    public bool DisableAllSources
+    {
+        set
+        {
+            SetSources(false);
+            ApplyAndSave();
+        }
+    }
+
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
+    [SettingsUISection(SectionTargets, GroupOther)]
+    public bool EnableCityServiceAutoNaming
+    {
+        set
+        {
+            SetCityServiceAutoNaming(true);
+            ApplyAndSave();
+        }
+    }
+
+    [SettingsUIButton]
+    [SettingsUIConfirmation]
     [SettingsUISection(SectionTargets, GroupOther)]
     public bool DisableCityServiceAutoNaming
     {
         set
         {
-            SetDisableCityServiceAutoNaming();
+            SetCityServiceAutoNaming(false);
             ApplyAndSave();
         }
     }
@@ -285,6 +321,78 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             NamedAddressNameFormat, true
         );
     }
+
+    [SettingsUISection(SectionSources, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool TransportStationSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool TransportDepotSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupSchool)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool SchoolSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupFireStation)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool FireStationSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupPoliceStation)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool PoliceStationSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupHospital)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool HospitalSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupPark)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool ParkSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupElectricity)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool ElectricitySource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupWater)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool WaterSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupSewage)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool SewageSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupGarbage)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool GarbageSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupDisaster)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool DisasterSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupDeathcare)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool DeathcareSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupTelecom)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool TelecomSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupPost)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool PostSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupParking)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool ParkingSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupCityService)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool RoadFacilitySource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupCityService)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
+    public bool AdminSource { get; set; } = true;
 
     public bool IsAutoNamingDisabled() => !AutoNaming;
 
@@ -394,6 +502,25 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         RoadFormat = NameFormat.Invalid;
         DistrictFormat = NameFormat.Invalid;
 
+        TransportStationSource = true;
+        TransportDepotSource = true;
+        SchoolSource = true;
+        FireStationSource = true;
+        PoliceStationSource = true;
+        HospitalSource = true;
+        ParkSource = true;
+        ElectricitySource = true;
+        WaterSource = true;
+        SewageSource = true;
+        GarbageSource = true;
+        DisasterSource = true;
+        DeathcareSource = true;
+        TelecomSource = true;
+        PostSource = true;
+        ParkingSource = true;
+        RoadFacilitySource = true;
+        AdminSource = true;
+
         TransportStopAutoNaming = true;
         TransportStationAutoNaming = true;
         TransportDepotAutoNaming = true;
@@ -415,26 +542,137 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         AdminAutoNaming = true;
     }
 
-    public void SetDisableCityServiceAutoNaming()
+    public void SetSources(bool enable = false)
     {
-        TransportStationAutoNaming = false;
-        TransportDepotAutoNaming = false;
-        SchoolAutoNaming = false;
-        FireStationAutoNaming = false;
-        PoliceStationAutoNaming = false;
-        HospitalAutoNaming = false;
-        ParkAutoNaming = false;
-        ElectricityAutoNaming = false;
-        WaterAutoNaming = false;
-        SewageAutoNaming = false;
-        GarbageAutoNaming = false;
-        DisasterAutoNaming = false;
-        DeathcareAutoNaming = false;
-        TelecomAutoNaming = false;
-        PostAutoNaming = false;
-        ParkingAutoNaming = false;
-        RoadFacilityAutoNaming = false;
-        AdminAutoNaming = false;
+        TransportStationSource = enable;
+        TransportDepotSource = enable;
+        SchoolSource = enable;
+        FireStationSource = enable;
+        PoliceStationSource = enable;
+        HospitalSource = enable;
+        ParkSource = enable;
+        ElectricitySource = enable;
+        WaterSource = enable;
+        SewageSource = enable;
+        GarbageSource = enable;
+        DisasterSource = enable;
+        DeathcareSource = enable;
+        TelecomSource = enable;
+        PostSource = enable;
+        ParkingSource = enable;
+        RoadFacilitySource = enable;
+        AdminSource = enable;
+    }
+
+    public void SetCityServiceAutoNaming(bool enable = false)
+    {
+        TransportStationAutoNaming = enable;
+        TransportDepotAutoNaming = enable;
+        SchoolAutoNaming = enable;
+        FireStationAutoNaming = enable;
+        PoliceStationAutoNaming = enable;
+        HospitalAutoNaming = enable;
+        ParkAutoNaming = enable;
+        ElectricityAutoNaming = enable;
+        WaterAutoNaming = enable;
+        SewageAutoNaming = enable;
+        GarbageAutoNaming = enable;
+        DisasterAutoNaming = enable;
+        DeathcareAutoNaming = enable;
+        TelecomAutoNaming = enable;
+        PostAutoNaming = enable;
+        ParkingAutoNaming = enable;
+        RoadFacilityAutoNaming = enable;
+        AdminAutoNaming = enable;
+    }
+
+    private List<NameSource> GetEnabledSources()
+    {
+        List<NameSource> sources = [
+            NameSource.Owner, NameSource.Road, NameSource.Intersection,
+            NameSource.SignatureBuilding, NameSource.CityService
+        ];
+        if (SpawnableBuildingName)
+        {
+            sources.Add(NameSource.SpawnableBuilding);
+        }
+        if (EnableDistrict)
+        {
+            sources.Add(NameSource.District);
+        }
+        if (TransportStationSource)
+        {
+            sources.Add(NameSource.TransportStation);
+        }
+        if (TransportDepotSource)
+        {
+            sources.Add(NameSource.TransportDepot);
+        }
+        if (SchoolSource)
+        {
+            sources.Add(NameSource.School);
+        }
+        if (FireStationSource)
+        {
+            sources.Add(NameSource.FireStation);
+        }
+        if (PoliceStationSource)
+        {
+            sources.Add(NameSource.PoliceStation);
+        }
+        if (HospitalSource)
+        {
+            sources.Add(NameSource.Hospital);
+        }
+        if (ParkSource)
+        {
+            sources.Add(NameSource.Park);
+        }
+        if (ElectricitySource)
+        {
+            sources.Add(NameSource.Electricity);
+        }
+        if (WaterSource)
+        {
+            sources.Add(NameSource.Water);
+        }
+        if (SewageSource)
+        {
+            sources.Add(NameSource.Sewage);
+        }
+        if (GarbageSource)
+        {
+            sources.Add(NameSource.Garbage);
+        }
+        if (DisasterSource)
+        {
+            sources.Add(NameSource.Disaster);
+        }
+        if (DeathcareSource)
+        {
+            sources.Add(NameSource.Deathcare);
+        }
+        if (TelecomSource)
+        {
+            sources.Add(NameSource.Telecom);
+        }
+        if (PostSource)
+        {
+            sources.Add(NameSource.Post);
+        }
+        if (ParkingSource)
+        {
+            sources.Add(NameSource.Parking);
+        }
+        if (RoadFacilitySource)
+        {
+            sources.Add(NameSource.RoadFacility);
+        }
+        if (AdminSource)
+        {
+            sources.Add(NameSource.Admin);
+        }
+        return sources;
     }
 
     public NameOptions ToNameOptions()
@@ -464,7 +702,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
                     Prefix = Prefix,
                     Separator = ""
                 }
-            }
+            },
+            EnabledSources = GetEnabledSources()
         };
 
         if (ApplyXfixToStops)
