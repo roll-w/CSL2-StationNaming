@@ -21,12 +21,98 @@
 using System;
 using System.Collections.Generic;
 using Game.Net;
+using Game.Routes;
 using Unity.Entities;
 
 namespace StationNaming.System;
 
 public static class EdgeUtils
 {
+    public static IEnumerable<RoadEdge> CollectIntersections(
+        Entity edge,
+        EntityManager entityManager,
+        int depth)
+    {
+        if (depth <= 0)
+        {
+            return [];
+        }
+
+        var edgeComponent = entityManager.GetComponentData<Edge>(edge);
+        var root = GetRootEntityForEdge(edge, entityManager);
+        List<RoadEdge> result = [];
+
+        SearchForIntersections(edgeComponent.m_Start, root, entityManager, depth, Direction.Start, result);
+        SearchForIntersections(edgeComponent.m_End, root, entityManager, depth, Direction.End, result);
+
+        return result;
+    }
+
+    private static void SearchForIntersections(
+        Entity edge, Entity root,
+        EntityManager entityManager,
+        int depth, Direction direction,
+        List<RoadEdge> intersections)
+    {
+        if (depth <= 0 || edge == Entity.Null)
+        {
+            return;
+        }
+
+        if (entityManager.HasComponent<Edge>(edge))
+        {
+            var edgeRoot = GetRootEntityForEdge(edge, entityManager);
+            if (edgeRoot != root)
+            {
+                return;
+            }
+
+            var edgeComponent = entityManager.GetComponentData<Edge>(edge);
+            var nextEdge = direction switch
+            {
+                Direction.End => edgeComponent.m_End,
+                Direction.Start => edgeComponent.m_Start,
+                _ => Entity.Null
+            };
+            SearchForIntersections(nextEdge, root, entityManager, depth - 1, direction, intersections);
+            return;
+        }
+
+        if (!entityManager.HasBuffer<ConnectedEdge>(edge))
+        {
+            return;
+        }
+
+        var anyRoad = false;
+        var allSelf = true;
+        var connectedEdges = entityManager.GetBuffer<ConnectedEdge>(edge);
+
+        foreach (var connectedEdge in connectedEdges)
+        {
+            if (!entityManager.HasComponent<Road>(connectedEdge.m_Edge))
+            {
+                continue;
+            }
+            if (allSelf)
+            {
+                var edgeRoot = GetRootEntityForEdge(connectedEdge.m_Edge, entityManager);
+                if (edgeRoot != root)
+                {
+                    anyRoad = true;
+                    allSelf = false;
+                }
+            }
+            SearchForIntersections(connectedEdge.m_Edge, root, entityManager, depth - 1, direction, intersections);
+        }
+
+        if (!anyRoad)
+        {
+            return;
+        }
+        RoadEdge roadEdge = new(direction, EdgeType.Same, edge, depth);
+        intersections.Add(roadEdge);
+    }
+
     public static Entity GetRootEntityForEdge(Entity entity, EntityManager entityManager)
     {
         if (entityManager.HasComponent<Aggregated>(entity))
@@ -41,7 +127,7 @@ public static class EdgeUtils
         EntityManager entityManager,
         Entity edgeEntity, int depth)
     {
-        HashSet<RoadEdge> edges =
+        List<RoadEdge> edges =
         [
             new(Direction.Init, EdgeType.Same, edgeEntity)
         ];
@@ -60,7 +146,7 @@ public static class EdgeUtils
         Entity edgeEntity, int depth,
         Entity aggregate, // to identify whether the edge belongs to the same road
         Direction direction,
-        ISet<RoadEdge> edges)
+        List<RoadEdge> edges)
     {
         if (depth <= 0)
         {
@@ -94,7 +180,7 @@ public static class EdgeUtils
         int depth,
         Entity aggregate,
         Entity node, Direction direction,
-        ISet<RoadEdge> edges)
+        List<RoadEdge> edges)
     {
         if (!entityManager.HasBuffer<ConnectedEdge>(node))
         {
@@ -114,21 +200,23 @@ public static class EdgeUtils
                 continue;
             }
 
-            var edgeAggregated =
-                entityManager.GetComponentData<Aggregated>(connectedEdge.m_Edge);
-            if (edgeAggregated.m_Aggregate != aggregate)
+            var edgeAggregated = GetRootEntityForEdge(connectedEdge.m_Edge, entityManager);
+            if (edgeAggregated != aggregate)
             {
                 edges.Add(new RoadEdge(direction, EdgeType.Other, connectedEdge.m_Edge, depth));
                 continue;
             }
 
-            if (edges.Add(new RoadEdge(direction, EdgeType.Same, connectedEdge.m_Edge, depth)))
+            var newEdge = new RoadEdge(direction, EdgeType.Same, connectedEdge.m_Edge, depth);
+            if (edges.Contains(newEdge))
             {
-                CollectEdges(
-                    entityManager, connectedEdge.m_Edge, depth - 1,
-                    aggregate, direction, edges
-                );
+                continue;
             }
+            edges.Add(newEdge);
+            CollectEdges(
+                entityManager, connectedEdge.m_Edge, depth - 1,
+                aggregate, direction, edges
+            );
         }
     }
 }

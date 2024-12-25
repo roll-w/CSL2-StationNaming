@@ -59,7 +59,7 @@ public partial class GeneralBuildingNamingSystem : GameSystemBase
             foreach (var entity in buildings)
             {
                 var candidates =
-                    _stopNameHelper.SetCandidatesForStation(entity, searchDepth);
+                    _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
             }
         }
         catch (Exception e)

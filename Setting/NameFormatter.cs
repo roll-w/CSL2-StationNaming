@@ -20,7 +20,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Game.Net;
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.UI;
@@ -35,6 +37,8 @@ public class NameFormatter(
     NameSystem nameSystem,
     PrefabSystem prefabSystem)
 {
+    private EntityManager _entityManager = entityManager;
+
     public NameOptions Options { get; set; } = new();
 
     public string FormatRefers(
@@ -48,13 +52,17 @@ public class NameFormatter(
             case 0:
                 return "";
             case 1 when refers[0].Source == NameSource.Owner:
-                return refers[0].GetName(entityManager, nameSystem);
+                return refers[0].GetName(_entityManager, nameSystem);
             default:
-                referFormat = StdFormatRefers(refers);
+                referFormat = refers[refers.Count - 1].Source switch
+                {
+                    NameSource.Intersection => FormatIntersection(refers),
+                    _ => StdFormatRefers(refers)
+                };
                 break;
         }
 
-        var targetType = NameUtils.GetTargetType(targetEntity, entityManager);
+        var targetType = NameUtils.GetTargetType(targetEntity, _entityManager);
 
         var targetFormat = Options.TargetFormats[targetType];
         var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
@@ -66,6 +74,56 @@ public class NameFormatter(
         );
     }
 
+    private string FormatIntersection(
+        IList<NameSourceRefer> refers)
+    {
+        var intersection = refers[refers.Count - 1];
+        var root = refers[refers.Count - 2];
+
+        var entity = intersection.Refer;
+        var rootEntity = EdgeUtils.GetRootEntityForEdge(root.Refer, _entityManager);
+
+        if (!_entityManager.HasBuffer<ConnectedEdge>(entity))
+        {
+            return "";
+        }
+
+        var connectedEdges = _entityManager.GetBuffer<ConnectedEdge>(entity);
+        List<NameSourceRefer> newRefers = [];
+        if (refers.Count > 2)
+        {
+            newRefers.AddRange(refers.Take(refers.Count - 2));
+        }
+
+        newRefers.Add(new NameSourceRefer(rootEntity, NameSource.Road));
+
+        // Collect and use StdFormatRefers
+        foreach (var connectedEdge in connectedEdges)
+        {
+            var edge = connectedEdge.m_Edge;
+            if (!_entityManager.HasComponent<Road>(edge))
+            {
+                continue;
+            }
+
+            var curRoot = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
+            if (edge == root.Refer || curRoot == rootEntity)
+            {
+                continue;
+            }
+
+            var refer = new NameSourceRefer(curRoot, NameSource.Road);
+            if (newRefers.Contains(refer))
+            {
+                continue;
+            }
+
+            newRefers.Add(refer);
+        }
+
+        return StdFormatRefers(newRefers);
+    }
+
     private string StdFormatRefers(IList<NameSourceRefer> refers)
     {
         StringBuilder builder = new();
@@ -73,7 +131,7 @@ public class NameFormatter(
         ForeachRefers(refers, Options.Reverse, (refer, hasNext) =>
         {
             var format = Options.SourceFormats[refer.Source];
-            var name = refer.GetName(entityManager, nameSystem);
+            var name = refer.GetName(_entityManager, nameSystem);
             builder.Append(format.Format(name, hasNext: hasNext));
         });
 
@@ -119,8 +177,8 @@ public class NameFormatter(
 
     private Entity GetPrefabEntity(Entity entity)
     {
-        return entityManager.HasComponent<PrefabRef>(entity)
-            ? entityManager.GetComponentData<PrefabRef>(entity).m_Prefab
+        return _entityManager.HasComponent<PrefabRef>(entity)
+            ? _entityManager.GetComponentData<PrefabRef>(entity).m_Prefab
             : Entity.Null;
     }
 

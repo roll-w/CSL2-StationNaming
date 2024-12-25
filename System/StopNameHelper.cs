@@ -49,7 +49,7 @@ public class StopNameHelper(
         NameOptions = nameOptions;
     }
 
-    public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int length = 2)
+    public IEnumerable<NameCandidate> SetCandidatesForStop(Entity stop, int depth = 2)
     {
         var hasAttached = _entityManager.HasComponent<Attached>(stop);
         var hasOwner = _entityManager.HasComponent<Owner>(stop);
@@ -60,7 +60,7 @@ public class StopNameHelper(
             var owner = RetrieveOwner(_entityManager, stop);
             if (_entityManager.HasComponent<Building>(owner))
             {
-                return AddCandidatesIfBuildingStop(stop, owner, length);
+                return AddCandidatesIfBuildingStop(stop, owner, depth);
             }
         }
 
@@ -76,12 +76,12 @@ public class StopNameHelper(
         }
 
         return _entityManager.HasComponent<Edge>(attached.m_Parent)
-            ? AddCandidatesIfRoadStop(stop, attached, length)
+            ? AddCandidatesIfRoadStop(stop, attached, depth)
             : [];
     }
 
-    public IEnumerable<NameCandidate> SetCandidatesForStation(
-        Entity station, int length = 2, bool includeSelf = false)
+    public IEnumerable<NameCandidate> SetCandidatesForBuilding(
+        Entity station, int depth = 2, bool includeSelf = false)
     {
         if (!_entityManager.HasComponent<Building>(station))
         {
@@ -95,7 +95,7 @@ public class StopNameHelper(
         }
 
         var edge = building.m_RoadEdge;
-        return SetCandidatesIfRoad(station, edge, length, includeSelf);
+        return SetCandidatesIfRoad(station, edge, depth, includeSelf);
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfBuildingStop(
@@ -107,7 +107,7 @@ public class StopNameHelper(
             return [];
         }
 
-        var candidates = SetCandidatesForStation(
+        var candidates = SetCandidatesForBuilding(
             owner, length, includeSelf: false
         );
         var buildingName = nameSystem.GetRenderedLabelName(owner);
@@ -134,37 +134,35 @@ public class StopNameHelper(
     }
 
     private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
-        Attached attached, int length)
+        Attached attached, int depth)
     {
-        return SetCandidatesIfRoad(stop, attached.m_Parent, length);
+        return SetCandidatesIfRoad(stop, attached.m_Parent, depth);
     }
 
     private IEnumerable<NameCandidate> SetCandidatesIfRoad(
-        Entity target, Entity edge, int length, bool includeSelf = false)
+        Entity target, Entity edge, int depth, bool includeSelf = false)
     {
         HashSet<NameCandidate> nameCandidates = [];
 
         var collectEdges = EdgeUtils.CollectEdges(
-            _entityManager, edge, length);
+            _entityManager, edge, depth);
 
-        var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
         var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
-        var roadRefer = new NameSourceRefer(root, NameSource.Road);
+        var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
 
         nameCandidates.Add(NameCandidate.Of(
             string.Empty,
             Direction.Init, EdgeType.Same,
-            roadRefer
+            edge, NameSource.Road
         ));
 
         var roadEdges = collectEdges.ToList();
+        AddIntersectionCandidate(edge, nameCandidates, depth);
+        AddOtherRoadCandidate(root, roadEdges, nameCandidates);
 
-        AddRoadCandidate(Direction.End, roadEdges, nameCandidates, currentRoad);
-        AddRoadCandidate(Direction.Start, roadEdges, nameCandidates, currentRoad);
-
-        foreach (var roadEdge in roadEdges)
+        if (NameOptions.BuildingName)
         {
-            if (NameOptions.BuildingName)
+            foreach (var roadEdge in roadEdges)
             {
                 CollectBuildingNames(
                     target,
@@ -178,54 +176,65 @@ public class StopNameHelper(
         return nameCandidates;
     }
 
-    private void AddRoadCandidate(
-        Direction direction,
-        IEnumerable<RoadEdge> roadEdges,
-        ICollection<NameCandidate> nameCandidates,
-        RoadEdge currentRoad
-    )
+    private void AddIntersectionCandidate(
+        Entity edge,
+        ICollection<NameCandidate> nameCandidates, int depth)
     {
-        var edges = roadEdges
-            .Where(e => e.Direction == direction
-                        && e.EdgeType == EdgeType.Other)
-            .OrderBy(it => -it.Depth)
-            .ToList();
-        if (edges.Count == 0)
+        var roadEdges = EdgeUtils.CollectIntersections(
+            edge, _entityManager, depth);
+
+        foreach (var roadEdge in roadEdges)
         {
-            return;
+            var nameCandidate = NameCandidate.Of(
+                string.Empty, roadEdge.Direction,
+                roadEdge.EdgeType,
+                // Add an auxiliary entity for indicating the intersection.
+                // See also: NameFormatter.FormatIntersection
+                edge, NameSource.Road,
+                roadEdge.Edge, NameSource.Intersection
+            );
+            nameCandidates.Add(nameCandidate);
         }
-
-        var first = edges.FirstOrDefault();
-
-        AddRoadCandidate(first, currentRoad.Edge, nameCandidates);
     }
 
-    private void AddRoadCandidate(
-        RoadEdge roadEdge,
-        Entity currentRoadRoot,
-        ICollection<NameCandidate> nameCandidates)
+    private void AddOtherRoadCandidate(
+        Entity root,
+        List<RoadEdge> roadEdges,
+        ICollection<NameCandidate> candidates)
     {
-        var root = EdgeUtils.GetRootEntityForEdge(roadEdge.Edge, _entityManager);
+        var hasAddStart = false;
+        var hasAddEnd = false;
+        foreach (var roadEdge in roadEdges)
+        {
+            if (roadEdge.Direction == Direction.Init
+                || roadEdge.Direction == Direction.Start && hasAddStart
+                || roadEdge.Direction == Direction.End && hasAddEnd)
+            {
+                continue;
+            }
 
-        List<NameSourceRefer> refers =
-        [
-            new(currentRoadRoot, NameSource.Road),
-            new(root, NameSource.Road)
-        ];
+            var rootEntityForEdge = EdgeUtils.GetRootEntityForEdge(roadEdge.Edge, _entityManager);
+            if (root == rootEntityForEdge)
+            {
+                continue;
+            }
 
-        nameCandidates.Add(NameCandidate.Of(
-            string.Empty,
-            roadEdge.Direction,
-            roadEdge.EdgeType,
-            refers
-        ));
-
-        nameCandidates.Add(NameCandidate.Of(
-            string.Empty,
-            roadEdge.Direction,
-            roadEdge.EdgeType,
-            root, NameSource.Intersection
-        ));
+            var nameCandidate = NameCandidate.Of(
+                string.Empty, roadEdge.Direction,
+                roadEdge.EdgeType,
+                roadEdge.Edge, NameSource.Road
+            );
+            candidates.Add(nameCandidate);
+            switch (roadEdge.Direction)
+            {
+                case Direction.Start:
+                    hasAddStart = true;
+                    break;
+                case Direction.End:
+                    hasAddEnd = true;
+                    break;
+            }
+        }
     }
 
     private void CollectBuildingNames(

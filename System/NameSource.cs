@@ -93,4 +93,33 @@ public static class NameSourceExtensions
             _ => false
         };
     }
+
+    public static bool IsBuilding(this NameSource source)
+    {
+        return source switch
+        {
+            NameSource.TransportStation
+                or NameSource.TransportDepot
+                or NameSource.FireStation
+                or NameSource.PoliceStation
+                or NameSource.School
+                or NameSource.Hospital
+                or NameSource.Park
+                or NameSource.Electricity
+                or NameSource.Water
+                or NameSource.Sewage
+                or NameSource.Admin
+                or NameSource.RoadFacility
+                or NameSource.Garbage
+                or NameSource.Disaster
+                or NameSource.Deathcare
+                or NameSource.Telecom
+                or NameSource.Post
+                or NameSource.Parking
+                or NameSource.CityService
+                or NameSource.Building
+                => true,
+            _ => false
+        };
+    }
 }

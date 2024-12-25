@@ -32,6 +32,10 @@ public struct NameOptions
     }
 
     public bool Reverse { get; set; } = false;
+
+    /// <summary>
+    /// Building name enabled.
+    /// </summary>
     public bool BuildingName { get; set; } = true;
     public bool BuildingNameWithCurrentRoad { get; set; } = true;
     public bool SpawnableBuildingName { get; set; } = true;
@@ -49,6 +53,11 @@ public struct NameOptions
 
     public bool IsNameSourceEnabled(NameSource source)
     {
+        if (source.IsBuilding() && !BuildingName)
+        {
+            return false;
+        }
+
         return EnabledSources.Contains(source);
     }
 }

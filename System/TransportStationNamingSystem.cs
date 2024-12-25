@@ -58,7 +58,7 @@ public partial class TransportStationNamingSystem : GameSystemBase
             foreach (var entity in stations)
             {
                 var candidates =
-                    _stopNameHelper.SetCandidatesForStation(entity, searchDepth);
+                    _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
             }
         }
         catch (Exception e)
