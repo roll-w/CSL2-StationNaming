@@ -34,7 +34,7 @@ namespace StationNaming.Setting;
 )]
 [SettingsUIShowGroupName(
     GroupStops, GroupExperimental, GroupBuilding,
-    GroupSpawnable, GroupDistrict, GroupTransport,
+    GroupSpawnable, GroupDistrict, GroupRoad, GroupTransport,
     GroupSchool, GroupFireStation, GroupPoliceStation,
     GroupHospital, GroupPark, GroupElectricity,
     GroupWater, GroupSewage, GroupGarbage,
@@ -44,7 +44,7 @@ namespace StationNaming.Setting;
 )]
 [SettingsUIGroupOrder(
     GroupStable, GroupStops, GroupBuilding,
-    GroupSpawnable, GroupDistrict, GroupTransport,
+    GroupSpawnable, GroupDistrict, GroupRoad, GroupTransport,
     GroupSchool, GroupFireStation, GroupPoliceStation,
     GroupHospital, GroupPark, GroupElectricity,
     GroupWater, GroupSewage, GroupGarbage,
@@ -65,6 +65,8 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     public const string GroupSpawnable = "Spawnable";
 
     public const string GroupDistrict = "District";
+
+    public const string GroupRoad = "Road";
 
     public const string GroupStops = "Stops";
 
@@ -138,30 +140,21 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUISection(SectionGeneral, GroupStable)]
     public bool AutoNaming { get; set; } = true;
 
-    /// <summary>
-    /// Should apply prefix and suffix to stops.
-    /// </summary>
-    [SettingsUISection(SectionTargets, GroupTransport)]
-    public bool ApplyXfixToStops { get; set; } = false;
-
-    public bool IsNotApplyXfixToStops() => !ApplyXfixToStops;
-
-    [SettingsUITextInput]
-    [SettingsUISection(SectionTargets, GroupTransport)]
-    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
-    public string StopPrefix { get; set; } = "";
-
-    [SettingsUITextInput]
-    [SettingsUISection(SectionTargets, GroupTransport)]
-    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
-    public string StopSuffix { get; set; } = "";
-
     [SettingsUISection(SectionSources, GroupDistrict)]
     public bool EnableDistrict { get; set; } = true;
 
     [SettingsUISection(SectionSources, GroupDistrict)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictDisabled))]
     public bool EnableDistrictPrefix { get; set; } = false;
+
+    public bool IsDistrictPrefixDisabled() => !EnableDistrict || !EnableDistrictPrefix;
+
+    /**
+     * If true, list candidates with added district prefix separately.
+     */
+    [SettingsUISection(SectionSources, GroupDistrict)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsDistrictPrefixDisabled))]
+    public bool DistrictPrefixSeparately { get; set; } = false;
 
     [SettingsUISection(SectionSources, GroupDistrict)]
     [SettingsUIDropdown(typeof(RoadNamingProvider), nameof(RoadNamingProvider.GetNameFormatOptions))]
@@ -322,6 +315,12 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         );
     }
 
+    [SettingsUISection(SectionSources, GroupRoad)]
+    public bool RoadSource { get; set; } = true;
+
+    [SettingsUISection(SectionSources, GroupRoad)]
+    public bool IntersectionSource  { get; set; } = true;
+
     [SettingsUISection(SectionSources, GroupTransport)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
     public bool TransportStationSource { get; set; } = true;
@@ -400,9 +399,51 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
     public bool TransportStopAutoNaming { get; set; } = true;
 
+    /// <summary>
+    /// Should apply prefix and suffix to stops.
+    /// </summary>
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIAdvanced]
+    public bool ApplyXfixToStops { get; set; } = false;
+
+    public bool IsNotApplyXfixToStops() => !ApplyXfixToStops;
+
+    [SettingsUITextInput]
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
+    [SettingsUIAdvanced]
+    public string StopPrefix { get; set; } = "";
+
+    [SettingsUITextInput]
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToStops))]
+    [SettingsUIAdvanced]
+    public string StopSuffix { get; set; } = "";
+
     [SettingsUISection(SectionTargets, GroupTransport)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
     public bool TransportStationAutoNaming { get; set; } = true;
+
+    /// <summary>
+    /// Should apply prefix and suffix to stations.
+    /// </summary>
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIAdvanced]
+    public bool ApplyXfixToTransportStation { get; set; } = false;
+
+    public bool IsNotApplyXfixToTransportStation() => !ApplyXfixToTransportStation;
+
+    [SettingsUITextInput]
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToTransportStation))]
+    [SettingsUIAdvanced]
+    public string TransportStationPrefix { get; set; } = "";
+
+    [SettingsUITextInput]
+    [SettingsUISection(SectionTargets, GroupTransport)]
+    [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsNotApplyXfixToTransportStation))]
+    [SettingsUIAdvanced]
+    public string TransportStationSuffix { get; set; } = "";
 
     [SettingsUISection(SectionTargets, GroupTransport)]
     [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
@@ -488,9 +529,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         BuildingNameWithCurrentRoad = true;
         SpawnableBuildingName = false;
 
-        ApplyXfixToStops = false;
-        StopPrefix = "";
-        StopSuffix = "";
+
 
         AddressNameFormat = "{NUMBER} {ROAD}";
         NamedAddressNameFormat = "{NAME}, {NUMBER} {ROAD}";
@@ -498,10 +537,13 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
         EnableDistrict = true;
         EnableDistrictPrefix = false;
+        DistrictPrefixSeparately = false;
 
         RoadFormat = NameFormat.Invalid;
         DistrictFormat = NameFormat.Invalid;
 
+        RoadSource = true;
+        IntersectionSource = true;
         TransportStationSource = true;
         TransportDepotSource = true;
         SchoolSource = true;
@@ -522,7 +564,15 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
         AdminSource = true;
 
         TransportStopAutoNaming = true;
+        ApplyXfixToStops = false;
+        StopPrefix = "";
+        StopSuffix = "";
+
         TransportStationAutoNaming = true;
+        ApplyXfixToTransportStation = false;
+        TransportStationPrefix = "";
+        TransportStationSuffix = "";
+
         TransportDepotAutoNaming = true;
         SchoolAutoNaming = true;
         FireStationAutoNaming = true;
@@ -544,6 +594,10 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     public void SetSources(bool enable = false)
     {
+        BuildingName = enable;
+        EnableDistrict = enable;
+        RoadSource = enable;
+        IntersectionSource = enable;
         TransportStationSource = enable;
         TransportDepotSource = enable;
         SchoolSource = enable;
@@ -588,10 +642,23 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
 
     private List<NameSource> GetEnabledSources()
     {
-        List<NameSource> sources = [
-            NameSource.Owner, NameSource.Road, NameSource.Intersection,
-            NameSource.SignatureBuilding, NameSource.CityService
-        ];
+        List<NameSource> sources = [NameSource.Owner];
+        if (BuildingName)
+        {
+            sources.AddRange([
+                NameSource.Building,
+                NameSource.SignatureBuilding,
+                NameSource.CityService
+            ]);
+        }
+        if (RoadSource)
+        {
+            sources.Add(NameSource.Road);
+        }
+        if (IntersectionSource)
+        {
+            sources.Add(NameSource.Intersection);
+        }
         if (SpawnableBuildingName)
         {
             sources.Add(NameSource.SpawnableBuilding);
@@ -684,6 +751,7 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             SpawnableBuildingName = BuildingName && SpawnableBuildingName,
             EnableDistrict = EnableDistrict,
             EnableDistrictPrefix = EnableDistrict && EnableDistrictPrefix,
+            SeparateDistrictPrefix = EnableDistrict && EnableDistrictPrefix && DistrictPrefixSeparately,
             SourceFormats =
             {
                 DefaultFormat = new NameFormat
@@ -712,6 +780,15 @@ public class StationNamingSettings(IMod mod) : ModSetting(mod)
             {
                 Prefix = StopPrefix,
                 Suffix = StopSuffix
+            };
+        }
+
+        if (ApplyXfixToTransportStation)
+        {
+            options.TargetFormats[TargetType.Station] = new NameFormat
+            {
+                Prefix = TransportStationPrefix,
+                Suffix = TransportStationSuffix
             };
         }
 

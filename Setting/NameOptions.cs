@@ -41,6 +41,7 @@ public struct NameOptions
     public bool SpawnableBuildingName { get; set; } = true;
     public bool EnableDistrict { get; set; } = true;
     public bool EnableDistrictPrefix { get; set; } = false;
+    public bool SeparateDistrictPrefix { get; set; } = false;
 
     public List<NameSource> EnabledSources { get; set; } =
         Enum.GetValues(typeof(NameSource))
