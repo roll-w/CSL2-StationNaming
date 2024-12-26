@@ -21,6 +21,7 @@
 using System.Collections.Generic;
 using Colossal.UI.Binding;
 using Game;
+using Game.Rendering;
 using Game.Routes;
 using Game.UI;
 using Game.UI.InGame;
@@ -34,6 +35,7 @@ public partial class UIBindingSystem : UISystemBase
     private Entity _selectedEntity;
     private NameSystem _nameSystem;
     private SelectedInfoUISystem _selectedInfoUISystem;
+    private CameraUpdateSystem _cameraUpdateSystem;
 
     private ValueBinding<Entity> _selectedEntityBinding;
 
@@ -47,6 +49,8 @@ public partial class UIBindingSystem : UISystemBase
 
         _selectedInfoUISystem = World.DefaultGameObjectInjectionWorld
             .GetOrCreateSystemManaged<SelectedInfoUISystem>();
+        _cameraUpdateSystem = World.DefaultGameObjectInjectionWorld
+            .GetOrCreateSystemManaged<CameraUpdateSystem>();
 
         AddBinding(new TriggerBinding<Entity>(
             Mod.Name,
@@ -78,6 +82,18 @@ public partial class UIBindingSystem : UISystemBase
             GetNameCandidates
         ));
 
+        AddBinding(new TriggerBinding<Entity>(
+            Mod.Name,
+            "navigateToEntity",
+            NavigateToEntity
+        ));
+
+        AddBinding(new TriggerBinding<ManagedNameCandidate>(
+            Mod.Name,
+            "navigateToCandidate",
+            NavigateToCandidate
+        ));
+
         Mod.GetLogger().Info("UI binding system initialized.");
     }
 
@@ -89,7 +105,7 @@ public partial class UIBindingSystem : UISystemBase
         _selectedEntityBinding.Update(_selectedInfoUISystem.selectedEntity);
     }
 
-    private void SetSelectedEntity(Entity entity)
+    internal void SetSelectedEntity(Entity entity)
     {
         if (_selectedEntity == entity && entity != Entity.Null && entity != default)
         {
@@ -112,8 +128,7 @@ public partial class UIBindingSystem : UISystemBase
         _selectedEntity = entity;
     }
 
-
-    private List<ManagedNameCandidate> GetNameCandidates(Entity entity)
+    internal List<ManagedNameCandidate> GetNameCandidates(Entity entity)
     {
         SetSelectedEntity(entity);
 
@@ -138,7 +153,7 @@ public partial class UIBindingSystem : UISystemBase
         return result;
     }
 
-    private bool IsShowCandidates()
+    internal bool IsShowCandidates()
     {
         var entity = _selectedInfoUISystem.selectedEntity;
         SetSelectedEntity(entity);
@@ -158,7 +173,7 @@ public partial class UIBindingSystem : UISystemBase
         return buildingSource.CouldNaming();
     }
 
-    private bool SetCandidateFor(Entity entity, ManagedNameCandidate candidate)
+    internal bool SetCandidateFor(Entity entity, ManagedNameCandidate candidate)
     {
         SetSelectedEntity(entity);
 
@@ -189,6 +204,40 @@ public partial class UIBindingSystem : UISystemBase
         return true;
     }
 
+    internal void NavigateToEntity(Entity entity)
+    {
+        if (entity == Entity.Null
+            || _cameraUpdateSystem.orbitCameraController == null
+            || !EntityManager.Exists(entity))
+        {
+            return;
+        }
+
+        _cameraUpdateSystem.orbitCameraController.followedEntity = entity;
+        _cameraUpdateSystem.orbitCameraController.TryMatchPosition(_cameraUpdateSystem.activeCameraController);
+        _cameraUpdateSystem.activeCameraController = _cameraUpdateSystem.orbitCameraController;
+    }
+
+    internal void NavigateToCandidate(ManagedNameCandidate candidate)
+    {
+        var refers = candidate.Refers;
+        if (refers.Count == 1)
+        {
+            NavigateToEntity(refers[0].Refer);
+            return;
+        }
+
+        var last = refers[refers.Count - 1];
+        NavigateToEntity(last.Refer);
+    }
+
+    /// <summary>
+    /// Add the target to the candidate list of the parent entity.
+    /// </summary>
+    public void AddToCandidates(Entity parent, Entity target)
+    {
+        // TODO:
+    }
 
     private DynamicBuffer<T> GetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
     {

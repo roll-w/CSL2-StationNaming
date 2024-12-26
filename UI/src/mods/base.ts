@@ -228,17 +228,6 @@ export namespace StationNaming {
         if (refers.length === 0) {
             return NameSource.None;
         }
-        if (refers.length === 1) {
-            return refers[0].Source.value__;
-        }
-        if (refers.length === 2) {
-            let first = refers[0].Source.value__;
-            let second = refers[1].Source.value__;
-            if (first === NameSource.Road && second === NameSource.Road) {
-                return NameSource.Intersection;
-            }
-            return second
-        }
         return refers[refers.length - 1].Source.value__;
     }
 }

@@ -1,7 +1,7 @@
 ﻿import {ModuleRegistryExtend} from "cs2/modding";
 import React, {useEffect, useState} from "react";
-import {PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
-import {call, useValue} from "cs2/api";
+import {Icon, PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
+import {call, trigger, useValue} from "cs2/api";
 import {Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
 import NameCandidate = StationNaming.NameCandidate;
@@ -21,6 +21,10 @@ export const CandidatesSectionKey = "StationNaming.NameCandidates"
 const setSelectedCandidate = (candidate: NameCandidate, selectedEntity: Entity) => {
     call(ModName, "setCandidateFor", selectedEntity, candidate).then(r => {
     })
+}
+
+const navigateToCandidate = (candidate: NameCandidate) => {
+    trigger(ModName, "navigateToCandidate", candidate)
 }
 
 const getNameCandidates = async (selectedEntity: Entity): Promise<any> => {
@@ -52,9 +56,19 @@ const CandidatesFoldout = (props: {
                         + "]"}
                     link={
                         <div onClick={() => {
-                            setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)
+                            navigateToCandidate(StationNaming.toNameCandidate(candidate))
                         }}>
-                            ✓
+                            <Icon src="Media/Game/Icons/MapMarker.svg"/>
+                        </div>
+                    }
+                    right={
+                        <div>
+                            <div onClick={() => {
+                                setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)
+                            }}>
+                                ✓
+                            </div>
+
                         </div>
                     }
                 />
@@ -65,7 +79,7 @@ const CandidatesFoldout = (props: {
 
 
 const CandidatesComponent = () => {
-    const showCandidates =  useValue(isShowCandidates$)
+    const showCandidates = useValue(isShowCandidates$)
     const selectedEntity = useValue(selectedEntity$)
 
     const [nameCandidates, setNameCandidates] =
