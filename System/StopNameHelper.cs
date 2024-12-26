@@ -150,15 +150,21 @@ public class StopNameHelper(
         var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
         var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
 
-        nameCandidates.Add(NameCandidate.Of(
-            string.Empty,
-            Direction.Init, EdgeType.Same,
-            edge, NameSource.Road
-        ));
+        if (NameOptions.IsNameSourceEnabled(NameSource.Intersection))
+        {
+            AddIntersectionCandidate(edge, root, nameCandidates, depth);
+        }
 
         var roadEdges = collectEdges.ToList();
-        AddIntersectionCandidate(edge, nameCandidates, depth);
-        AddOtherRoadCandidate(root, roadEdges, nameCandidates);
+        if (NameOptions.IsNameSourceEnabled(NameSource.Road))
+        {
+            nameCandidates.Add(NameCandidate.Of(
+                string.Empty,
+                Direction.Init, EdgeType.Same,
+                edge, NameSource.Road
+            ));
+            AddOtherRoadCandidate(root, roadEdges, nameCandidates);
+        }
 
         if (NameOptions.BuildingName)
         {
@@ -177,7 +183,7 @@ public class StopNameHelper(
     }
 
     private void AddIntersectionCandidate(
-        Entity edge,
+        Entity edge, Entity root,
         ICollection<NameCandidate> nameCandidates, int depth)
     {
         var roadEdges = EdgeUtils.CollectIntersections(
@@ -185,13 +191,38 @@ public class StopNameHelper(
 
         foreach (var roadEdge in roadEdges)
         {
+            List<NameSourceRefer> refers = [new(root, NameSource.Road)];
+            var node = roadEdge.Edge;
+
+            var connectedEdges = _entityManager.GetBuffer<ConnectedEdge>(node);
+            foreach (var connectedEdge in connectedEdges)
+            {
+                var curEdge = connectedEdge.m_Edge;
+                if (curEdge == edge
+                    || !_entityManager.HasComponent<Road>(curEdge))
+                {
+                    continue;
+                }
+
+                var curRoot = EdgeUtils.GetRootEntityForEdge(curEdge, _entityManager);
+                if (curRoot == root)
+                {
+                    continue;
+                }
+
+                var refer = new NameSourceRefer(curRoot, NameSource.Road);
+                if (!refers.Contains(refer))
+                {
+                    refers.Add(refer);
+                }
+            }
+
+            refers.Add(new NameSourceRefer(node, NameSource.Intersection));
+
             var nameCandidate = NameCandidate.Of(
                 string.Empty, roadEdge.Direction,
                 roadEdge.EdgeType,
-                // Add an auxiliary entity for indicating the intersection.
-                // See also: NameFormatter.FormatIntersection
-                edge, NameSource.Road,
-                roadEdge.Edge, NameSource.Intersection
+                refers
             );
             nameCandidates.Add(nameCandidate);
         }
@@ -323,7 +354,7 @@ public class StopNameHelper(
         foreach (var nameCandidate in SortBySource(candidates))
         {
             var postProcessed = PostProcessNameCandidate(nameCandidate, target);
-            nameCandidates.Add(postProcessed);
+            postProcessed.ForEach(it => nameCandidates.Add(it));
         }
 
         if (!NameOptions.EnableDistrict)
@@ -337,48 +368,47 @@ public class StopNameHelper(
         }
     }
 
-    private NameCandidate PostProcessNameCandidate(
+    private List<NameCandidate> PostProcessNameCandidate(
         NameCandidate candidate,
         Entity target
     )
     {
-        if (!NameOptions.EnableDistrictPrefix || candidate.Refers.Length == 0)
+        if (!NameOptions.EnableDistrictPrefix
+            || candidate.Refers.Length == 0
+            || candidate.Refers[0].Source == NameSource.Owner)
         {
-            return GenerateNameCandidate(candidate, target);
-        }
-
-        var first = candidate.Refers[0];
-
-        if (first.Source == NameSource.Owner)
-        {
-            return GenerateNameCandidate(candidate, target);
+            return [GenerateNameCandidate(candidate, target)];
         }
 
         var districtEntity = GetDistrictEntity(target, _entityManager);
         if (districtEntity == Entity.Null)
         {
-            return GenerateNameCandidate(candidate, target);
+            return [GenerateNameCandidate(candidate, target)];
+        }
+
+        List<NameCandidate> res = [];
+        if (NameOptions.SeparateDistrictPrefix)
+        {
+            res.Add(GenerateNameCandidate(candidate, target));
         }
 
         var districtRefer = new NameSourceRefer(districtEntity, NameSource.District);
         var refers = candidate.Refers;
 
-        var newRefers = new List<NameSourceRefer>(refers.Length + 1);
+        List<NameSourceRefer> newRefers = [districtRefer];
         foreach (var r in refers)
         {
             newRefers.Add(r);
         }
 
-        newRefers.Insert(0, districtRefer);
-
         var name = _nameFormatter.FormatRefers(newRefers, target);
-
-        return NameCandidate.Of(
+        res.Add(NameCandidate.Of(
             name,
             candidate.Direction,
             candidate.EdgeType,
             newRefers
-        );
+        ));
+        return res;
     }
 
     private bool GenerateDistrictNameCandidate(

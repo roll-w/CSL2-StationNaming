@@ -73,7 +73,8 @@ public partial class AutoUpdateNamingSystem : GameSystemBase
         foreach (var naming in namingAssociations)
         {
             var target = naming.Target;
-            if (!EntityManager.HasComponent<ManualSelectNaming>(target))
+            if (!EntityManager.Exists(target)
+                || !EntityManager.HasComponent<ManualSelectNaming>(target))
             {
                 continue;
             }

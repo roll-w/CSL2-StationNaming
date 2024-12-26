@@ -24,6 +24,12 @@ using Unity.Entities;
 
 namespace StationNaming.System;
 
+/// <summary>
+///
+/// </summary>
+/// <param name="target">
+/// The target entity of the current naming association.
+/// </param>
 public struct NamingAssociation(Entity target) : IBufferElementData,
     IQueryTypeParameter, ISerializable, IEquatable<NamingAssociation>
 {

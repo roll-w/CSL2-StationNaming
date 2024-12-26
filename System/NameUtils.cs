@@ -140,7 +140,10 @@ public static class NameUtils
         {
             return TargetType.Stop;
         }
-
+        if (entityManager.HasComponent<TransportStation>(target))
+        {
+            return TargetType.Station;
+        }
         // TODO: add more target types
         return TargetType.None;
     }
