@@ -21,7 +21,7 @@ mod setting file where it is located at
 You could change the naming format for the different types and set your own prefix
 and suffix for the station names.
 
-```json lines
+```
 RollW_StationNaming
 {
   "Prefix": " ", // Set the global prefix here
@@ -39,7 +39,7 @@ RollW_StationNaming
     "Separator": " ", // Set the separator after the district name
     "Prefix": "", // Set the prefix for the district name only
     "Suffix": "" // Set the suffix for the district name only
-  },
+  }
 }
 ```
 
