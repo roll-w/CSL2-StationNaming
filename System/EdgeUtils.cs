@@ -54,7 +54,7 @@ public static class EdgeUtils
         int depth, Direction direction,
         List<RoadEdge> intersections)
     {
-        if (depth <= 0 || edge == Entity.Null)
+        if (depth < 0 || edge == Entity.Null)
         {
             return;
         }
@@ -87,29 +87,50 @@ public static class EdgeUtils
         var allSelf = true;
         var connectedEdges = entityManager.GetBuffer<ConnectedEdge>(edge);
 
+        HashSet<Entity> selfEdges = [];
         foreach (var connectedEdge in connectedEdges)
         {
             if (!entityManager.HasComponent<Road>(connectedEdge.m_Edge))
             {
                 continue;
             }
-            if (allSelf)
+
+            anyRoad = true;
+            if (!allSelf)
             {
-                var edgeRoot = GetRootEntityForEdge(connectedEdge.m_Edge, entityManager);
-                if (edgeRoot != root)
-                {
-                    anyRoad = true;
-                    allSelf = false;
-                }
+                continue;
             }
-            SearchForIntersections(connectedEdge.m_Edge, root, entityManager, depth - 1, direction, intersections);
+
+            var edgeRoot = GetRootEntityForEdge(connectedEdge.m_Edge, entityManager);
+            if (edgeRoot != root)
+            {
+                allSelf = false;
+            }
+            else if (connectedEdge.m_Edge != edge)
+            {
+                selfEdges.Add(connectedEdge.m_Edge);
+            }
         }
 
-        if (!anyRoad)
+        if (allSelf || !anyRoad)
+        {
+            foreach (var connectedEdge in selfEdges)
+            {
+                SearchForIntersections(
+                    connectedEdge, root,
+                    entityManager, depth - 1, direction,
+                    intersections);
+            }
+
+            return;
+        }
+
+        RoadEdge roadEdge = new(direction, EdgeType.Same, edge, depth);
+        if (intersections.Contains(roadEdge))
         {
             return;
         }
-        RoadEdge roadEdge = new(direction, EdgeType.Same, edge, depth);
+
         intersections.Add(roadEdge);
     }
 
@@ -123,6 +144,8 @@ public static class EdgeUtils
         return entity;
     }
 
+    // TODO: remove and replace with CollectIntersections
+    [Obsolete]
     public static IEnumerable<RoadEdge> CollectEdges(
         EntityManager entityManager,
         Entity edgeEntity, int depth)
@@ -212,6 +235,7 @@ public static class EdgeUtils
             {
                 continue;
             }
+
             edges.Add(newEdge);
             CollectEdges(
                 entityManager, connectedEdge.m_Edge, depth - 1,
@@ -236,7 +260,7 @@ public readonly struct RoadEdge(
     public bool Equals(RoadEdge other)
     {
         return Direction == other.Direction && Edge.Equals(other.Edge) &&
-               EdgeType == other.EdgeType && Depth == other.Depth;
+               EdgeType == other.EdgeType;
     }
 
     public override bool Equals(object obj)
@@ -250,8 +274,7 @@ public readonly struct RoadEdge(
         {
             return ((int)Direction * 397)
                    ^ Edge.GetHashCode()
-                   ^ ((int)EdgeType * 397)
-                   ^ Depth;
+                   ^ ((int)EdgeType * 397);
         }
     }
 }

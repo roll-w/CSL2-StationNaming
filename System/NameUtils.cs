@@ -96,17 +96,15 @@ public static class NameUtils
             {
                 return pair.Value;
             }
-
-            var source = TryGetBuildingSourceByPrefab(target, entityManager);
-            if (source != NameSource.None && source != NameSource.Unknown)
-            {
-                return source;
-            }
-
-            return pair.Value;
         }
 
-        return NameSource.Unknown;
+        var source = TryGetBuildingSourceByPrefab(target, entityManager);
+        if (source != NameSource.None && source != NameSource.Unknown)
+        {
+            return source;
+        }
+
+        return NameSource.Building;
     }
 
     private static NameSource TryGetBuildingSourceByPrefab(Entity target, EntityManager entityManager)
@@ -140,10 +138,12 @@ public static class NameUtils
         {
             return TargetType.Stop;
         }
+
         if (entityManager.HasComponent<TransportStation>(target))
         {
             return TargetType.Station;
         }
+
         // TODO: add more target types
         return TargetType.None;
     }

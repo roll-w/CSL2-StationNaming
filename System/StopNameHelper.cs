@@ -168,12 +168,14 @@ public class StopNameHelper(
 
         if (NameOptions.BuildingName)
         {
+            HashSet<Entity> visitedBuildings = [];
             foreach (var roadEdge in roadEdges)
             {
                 CollectBuildingNames(
                     target,
                     currentRoad, roadEdge,
-                    nameCandidates, includeSelf
+                    nameCandidates,
+                    visitedBuildings, includeSelf
                 );
             }
         }
@@ -273,6 +275,7 @@ public class StopNameHelper(
         RoadEdge currentRoad,
         RoadEdge roadEdge,
         ICollection<NameCandidate> candidates,
+        ISet<Entity> visitedBuildings,
         bool includeSelf)
     {
         if (!_entityManager.HasBuffer<ConnectedBuilding>(roadEdge.Edge))
@@ -284,6 +287,11 @@ public class StopNameHelper(
             _entityManager.GetBuffer<ConnectedBuilding>(roadEdge.Edge);
         foreach (var connectedBuilding in connectedBuildings)
         {
+            if (!visitedBuildings.Add(connectedBuilding.m_Building))
+            {
+                continue;
+            }
+
             GenerateBuildingSourceCandidates(
                 self, currentRoad,
                 roadEdge, candidates,

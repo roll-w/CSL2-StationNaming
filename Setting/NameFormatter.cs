@@ -74,7 +74,7 @@ public class NameFormatter(
     {
         StringBuilder builder = new();
 
-        ForeachRefers(refers, Options.Reverse, (refer, hasNext) =>
+        ForeachRefers(refers, Options.Reverse, (refer, hasNext, next) =>
         {
             if (refer.Source == NameSource.Intersection)
             {
@@ -82,7 +82,8 @@ public class NameFormatter(
             }
             var format = Options.SourceFormats[refer.Source];
             var name = refer.GetName(_entityManager, nameSystem);
-            builder.Append(format.Format(name, hasNext: hasNext));
+            var isNextIntersection = next?.Source == NameSource.Intersection;
+            builder.Append(format.Format(name, hasNext: hasNext && !isNextIntersection));
         });
 
         return builder.ToString();
@@ -91,14 +92,15 @@ public class NameFormatter(
     private static void ForeachRefers(
         IList<NameSourceRefer> refers,
         bool reverse,
-        Action<NameSourceRefer, bool> action)
+        Action<NameSourceRefer, bool, NameSourceRefer?> action)
     {
         var count = refers.Count;
         for (var i = 0; i < count; i++)
         {
             var refer = reverse ? refers[count - i - 1] : refers[i];
             var hasNext = i < count - 1;
-            action(refer, hasNext);
+            NameSourceRefer? next = hasNext ? refers[i + 1] : null;
+            action(refer, hasNext, next);
         }
     }
 
