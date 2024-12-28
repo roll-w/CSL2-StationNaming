@@ -11,7 +11,8 @@
 # Station Naming
 
 This is a mod for `Cities: Skylines 2` that allows you naming your
-transport stations, stops and city service buildings automatically.
+transport stations, stops and city service buildings automatically
+or manually.
 
 This mod should be compatible with other auto naming mods, but you should
 check the mod settings to avoid conflicts.
@@ -29,7 +30,7 @@ mod setting file where it is located at
 `AppData/LocalLow/Colossal Order/Cities Skylines II/RollW_StationNaming.coc`.
 
 For more information on how to set the name format in the setting file,
-please check the [GitHub repository](https://github.com/Roll-W/CSL2-StationNaming).
+please check the [GitHub repository](https://github.com/roll-w/CSL2-StationNaming).
 
 ## Translations
 
@@ -52,6 +53,7 @@ on GitHub.
 	<!--Thumbnail-->
 	<Thumbnail Value="Properties/Thumbnail.png" />
 	<!--Screenshot, can be set multiple times-->
+	<Screenshot Value="Properties/Thumbnail.png" />
 	<Screenshot Value="Properties/Screenshots/1.jpg" />
 	<Screenshot Value="Properties/Screenshots/2.jpg" />
 	<Screenshot Value="Properties/Screenshots/3.jpg" />
@@ -62,15 +64,19 @@ on GitHub.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.4.1" />
+	<ModVersion Value="0.5.0" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Support for Economy 2.0
+- Feature: Support enable or disable from naming sources.
+- Feature: Support navigating to the source of the candidate.
+- Feature: Enhanced support for intersections.
+- Fix: Exclude pedestrian path from the generated names.
+- Fix: Other minor bug fixes.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
-	<ExternalLink Type="github" Url="https://github.com/Roll-W/CSL2-StationNaming" />
+	<ExternalLink Type="github" Url="https://github.com/roll-w/CSL2-StationNaming" />
 </Publish>
