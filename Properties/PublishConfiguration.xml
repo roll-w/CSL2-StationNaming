@@ -71,7 +71,7 @@ on GitHub.
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Support enable or disable from naming sources.
+- Feature: Support enable or disable naming sources.
 - Feature: Support navigating to the source of the candidate.
 - Feature: Enhanced support for intersections.
 - Fix: Exclude pedestrian path from the generated names.
