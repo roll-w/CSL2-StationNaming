@@ -191,6 +191,12 @@ public static class NameUtils
 
         var nameType = (NameSystem.NameType)NameTypeField.GetValue(name);
         var nameID = (string)NameIDField.GetValue(name);
+
+        if (string.IsNullOrEmpty(nameID))
+        {
+            return string.Empty;
+        }
+
         var nameArgs = (string[])NameArgsField.GetValue(name);
 
         var localizationManager = GameManager.instance.localizationManager;
@@ -214,6 +220,7 @@ public static class NameUtils
             {
                 return FormatName(nameID, nameArgs, localizationManager);
             }
+            default: return string.Empty;
         }
 
         return string.Empty;
