@@ -164,6 +164,11 @@ public static class NameUtils
         this NameSystem nameSystem,
         Entity entity)
     {
+        if (entity == Entity.Null)
+        {
+            return string.Empty;
+        }
+
         try
         {
             var nameByReflection = TryGetNameByReflection(nameSystem, entity);
