@@ -108,13 +108,13 @@ public class NameFormatter(
     {
         if (!prefab)
         {
-            return "";
+            return string.Empty;
         }
 
         var prefabEntity = GetPrefabEntity(entity);
         if (prefabEntity == Entity.Null)
         {
-            return "";
+            return string.Empty;
         }
 
         var prefabName = prefabSystem.GetPrefabName(prefabEntity);

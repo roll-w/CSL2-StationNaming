@@ -130,6 +130,10 @@ public struct NameSourceRefer : IEquatable<NameSourceRefer>,
             return nameSystem.TryGetRealRenderedName(Refer);
         }
         var aggregate = entityManager.GetComponentData<Aggregated>(Refer).m_Aggregate;
+        if (aggregate == Entity.Null)
+        {
+            return string.Empty;
+        }
         return nameSystem.GetRenderedLabelName(aggregate);
     }
 }
