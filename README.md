@@ -45,7 +45,7 @@ RollW_StationNaming
 
 > Note: Remember to remove the comments ("//") after you modify the settings.
 
-## Translations
+## Localizations
 
 - English
 - Simplified Chinese (简体中文)
@@ -68,7 +68,7 @@ on GitHub.
 ```text
 MIT License
 
-Copyright (c) 2024 RollW
+Copyright (c) 2024-2025 RollW
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -4,9 +4,9 @@
         <AssemblyTitle>$(Title)</AssemblyTitle>
         <Description>A Cities: Skylines 2 mod.</Description>
         <Authors>RollW</Authors>
-        <Copyright>Copyright (c) 2024 RollW (github.com/roll-w). All rights reserved.</Copyright>
+        <Copyright>Copyright (c) 2024-2025 RollW (github.com/roll-w). All rights reserved.</Copyright>
         <Product>$(Title)</Product>
-        <Version>0.5.0</Version>
+        <Version>0.5.1</Version>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
         <OutputType>Library</OutputType>

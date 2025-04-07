@@ -32,7 +32,7 @@ mod setting file where it is located at
 For more information on how to set the name format in the setting file,
 please check the [GitHub repository](https://github.com/roll-w/CSL2-StationNaming).
 
-## Translations
+## Localizations
 
 - English
 - Simplified Chinese (简体中文)
@@ -64,18 +64,14 @@ on GitHub.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.5.0" />
+	<ModVersion Value="0.5.1" />
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Feature: Support enable or disable naming sources.
-- Feature: Support navigating to the source of the candidate.
-- Feature: Enhanced support for intersections.
-- Fix: Exclude pedestrian path from the generated names.
-- Fix: Other minor bug fixes.
+- Fix: An issue that could potentially cause the naming auto update to fail.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/roll-w/CSL2-StationNaming" />
