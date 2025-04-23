@@ -22,6 +22,8 @@ using System;
 
 namespace StationNaming.Setting;
 
+using TemplateVar = string;
+
 public struct NameFormat : IEquatable<NameFormat>
 {
     public static readonly NameFormat Invalid = new()
@@ -29,11 +31,17 @@ public struct NameFormat : IEquatable<NameFormat>
         Separator = None
     };
 
-    public const string Asset = "{ASSET}";
-    public const string None = "{NONE}";
+    public const TemplateVar Asset = "{ASSET}";
+    public const TemplateVar None = "{NONE}";
+    public const TemplateVar Name = "{NAME}";
+    public const TemplateVar Space = "{SPACE}";
+    public const TemplateVar City = "{CITY}";
+    public const TemplateVar District = "{DISTRICT}";
+    public const TemplateVar Road = "{ROAD}";
 
     public string Separator { get; set; } = " ";
     public string NextFormat { get; set; } = "{0}";
+    public string Template { get; set; } = "{NAME}";
     public string Prefix { get; set; } = "";
     public string Suffix { get; set; } = "";
 
@@ -67,6 +75,13 @@ public struct NameFormat : IEquatable<NameFormat>
     private string GetSuffix(string prefab)
     {
         return Suffix.Replace(Asset, prefab);
+    }
+
+    public bool HasVar(TemplateVar var)
+    {
+        return Template.Contains(var) ||
+               Prefix.Contains(var) ||
+               Suffix.Contains(var);
     }
 
     public string Format(
