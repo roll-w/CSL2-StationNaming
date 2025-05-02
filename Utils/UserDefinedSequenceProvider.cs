@@ -26,6 +26,7 @@ namespace StationNaming.Utils;
 
 public class UserDefinedSequenceProvider(UserDefinedSequenceConfiguration configuration) : ISequenceProvider
 {
+    private UserDefinedSequenceConfiguration _configuration = configuration;
     // TODO: Implement the UserDefinedSequenceProvider class
 
     public string GetSequence(int index, int count, ISequenceProvider.SequenceOptions options)
@@ -42,34 +43,57 @@ public class UserDefinedSequenceProvider(UserDefinedSequenceConfiguration config
             return "Invalid";
         }
 
-        if (configuration.Digits.TryGetValue((uint)index, out var digit))
+        if (_configuration.CompositeConfig.Valid())
         {
-            return digit;
-        }
-
-        var digits = new List<string>();
-        var current = index;
-        var divisor = 1;
-        while (current > 0)
-        {
-            var remainder = current % 10;
-            if (remainder > 0)
+            // TODO:
+            var composite = _configuration.CompositeConfig;
+            if (composite.Digits.TryGetValue((uint)index, out var digit))
             {
-                var dg = configuration.Digits[(uint)(remainder * divisor)];
-                digits.Add(dg);
+                return digit;
             }
-            current /= 10;
-            divisor *= 10;
+
+            var digits = new List<string>();
+            var current = index;
+            var divisor = 1;
+            while (current > 0)
+            {
+                var remainder = current % 10;
+                if (remainder > 0)
+                {
+                    var dg = composite.Digits[(uint)(remainder * divisor)];
+                    digits.Add(dg);
+                }
+                current /= 10;
+                divisor *= 10;
+            }
+
+            return string.Join("", digits);
         }
 
-        return string.Join("", digits);
+        return string.Empty;
     }
 }
 
 public struct UserDefinedSequenceConfiguration
 {
-    public Dictionary<uint, string> Digits;
-    public string Ten;
-    public string Hundred;
-    public string Thousand;
+    public Enumerate EnumerateConfig;
+    public Composite CompositeConfig;
+
+    public struct Enumerate
+    {
+        public Dictionary<uint, string> Sequences;
+    }
+
+    public struct Composite
+    {
+        public Dictionary<uint, string> Digits;
+        public string Ten;
+        public string Hundred;
+        public string Thousand;
+
+        public bool Valid()
+        {
+            return Digits.Count > 0;
+        }
+    }
 }

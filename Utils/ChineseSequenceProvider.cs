@@ -22,7 +22,10 @@
 
 namespace StationNaming.Utils;
 
-public class CnSequenceProvider: ISequenceProvider
+/// <summary>
+/// Provides Chinese numerals for an index.
+/// </summary>
+public class ChineseSequenceProvider: ISequenceProvider
 {
     public string GetSequence(int index, int count, ISequenceProvider.SequenceOptions options)
     {

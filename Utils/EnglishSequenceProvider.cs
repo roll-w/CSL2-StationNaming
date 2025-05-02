@@ -28,7 +28,7 @@ namespace StationNaming.Utils;
 /// Example: 1 -> first, 2 -> second, 3 -> third
 ///
 /// </summary>
-public class EnSequenceProvider : ISequenceProvider
+public class EnglishSequenceProvider : ISequenceProvider
 {
     public string GetSequence(int index, int count, ISequenceProvider.SequenceOptions options)
     {
