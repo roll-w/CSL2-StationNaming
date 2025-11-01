@@ -42,6 +42,8 @@ const CandidatesFoldout = (props: {
 }) => {
     const {translate} = useLocalization();
 
+    const buttonClass = "button_UgX item-mouse-states_Fmi item-focused_FuT"
+
     return (
         <PanelFoldout initialExpanded={props.initialExpanded || false} header={
             <PanelSectionRow left={props.name}/>
@@ -54,21 +56,16 @@ const CandidatesFoldout = (props: {
                             "NameSource"
                         ))
                         + "]"}
-                    link={
-                        <div onClick={() => {
-                            navigateToCandidate(StationNaming.toNameCandidate(candidate))
-                        }}>
-                            <Icon src="Media/Game/Icons/MapMarker.svg"/>
-                        </div>
-                    }
                     right={
-                        <div>
-                            <div onClick={() => {
-                                setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)
-                            }}>
+                        <div className={"row_aZw"}>
+                            <button className={buttonClass}
+                                    onClick={() => navigateToCandidate(StationNaming.toNameCandidate(candidate))}>
+                                <Icon src="Media/Game/Icons/MapMarker.svg"/>
+                            </button>
+                            <button className={buttonClass}
+                                    onClick={() => setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)}>
                                 ✓
-                            </div>
-
+                            </button>
                         </div>
                     }
                 />
