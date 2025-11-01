@@ -23,42 +23,39 @@ using System.Collections.Generic;
 using System.Linq;
 using StationNaming.System;
 
-namespace StationNaming.Setting;
-
-public struct NameOptions
+namespace StationNaming.Setting
 {
-    public NameOptions()
+    public class NameOptions
     {
-    }
+        public bool Reverse { get; set; } = false;
 
-    public bool Reverse { get; set; } = false;
+        /// <summary>
+        /// Building name enabled.
+        /// </summary>
+        public bool BuildingName { get; set; } = true;
+        public bool BuildingNameWithCurrentRoad { get; set; } = true;
+        public bool SpawnableBuildingName { get; set; } = true;
+        public bool EnableDistrict { get; set; } = true;
+        public bool EnableDistrictPrefix { get; set; } = false;
+        public bool SeparateDistrictPrefix { get; set; } = false;
 
-    /// <summary>
-    /// Building name enabled.
-    /// </summary>
-    public bool BuildingName { get; set; } = true;
-    public bool BuildingNameWithCurrentRoad { get; set; } = true;
-    public bool SpawnableBuildingName { get; set; } = true;
-    public bool EnableDistrict { get; set; } = true;
-    public bool EnableDistrictPrefix { get; set; } = false;
-    public bool SeparateDistrictPrefix { get; set; } = false;
+        public List<NameSource> EnabledSources { get; set; } =
+            Enum.GetValues(typeof(NameSource))
+                .Cast<NameSource>()
+                .ToList();
 
-    public List<NameSource> EnabledSources { get; set; } =
-        Enum.GetValues(typeof(NameSource))
-            .Cast<NameSource>()
-            .ToList();
+        public FormatDictionary<NameSource> SourceFormats { get; private set; } = new FormatDictionary<NameSource>();
 
-    public FormatDictionary<NameSource> SourceFormats { get; private set; } = new();
+        public FormatDictionary<TargetType> TargetFormats { get; private set; } = new FormatDictionary<TargetType>();
 
-    public FormatDictionary<TargetType> TargetFormats { get; private set; } = new();
-
-    public bool IsNameSourceEnabled(NameSource source)
-    {
-        if (source.IsBuilding() && !BuildingName)
+        public bool IsNameSourceEnabled(NameSource source)
         {
-            return false;
-        }
+            if (source.IsBuilding() && !BuildingName)
+            {
+                return false;
+            }
 
-        return EnabledSources.Contains(source);
+            return EnabledSources.Contains(source);
+        }
     }
 }

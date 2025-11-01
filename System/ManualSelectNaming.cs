@@ -22,49 +22,46 @@ using System;
 using Colossal.Serialization.Entities;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public struct ManualSelectNaming : IComponentData, ISerializable,
-    IEquatable<ManualSelectNaming>
+namespace StationNaming.System
 {
-    public NameCandidate SelectedName;
-
-    public ManualSelectNaming(NameCandidate selectedName)
+    public struct ManualSelectNaming : IComponentData, ISerializable,
+        IEquatable<ManualSelectNaming>
     {
-        SelectedName = selectedName;
-    }
+        public NameCandidate SelectedName;
 
-    public ManualSelectNaming()
-    {
-    }
+        public ManualSelectNaming(NameCandidate selectedName)
+        {
+            SelectedName = selectedName;
+        }
 
-    public bool Equals(ManualSelectNaming other)
-    {
-        return SelectedName.Equals(other.SelectedName);
-    }
+        public bool Equals(ManualSelectNaming other)
+        {
+            return SelectedName.Equals(other.SelectedName);
+        }
 
-    public override bool Equals(object obj)
-    {
-        return obj is ManualSelectNaming other && Equals(other);
-    }
+        public override bool Equals(object obj)
+        {
+            return obj is ManualSelectNaming other && Equals(other);
+        }
 
-    public override int GetHashCode()
-    {
-        return SelectedName.GetHashCode();
-    }
+        public override int GetHashCode()
+        {
+            return SelectedName.GetHashCode();
+        }
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
-    {
-        writer.Write(SelectedName);
-    }
+        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        {
+            writer.Write(SelectedName);
+        }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
-    {
-        reader.Read(out SelectedName);
-    }
+        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out SelectedName);
+        }
 
-    public override string ToString()
-    {
-        return $"{nameof(SelectedName)}: {SelectedName}";
+        public override string ToString()
+        {
+            return $"{nameof(SelectedName)}: {SelectedName}";
+        }
     }
 }

@@ -25,8 +25,8 @@ namespace StationNaming.Setting
 {
     public static class Localizations
     {
-        private static readonly Translation[] Translations =
-        [
+        private static readonly Translation[] Translations = new Translation[]
+        {
             new Translation("Options.SECTION[StationNaming.StationNaming.Mod]")
                 .AddTranslation(LocaleCode.EnUs, "Station Naming")
                 .AddTranslation(LocaleCode.ZhHans, "站点命名")
@@ -1030,7 +1030,7 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "None")
                 .AddTranslation(LocaleCode.ZhHans, "None")
                 .AddTranslation(LocaleCode.ZhHant, "None"),
-        ];
+        };
 
         public static void LoadTranslations(StationNamingSettings settings)
         {

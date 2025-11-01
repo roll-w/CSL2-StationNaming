@@ -21,6 +21,7 @@
 using Colossal.Serialization.Entities;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public struct ToAutoNaming: IComponentData, IEmptySerializable;
+namespace StationNaming.System
+{
+    public struct ToAutoNaming: IComponentData, IEmptySerializable { }
+}

@@ -20,9 +20,7 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using Game.Net;
 using Game.Prefabs;
 using Game.SceneFlow;
 using Game.UI;
@@ -30,121 +28,128 @@ using StationNaming.System;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace StationNaming.Setting;
-
-public class NameFormatter(
-    EntityManager entityManager,
-    NameSystem nameSystem,
-    PrefabSystem prefabSystem)
+namespace StationNaming.Setting
 {
-    private EntityManager _entityManager = entityManager;
-
-    public NameOptions Options { get; set; } = new();
-
-    public string FormatRefers(
-        IList<NameSourceRefer> refers,
-        Entity targetEntity)
+    public class NameFormatter
     {
-        var count = refers.Count;
-        string referFormat;
-        switch (count)
+        private readonly EntityManager _entityManager;
+        private readonly NameSystem _nameSystem;
+        private readonly PrefabSystem _prefabSystem;
+
+        public NameFormatter(EntityManager entityManager, NameSystem nameSystem, PrefabSystem prefabSystem)
         {
-            case 0:
-                return "";
-            case 1 when refers[0].Source == NameSource.Owner:
-                return refers[0].GetName(_entityManager, nameSystem);
-            default:
-                referFormat = StdFormatRefers(refers);
-                break;
+            _entityManager = entityManager;
+            _nameSystem = nameSystem;
+            _prefabSystem = prefabSystem;
         }
 
-        var targetType = NameUtils.GetTargetType(targetEntity, _entityManager);
+        public NameOptions Options { get; set; } = new NameOptions();
 
-        var targetFormat = Options.TargetFormats[targetType];
-        var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
-
-        return targetFormat.Format(
-            referFormat,
-            prefabName: prefabName,
-            hasNext: false
-        );
-    }
-
-    private string StdFormatRefers(IList<NameSourceRefer> refers)
-    {
-        StringBuilder builder = new();
-
-        ForeachRefers(refers, Options.Reverse, (refer, hasNext, next) =>
+        public string FormatRefers(
+            IList<NameSourceRefer> refers,
+            Entity targetEntity)
         {
-            if (refer.Source == NameSource.Intersection)
+            var count = refers.Count;
+            string referFormat;
+            switch (count)
             {
-                return;
+                case 0:
+                    return "";
+                case 1 when refers[0].Source == NameSource.Owner:
+                    return refers[0].GetName(_entityManager, _nameSystem);
+                default:
+                    referFormat = StdFormatRefers(refers);
+                    break;
             }
-            var format = Options.SourceFormats[refer.Source];
-            var name = refer.GetName(_entityManager, nameSystem);
-            var isNextIntersection = next?.Source == NameSource.Intersection;
-            builder.Append(format.Format(name, hasNext: hasNext && !isNextIntersection));
-        });
 
-        return builder.ToString();
-    }
+            var targetType = NameUtils.GetTargetType(targetEntity, _entityManager);
 
-    private static void ForeachRefers(
-        IList<NameSourceRefer> refers,
-        bool reverse,
-        Action<NameSourceRefer, bool, NameSourceRefer?> action)
-    {
-        var count = refers.Count;
-        for (var i = 0; i < count; i++)
-        {
-            var refer = reverse ? refers[count - i - 1] : refers[i];
-            var hasNext = i < count - 1;
-            NameSourceRefer? next = hasNext ? refers[i + 1] : null;
-            action(refer, hasNext, next);
-        }
-    }
+            var targetFormat = Options.TargetFormats[targetType];
+            var prefabName = GetPrefabName(targetEntity, targetFormat.IsAnyPrefab());
 
-    private string GetPrefabName(Entity entity, bool prefab)
-    {
-        if (!prefab)
-        {
-            return string.Empty;
+            return targetFormat.Format(
+                referFormat,
+                prefabName: prefabName,
+                hasNext: false
+            );
         }
 
-        var prefabEntity = GetPrefabEntity(entity);
-        if (prefabEntity == Entity.Null)
+        private string StdFormatRefers(IList<NameSourceRefer> refers)
         {
-            return string.Empty;
+            StringBuilder builder = new();
+
+            ForeachRefers(refers, Options.Reverse, (refer, hasNext, next) =>
+            {
+                if (refer.Source == NameSource.Intersection)
+                {
+                    return;
+                }
+                var format = Options.SourceFormats[refer.Source];
+                var name = refer.GetName(_entityManager, _nameSystem);
+                var isNextIntersection = next?.Source == NameSource.Intersection;
+                builder.Append(format.Format(name, hasNext: hasNext && !isNextIntersection));
+            });
+
+            return builder.ToString();
         }
 
-        var prefabName = prefabSystem.GetPrefabName(prefabEntity);
-        var prefabKey = "Assets.NAME[" + prefabName + "]";
-
-        var localizationManager = GameManager.instance.localizationManager;
-
-        return localizationManager.activeDictionary.TryGetValue(prefabKey, out var localized)
-            ? localized
-            : prefabName;
-    }
-
-    private Entity GetPrefabEntity(Entity entity)
-    {
-        return _entityManager.HasComponent<PrefabRef>(entity)
-            ? _entityManager.GetComponentData<PrefabRef>(entity).m_Prefab
-            : Entity.Null;
-    }
-
-    public string FormatRefers(
-        INativeList<NameSourceRefer> refers,
-        Entity targetEntity
-    )
-    {
-        List<NameSourceRefer> copy = [];
-        for (var i = 0; i < refers.Length; i++)
+        private static void ForeachRefers(
+            IList<NameSourceRefer> refers,
+            bool reverse,
+            Action<NameSourceRefer, bool, NameSourceRefer?> action)
         {
-            copy.Add(refers[i]);
+            var count = refers.Count;
+            for (var i = 0; i < count; i++)
+            {
+                var refer = reverse ? refers[count - i - 1] : refers[i];
+                var hasNext = i < count - 1;
+                NameSourceRefer? next = hasNext ? refers[i + 1] : null;
+                action(refer, hasNext, next);
+            }
         }
 
-        return FormatRefers(copy, targetEntity);
+        private string GetPrefabName(Entity entity, bool prefab)
+        {
+            if (!prefab)
+            {
+                return string.Empty;
+            }
+
+            var prefabEntity = GetPrefabEntity(entity);
+            if (prefabEntity == Entity.Null)
+            {
+                return string.Empty;
+            }
+
+            var prefabName = _prefabSystem.GetPrefabName(prefabEntity);
+            var prefabKey = "Assets.NAME[" + prefabName + "]";
+
+            var localizationManager = GameManager.instance.localizationManager;
+
+            return localizationManager.activeDictionary.TryGetValue(prefabKey, out var localized)
+                ? localized
+                : prefabName;
+        }
+
+        private Entity GetPrefabEntity(Entity entity)
+        {
+            return _entityManager.HasComponent<PrefabRef>(entity)
+                ? _entityManager.GetComponentData<PrefabRef>(entity).m_Prefab
+                : Entity.Null;
+        }
+
+        public string FormatRefers(
+            INativeList<NameSourceRefer> refers,
+            Entity targetEntity
+        )
+        {
+            List<NameSourceRefer> copy = new List<NameSourceRefer>();
+            for (var i = 0; i < refers.Length; i++)
+            {
+                copy.Add(refers[i]);
+            }
+
+            return FormatRefers(copy, targetEntity);
+        }
     }
 }

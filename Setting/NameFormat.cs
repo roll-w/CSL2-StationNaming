@@ -20,112 +20,113 @@
 
 using System;
 
-namespace StationNaming.Setting;
-
-using TemplateVar = string;
-
-public struct NameFormat : IEquatable<NameFormat>
+namespace StationNaming.Setting
 {
-    public static readonly NameFormat Invalid = new()
+    public struct NameFormat : IEquatable<NameFormat>
     {
-        Separator = None
-    };
-
-    public const TemplateVar Asset = "{ASSET}";
-    public const TemplateVar None = "{NONE}";
-    public const TemplateVar Name = "{NAME}";
-    public const TemplateVar Space = "{SPACE}";
-    public const TemplateVar City = "{CITY}";
-    public const TemplateVar District = "{DISTRICT}";
-    public const TemplateVar Road = "{ROAD}";
-
-    public string Separator { get; set; } = " ";
-    public string NextFormat { get; set; } = "{0}";
-    public string Template { get; set; } = "{NAME}";
-    public string Prefix { get; set; } = "";
-    public string Suffix { get; set; } = "";
-
-    public NameFormat()
-    {
-    }
-
-    public NameFormat(string separator, string prefix, string suffix)
-    {
-        Separator = separator;
-        Prefix = prefix;
-        Suffix = suffix;
-    }
-
-    public bool IsValid()
-    {
-        return Separator != None;
-    }
-
-    public bool IsAnyPrefab()
-    {
-        return Prefix.Contains(Asset)
-               || Suffix.Contains(Asset);
-    }
-
-    private string GetPrefix(string prefab)
-    {
-        return Prefix.Replace(Asset, prefab);
-    }
-
-    private string GetSuffix(string prefab)
-    {
-        return Suffix.Replace(Asset, prefab);
-    }
-
-    public bool HasVar(TemplateVar var)
-    {
-        return Template.Contains(var) ||
-               Prefix.Contains(var) ||
-               Suffix.Contains(var);
-    }
-
-    public string Format(
-        string name,
-        string prefabName = "",
-        bool hasNext = true)
-    {
-        return GetPrefix(prefabName) + name +
-               GetSuffix(prefabName) +
-               (hasNext ? Separator : "");
-    }
-
-    public bool Equals(NameFormat other)
-    {
-        return Separator == other.Separator &&
-               NextFormat == other.NextFormat &&
-               Prefix == other.Prefix &&
-               Suffix == other.Suffix;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return obj is NameFormat other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
+        public static readonly NameFormat Invalid = new()
         {
-            var hashCode = (Separator != null ? Separator.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (NextFormat != null ? NextFormat.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Prefix != null ? Prefix.GetHashCode() : 0);
-            hashCode = (hashCode * 397) ^ (Suffix != null ? Suffix.GetHashCode() : 0);
-            return hashCode;
+            Separator = None
+        };
+
+        public const string Asset = "{ASSET}";
+        public const string None = "{NONE}";
+        public const string Name = "{NAME}";
+        public const string Space = "{SPACE}";
+        public const string City = "{CITY}";
+        public const string District = "{DISTRICT}";
+        public const string Road = "{ROAD}";
+
+        public string Separator { get; set; }
+        public string NextFormat { get; set; }
+        public string Template { get; set; }
+        public string Prefix { get; set; }
+        public string Suffix { get; set; }
+
+
+        public NameFormat(string separator, string prefix, string suffix)
+        {
+            Separator = " ";
+            Separator = separator;
+            NextFormat = "{0}";
+            Prefix = "";
+            Suffix = "";
+            Template = "{NAME}";
+            Prefix = prefix;
+            Suffix = suffix;
         }
-    }
 
-    public static bool operator ==(NameFormat left, NameFormat right)
-    {
-        return left.Equals(right);
-    }
+        public bool IsValid()
+        {
+            return Separator != None;
+        }
 
-    public static bool operator !=(NameFormat left, NameFormat right)
-    {
-        return !left.Equals(right);
+        public bool IsAnyPrefab()
+        {
+            return Prefix.Contains(Asset)
+                   || Suffix.Contains(Asset);
+        }
+
+        private string GetPrefix(string prefab)
+        {
+            return string.IsNullOrEmpty(prefab) ? string.Empty : Prefix.Replace(Asset, prefab);
+        }
+
+        private string GetSuffix(string prefab)
+        {
+            return string.IsNullOrEmpty(prefab) ? string.Empty : Suffix.Replace(Asset, prefab);
+        }
+
+        public bool HasVar(string var)
+        {
+            return Template.Contains(var) ||
+                   Prefix.Contains(var) ||
+                   Suffix.Contains(var);
+        }
+
+        public string Format(
+            string name,
+            string prefabName = "",
+            bool hasNext = true)
+        {
+            return GetPrefix(prefabName) + name +
+                   GetSuffix(prefabName) +
+                   (hasNext ? Separator : "");
+        }
+
+        public bool Equals(NameFormat other)
+        {
+            return Separator == other.Separator &&
+                   NextFormat == other.NextFormat &&
+                   Prefix == other.Prefix &&
+                   Suffix == other.Suffix;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is NameFormat other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hashCode = (Separator != null ? Separator.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (NextFormat != null ? NextFormat.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Prefix != null ? Prefix.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (Suffix != null ? Suffix.GetHashCode() : 0);
+                return hashCode;
+            }
+        }
+
+        public static bool operator ==(NameFormat left, NameFormat right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NameFormat left, NameFormat right)
+        {
+            return !left.Equals(right);
+        }
     }
 }

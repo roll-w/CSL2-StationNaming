@@ -20,29 +20,30 @@
 
 using Unity.Entities;
 
-namespace StationNaming.System.Utils;
-
-public static class SystemUtils
+namespace StationNaming.System.Utils
 {
-    public static DynamicBuffer<T> GetBuffer<T>(
-        EntityManager entityManager,
-        Entity entity) where T : unmanaged, IBufferElementData
+    public static class SystemUtils
     {
-        return entityManager.HasBuffer<T>(entity)
-            ? entityManager.GetBuffer<T>(entity)
-            : entityManager.AddBuffer<T>(entity);
-    }
-
-    public static void TryRemoveBuffer<T>(
-        EntityManager entityManager,
-        Entity entity) where T : unmanaged, IBufferElementData
-    {
-        if (!entityManager.HasBuffer<T>(entity))
+        public static DynamicBuffer<T> GetBuffer<T>(
+            EntityManager entityManager,
+            Entity entity) where T : unmanaged, IBufferElementData
         {
-          return;
+            return entityManager.HasBuffer<T>(entity)
+                ? entityManager.GetBuffer<T>(entity)
+                : entityManager.AddBuffer<T>(entity);
         }
-        var buffer = entityManager.GetBuffer<T>(entity);
-        buffer.Clear();
-    }
 
+        public static void TryRemoveBuffer<T>(
+            EntityManager entityManager,
+            Entity entity) where T : unmanaged, IBufferElementData
+        {
+            if (!entityManager.HasBuffer<T>(entity))
+            {
+                return;
+            }
+            var buffer = entityManager.GetBuffer<T>(entity);
+            buffer.Clear();
+        }
+
+    }
 }

@@ -25,115 +25,116 @@ using Game.Net;
 using Game.UI;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public struct NameSourceRefer : IEquatable<NameSourceRefer>,
-    ISerializable, IJsonWritable, IJsonReadable
+namespace StationNaming.System
 {
-    public Entity Refer;
-    public NameSource Source;
-
-    public NameSourceRefer(Entity refer, NameSource source)
+    public struct NameSourceRefer : IEquatable<NameSourceRefer>,
+        ISerializable, IJsonWritable, IJsonReadable
     {
-        Refer = refer;
-        Source = source;
-    }
+        public Entity Refer;
+        public NameSource Source;
 
-    public bool Equals(NameSourceRefer other)
-    {
-        return Refer.Equals(other.Refer) && Source == other.Source;
-    }
-
-    public override bool Equals(object obj)
-    {
-        return obj is NameSourceRefer other && Equals(other);
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
+        public NameSourceRefer(Entity refer, NameSource source)
         {
-            return (Refer.GetHashCode() * 397) ^ (int)Source;
+            Refer = refer;
+            Source = source;
         }
-    }
 
-    public void Read(IJsonReader reader)
-    {
-        reader.ReadMapBegin();
-        reader.ReadProperty("refer");
-        reader.Read(out Refer);
-        reader.ReadProperty("source");
-        reader.Read(out string source);
-        Source = Enum.TryParse<NameSource>(source, out var nameSource)
-            ? nameSource
-            : NameSource.None;
-        reader.ReadMapEnd();
-    }
-
-    public void Write(IJsonWriter writer)
-    {
-        writer.TypeBegin("NameSourceRefer");
-        writer.PropertyName("refer");
-        writer.Write(Refer);
-        writer.PropertyName("source");
-        writer.Write(Source.ToString());
-        writer.TypeEnd();
-    }
-
-    public override string ToString()
-    {
-        return $"NameSourceRefer({Refer}, {Source})";
-    }
-
-    public static bool operator ==(NameSourceRefer left, NameSourceRefer right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(NameSourceRefer left, NameSourceRefer right)
-    {
-        return !left.Equals(right);
-    }
-
-    public static NameSourceRefer Invalid => new(
-        Entity.Null,
-        NameSource.None
-    );
-
-    public static NameSourceRefer From(Entity entity, NameSource type)
-    {
-        return new NameSourceRefer(entity, type);
-    }
-
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
-    {
-        writer.Write(Refer);
-        writer.Write(Source.ToString());
-    }
-
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
-    {
-        reader.Read(out Refer);
-        reader.Read(out string source);
-
-        Source = Enum.TryParse<NameSource>(source, out var nameSource)
-            ? nameSource
-            : NameSource.None;
-    }
-
-    public string GetName(
-        EntityManager entityManager,
-        NameSystem nameSystem)
-    {
-        if (!entityManager.HasComponent<Aggregated>(Refer))
+        public bool Equals(NameSourceRefer other)
         {
-            return nameSystem.TryGetRealRenderedName(Refer);
+            return Refer.Equals(other.Refer) && Source == other.Source;
         }
-        var aggregate = entityManager.GetComponentData<Aggregated>(Refer).m_Aggregate;
-        if (aggregate == Entity.Null)
+
+        public override bool Equals(object obj)
         {
-            return string.Empty;
+            return obj is NameSourceRefer other && Equals(other);
         }
-        return nameSystem.GetRenderedLabelName(aggregate);
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Refer.GetHashCode() * 397) ^ (int)Source;
+            }
+        }
+
+        public void Read(IJsonReader reader)
+        {
+            reader.ReadMapBegin();
+            reader.ReadProperty("refer");
+            reader.Read(out Refer);
+            reader.ReadProperty("source");
+            reader.Read(out string source);
+            Source = Enum.TryParse<NameSource>(source, out var nameSource)
+                ? nameSource
+                : NameSource.None;
+            reader.ReadMapEnd();
+        }
+
+        public void Write(IJsonWriter writer)
+        {
+            writer.TypeBegin("NameSourceRefer");
+            writer.PropertyName("refer");
+            writer.Write(Refer);
+            writer.PropertyName("source");
+            writer.Write(Source.ToString());
+            writer.TypeEnd();
+        }
+
+        public override string ToString()
+        {
+            return $"NameSourceRefer({Refer}, {Source})";
+        }
+
+        public static bool operator ==(NameSourceRefer left, NameSourceRefer right)
+        {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(NameSourceRefer left, NameSourceRefer right)
+        {
+            return !left.Equals(right);
+        }
+
+        public static NameSourceRefer Invalid => new(
+            Entity.Null,
+            NameSource.None
+        );
+
+        public static NameSourceRefer From(Entity entity, NameSource type)
+        {
+            return new NameSourceRefer(entity, type);
+        }
+
+        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        {
+            writer.Write(Refer);
+            writer.Write(Source.ToString());
+        }
+
+        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out Refer);
+            reader.Read(out string source);
+
+            Source = Enum.TryParse<NameSource>(source, out var nameSource)
+                ? nameSource
+                : NameSource.None;
+        }
+
+        public string GetName(
+            EntityManager entityManager,
+            NameSystem nameSystem)
+        {
+            if (!entityManager.HasComponent<Aggregated>(Refer))
+            {
+                return nameSystem.TryGetRealRenderedName(Refer);
+            }
+            var aggregate = entityManager.GetComponentData<Aggregated>(Refer).m_Aggregate;
+            if (aggregate == Entity.Null)
+            {
+                return string.Empty;
+            }
+            return nameSystem.GetRenderedLabelName(aggregate);
+        }
     }
 }

@@ -27,131 +27,132 @@ using StationNaming.Setting;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public partial class AutoUpdateNamingSystem : GameSystemBase
+namespace StationNaming.System
 {
-    private NameSystem _nameSystem;
-    private PrefabSystem _prefabSystem;
-    private EntityQuery _associationQuery;
-
-    private NameFormatter _nameFormatter;
-
-    protected override void OnUpdate()
+    public partial class AutoUpdateNamingSystem : GameSystemBase
     {
-        var settings = Mod.GetInstance().GetSettings();
-        if (!settings.Enable)
+        private NameSystem _nameSystem;
+        private PrefabSystem _prefabSystem;
+        private EntityQuery _associationQuery;
+
+        private NameFormatter _nameFormatter;
+
+        protected override void OnUpdate()
         {
-            return;
-        }
-
-        if (!settings.AutoUpdate)
-        {
-            return;
-        }
-
-        _nameFormatter.Options = settings.ToNameOptions();
-
-        var entities = _associationQuery.ToEntityArray(Allocator.Temp);
-
-        foreach (var entity in entities)
-        {
-            if (!EntityManager.HasBuffer<NamingAssociation>(entity))
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
-                continue;
+                return;
             }
 
-            CheckAndUpdate(entity);
-        }
-    }
-
-    private void CheckAndUpdate(Entity entity)
-    {
-        var namingAssociations = EntityManager.GetBuffer<NamingAssociation>(entity);
-        List<NamingAssociation> valid = [];
-
-        foreach (var naming in namingAssociations)
-        {
-            var target = naming.Target;
-            if (!EntityManager.Exists(target)
-                || !EntityManager.HasComponent<ManualSelectNaming>(target))
+            if (!settings.AutoUpdate)
             {
-                continue;
+                return;
             }
 
-            var selectNaming =
-                EntityManager.GetComponentData<ManualSelectNaming>(target);
-            var rawNameCandidate = selectNaming.SelectedName;
-            var currentName = _nameSystem.GetRenderedLabelName(target);
-            var rawCandidateName = rawNameCandidate.Name.ToString();
-            if (!rawNameCandidate.IsValid() ||
-                !currentName.Contains(rawCandidateName))
+            _nameFormatter.Options = settings.ToNameOptions();
+
+            var entities = _associationQuery.ToEntityArray(Allocator.Temp);
+
+            foreach (var entity in entities)
             {
-                // it probably means user has changed the name,
-                // we should not update it
-                EntityManager.RemoveComponent<ManualSelectNaming>(target);
-                continue;
+                if (!EntityManager.HasBuffer<NamingAssociation>(entity))
+                {
+                    continue;
+                }
+
+                CheckAndUpdate(entity);
+            }
+        }
+
+        private void CheckAndUpdate(Entity entity)
+        {
+            var namingAssociations = EntityManager.GetBuffer<NamingAssociation>(entity);
+            List<NamingAssociation> valid = new List<NamingAssociation>();
+
+            foreach (var naming in namingAssociations)
+            {
+                var target = naming.Target;
+                if (!EntityManager.Exists(target)
+                    || !EntityManager.HasComponent<ManualSelectNaming>(target))
+                {
+                    continue;
+                }
+
+                var selectNaming =
+                    EntityManager.GetComponentData<ManualSelectNaming>(target);
+                var rawNameCandidate = selectNaming.SelectedName;
+                var currentName = _nameSystem.GetRenderedLabelName(target);
+                var rawCandidateName = rawNameCandidate.Name.ToString();
+                if (!rawNameCandidate.IsValid() ||
+                    !currentName.Contains(rawCandidateName))
+                {
+                    // it probably means user has changed the name,
+                    // we should not update it
+                    EntityManager.RemoveComponent<ManualSelectNaming>(target);
+                    continue;
+                }
+
+                var updatedName = GetUpdatedName(selectNaming, target);
+
+                var copy = rawNameCandidate;
+                copy.Name = updatedName;
+
+                valid.Add(naming);
+                EntityManager.AddComponentData(
+                    target,
+                    new ManualSelectNaming(copy)
+                );
+
+                var targetName = currentName.Replace(rawCandidateName, updatedName);
+                _nameSystem.SetCustomName(target, targetName);
             }
 
-            var updatedName = GetUpdatedName(selectNaming, target);
-
-            var copy = rawNameCandidate;
-            copy.Name = updatedName;
-
-            valid.Add(naming);
-            EntityManager.AddComponentData(
-                target,
-                new ManualSelectNaming(copy)
-            );
-
-            var targetName = currentName.Replace(rawCandidateName, updatedName);
-            _nameSystem.SetCustomName(target, targetName);
+            namingAssociations.Clear();
+            foreach (var naming in valid)
+            {
+                namingAssociations.Add(naming);
+            }
         }
 
-        namingAssociations.Clear();
-        foreach (var naming in valid)
+        private string GetUpdatedName(ManualSelectNaming selectNaming, Entity entity)
         {
-            namingAssociations.Add(naming);
+            var selectedName = selectNaming.SelectedName;
+            var refers = selectedName.Refers;
+
+            var name = _nameFormatter.FormatRefers(refers, entity);
+            return name;
         }
-    }
 
-    private string GetUpdatedName(ManualSelectNaming selectNaming, Entity entity)
-    {
-        var selectedName = selectNaming.SelectedName;
-        var refers = selectedName.Refers;
-
-        var name = _nameFormatter.FormatRefers(refers, entity);
-        return name;
-    }
-
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-
-        _nameSystem = World.DefaultGameObjectInjectionWorld
-            .GetExistingSystemManaged<NameSystem>();
-        _prefabSystem = World.DefaultGameObjectInjectionWorld
-            .GetExistingSystemManaged<PrefabSystem>();
-        _nameFormatter = new NameFormatter(EntityManager, _nameSystem, _prefabSystem);
-
-        _associationQuery = GetEntityQuery(new EntityQueryDesc
+        protected override void OnCreate()
         {
-            All =
-            [
-                ComponentType.ReadOnly<NamingAssociation>(),
-                ComponentType.ReadOnly<CustomName>()
-            ],
-            Any =
-            [
-                ComponentType.ReadOnly<BatchesUpdated>(),
-                ComponentType.ReadOnly<Updated>()
-            ],
-            None =
-            [
-                ComponentType.ReadOnly<Deleted>()
-            ]
-        });
+            base.OnCreate();
 
-        RequireForUpdate(_associationQuery);
+            _nameSystem = World.DefaultGameObjectInjectionWorld
+                .GetExistingSystemManaged<NameSystem>();
+            _prefabSystem = World.DefaultGameObjectInjectionWorld
+                .GetExistingSystemManaged<PrefabSystem>();
+            _nameFormatter = new NameFormatter(EntityManager, _nameSystem, _prefabSystem);
+
+            _associationQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<NamingAssociation>(),
+                    ComponentType.ReadOnly<CustomName>()
+                },
+                Any = new[]
+                {
+                    ComponentType.ReadOnly<BatchesUpdated>(),
+                    ComponentType.ReadOnly<Updated>()
+                },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Deleted>()
+                }
+            });
+
+            RequireForUpdate(_associationQuery);
+        }
     }
 }

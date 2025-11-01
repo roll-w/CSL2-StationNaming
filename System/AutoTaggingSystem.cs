@@ -25,111 +25,112 @@ using Game.Routes;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-/// <summary>
-/// The system that automatically tags the newly created buildings.
-///
-/// When a building is created, this system will check if the building
-/// could be named automatically.
-/// If so, it will add the "ToAutoNaming" tag to the building.
-/// </summary>
-public partial class AutoTaggingSystem : GameSystemBase
+namespace StationNaming.System
 {
-    private EntityQuery _createdQuery;
-
-    protected override void OnUpdate()
+    /// <summary>
+    /// The system that automatically tags the newly created buildings.
+    ///
+    /// When a building is created, this system will check if the building
+    /// could be named automatically.
+    /// If so, it will add the "ToAutoNaming" tag to the building.
+    /// </summary>
+    public partial class AutoTaggingSystem : GameSystemBase
     {
-        if (!Mod.GetInstance().GetSettings().Enable)
-        {
-            return;
-        }
+        private EntityQuery _createdQuery;
 
-        if (!Mod.GetInstance().GetSettings().AutoNaming)
+        protected override void OnUpdate()
         {
-            return;
-        }
-
-        var entities = _createdQuery.ToEntityArray(Allocator.Temp);
-
-        foreach (var entity in entities)
-        {
-            if (!CouldNaming(entity))
+            if (!Mod.GetInstance().GetSettings().Enable)
             {
-                continue;
+                return;
             }
 
-            EntityManager.AddComponent<ToAutoNaming>(entity);
-            EntityManager.AddComponent<Selected>(entity);
-        }
-    }
+            if (!Mod.GetInstance().GetSettings().AutoNaming)
+            {
+                return;
+            }
 
-    private bool CouldNaming(Entity entity)
-    {
-        var settings = Mod.GetInstance().GetSettings();
-        if (EntityManager.HasComponent<TransportStop>(entity))
-        {
-            return settings.TransportStopAutoNaming;
-        }
+            var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
-        // Get the newly created building's type.
-        // (Although we still use "NameSource" here, it's not a good idea, but it works.)
-        var nameSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
-        if (!nameSource.CouldNaming())
-        {
-            return false;
+            foreach (var entity in entities)
+            {
+                if (!CouldNaming(entity))
+                {
+                    continue;
+                }
+
+                EntityManager.AddComponent<ToAutoNaming>(entity);
+                EntityManager.AddComponent<Selected>(entity);
+            }
         }
 
-        return CheckSetting(nameSource);
-    }
-
-    private bool CheckSetting(NameSource nameSource)
-    {
-        var settings = Mod.GetInstance().GetSettings();
-        return nameSource switch
+        private bool CouldNaming(Entity entity)
         {
-            NameSource.TransportStation => settings.TransportStationAutoNaming,
-            NameSource.TransportDepot => settings.TransportDepotAutoNaming,
-            NameSource.FireStation => settings.FireStationAutoNaming,
-            NameSource.PoliceStation => settings.PoliceStationAutoNaming,
-            NameSource.School => settings.SchoolAutoNaming,
-            NameSource.Hospital => settings.HospitalAutoNaming,
-            NameSource.Park => settings.ParkAutoNaming,
-            NameSource.Electricity => settings.ElectricityAutoNaming,
-            NameSource.Water => settings.WaterAutoNaming,
-            NameSource.Sewage => settings.SewageAutoNaming,
-            NameSource.Garbage => settings.GarbageAutoNaming,
-            NameSource.Deathcare => settings.DeathcareAutoNaming,
-            NameSource.Telecom => settings.TelecomAutoNaming,
-            NameSource.Parking => settings.ParkingAutoNaming,
-            NameSource.Admin => settings.AdminAutoNaming,
-            NameSource.RoadFacility => settings.RoadFacilityAutoNaming,
-            _ => false
-        };
-    }
+            var settings = Mod.GetInstance().GetSettings();
+            if (EntityManager.HasComponent<TransportStop>(entity))
+            {
+                return settings.TransportStopAutoNaming;
+            }
 
-    protected override void OnCreate()
-    {
-        base.OnCreate();
+            // Get the newly created building's type.
+            // (Although we still use "NameSource" here, it's not a good idea, but it works.)
+            var nameSource = NameUtils.TryGetBuildingSource(entity, EntityManager);
+            if (!nameSource.CouldNaming())
+            {
+                return false;
+            }
 
-        _createdQuery = GetEntityQuery(new EntityQueryDesc
+            return CheckSetting(nameSource);
+        }
+
+        private bool CheckSetting(NameSource nameSource)
         {
-            All =
-            [
-                ComponentType.ReadOnly<Created>()
-            ],
-            Any =
-            [
-                ComponentType.ReadOnly<TransportStop>(),
-                ComponentType.ReadOnly<TransportStation>(),
-                ComponentType.ReadOnly<Building>()
-            ],
-            None =
-            [
-                ComponentType.ReadOnly<Deleted>()
-            ]
-        });
+            var settings = Mod.GetInstance().GetSettings();
+            return nameSource switch
+            {
+                NameSource.TransportStation => settings.TransportStationAutoNaming,
+                NameSource.TransportDepot => settings.TransportDepotAutoNaming,
+                NameSource.FireStation => settings.FireStationAutoNaming,
+                NameSource.PoliceStation => settings.PoliceStationAutoNaming,
+                NameSource.School => settings.SchoolAutoNaming,
+                NameSource.Hospital => settings.HospitalAutoNaming,
+                NameSource.Park => settings.ParkAutoNaming,
+                NameSource.Electricity => settings.ElectricityAutoNaming,
+                NameSource.Water => settings.WaterAutoNaming,
+                NameSource.Sewage => settings.SewageAutoNaming,
+                NameSource.Garbage => settings.GarbageAutoNaming,
+                NameSource.Deathcare => settings.DeathcareAutoNaming,
+                NameSource.Telecom => settings.TelecomAutoNaming,
+                NameSource.Parking => settings.ParkingAutoNaming,
+                NameSource.Admin => settings.AdminAutoNaming,
+                NameSource.RoadFacility => settings.RoadFacilityAutoNaming,
+                _ => false
+            };
+        }
 
-        RequireForUpdate(_createdQuery);
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+
+            _createdQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<Created>()
+                },
+                Any = new[]
+                {
+                    ComponentType.ReadOnly<TransportStop>(),
+                    ComponentType.ReadOnly<TransportStation>(),
+                    ComponentType.ReadOnly<Building>()
+                },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Deleted>()
+                }
+            });
+
+            RequireForUpdate(_createdQuery);
+        }
     }
 }

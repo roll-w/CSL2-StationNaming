@@ -22,56 +22,61 @@ using System;
 using Colossal.Serialization.Entities;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-/// <summary>
-///
-/// </summary>
-/// <param name="target">
-/// The target entity of the current naming association.
-/// </param>
-public struct NamingAssociation(Entity target) : IBufferElementData,
-    IQueryTypeParameter, ISerializable, IEquatable<NamingAssociation>
+namespace StationNaming.System
 {
-    public Entity Target = target;
-
-    public bool Equals(NamingAssociation other)
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="target">
+    /// The target entity of the current naming association.
+    /// </param>
+    public struct NamingAssociation : IBufferElementData, IQueryTypeParameter, ISerializable, IEquatable<NamingAssociation>
     {
-        return Target == other.Target;
-    }
+        public Entity Target;
 
-    public override bool Equals(object obj)
-    {
-        return obj is NamingAssociation other && Equals(other);
-    }
+        public NamingAssociation(Entity target)
+        {
+            Target = target;
+        }
 
-    public override int GetHashCode()
-    {
-        return Target.GetHashCode();
-    }
+        public bool Equals(NamingAssociation other)
+        {
+            return Target == other.Target;
+        }
 
-    public static bool operator ==(NamingAssociation left, NamingAssociation right)
-    {
-        return left.Equals(right);
-    }
+        public override bool Equals(object obj)
+        {
+            return obj is NamingAssociation other && Equals(other);
+        }
 
-    public static bool operator !=(NamingAssociation left, NamingAssociation right)
-    {
-        return !left.Equals(right);
-    }
+        public override int GetHashCode()
+        {
+            return Target.GetHashCode();
+        }
 
-    public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
-    {
-        writer.Write(Target);
-    }
+        public static bool operator ==(NamingAssociation left, NamingAssociation right)
+        {
+            return left.Equals(right);
+        }
 
-    public void Deserialize<TReader>(TReader reader) where TReader : IReader
-    {
-        reader.Read(out Target);
-    }
+        public static bool operator !=(NamingAssociation left, NamingAssociation right)
+        {
+            return !left.Equals(right);
+        }
 
-    public override string ToString()
-    {
-        return $"{nameof(Target)}: {Target}";
+        public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
+        {
+            writer.Write(Target);
+        }
+
+        public void Deserialize<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out Target);
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(Target)}: {Target}";
+        }
     }
 }

@@ -18,108 +18,111 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace StationNaming.System;
-
-public enum NameSource : uint
+namespace StationNaming.System
 {
-    Owner = 0,
-    Road,
-    Intersection,
-    District,
-    TransportStation,
-    TransportDepot,
-    SpawnableBuilding,
-    SignatureBuilding,
-    School,
-    FireStation,
-    PoliceStation,
-    Hospital,
-    Park,
-    Electricity,
-    Water,
-    Sewage,
-    Admin,
-    RoadFacility,
-    Garbage,
-    Disaster,
-    Deathcare,
-    Telecom,
-    Post,
-    Parking,
-
-    /**
-     * Other city service buildings not listed
-     */
-    CityService,
-
-    /**
-     * Other buildings that we don't know its type.
-     */
-    Building,
-    Unknown,
-
-    /**
-     * Used for scope, not a real source.
-     */
-    None
-}
-
-public static class NameSourceExtensions
-{
-    public static bool CouldNaming(this NameSource source)
+    public enum NameSource : uint
     {
-        return source switch
-        {
-            NameSource.TransportStation
-                or NameSource.TransportDepot
-                or NameSource.FireStation
-                or NameSource.PoliceStation
-                or NameSource.School
-                or NameSource.Hospital
-                or NameSource.Park
-                or NameSource.Electricity
-                or NameSource.Water
-                or NameSource.Sewage
-                or NameSource.Admin
-                or NameSource.RoadFacility
-                or NameSource.Garbage
-                or NameSource.Disaster
-                or NameSource.Deathcare
-                or NameSource.Telecom
-                or NameSource.Post
-                or NameSource.Parking
-                or NameSource.CityService
-                => true,
-            _ => false
-        };
+        Owner = 0,
+        Road,
+        Intersection,
+        District,
+        TransportStation,
+        TransportDepot,
+        SpawnableBuilding,
+        SignatureBuilding,
+        School,
+        FireStation,
+        PoliceStation,
+        Hospital,
+        Park,
+        Electricity,
+        Water,
+        Sewage,
+        Admin,
+        RoadFacility,
+        Garbage,
+        Disaster,
+        Deathcare,
+        Telecom,
+        Post,
+        Parking,
+
+        /**
+         * Other city service buildings not listed
+         */
+        CityService,
+
+        /**
+         * Other buildings that we don't know its type.
+         */
+        Building,
+        City,
+
+        Unknown,
+
+        /**
+         * Used for scope, not a real source.
+         */
+        None
     }
 
-    public static bool IsBuilding(this NameSource source)
+    public static class NameSourceExtensions
     {
-        return source switch
+        public static bool CouldNaming(this NameSource source)
         {
-            NameSource.TransportStation
-                or NameSource.TransportDepot
-                or NameSource.FireStation
-                or NameSource.PoliceStation
-                or NameSource.School
-                or NameSource.Hospital
-                or NameSource.Park
-                or NameSource.Electricity
-                or NameSource.Water
-                or NameSource.Sewage
-                or NameSource.Admin
-                or NameSource.RoadFacility
-                or NameSource.Garbage
-                or NameSource.Disaster
-                or NameSource.Deathcare
-                or NameSource.Telecom
-                or NameSource.Post
-                or NameSource.Parking
-                or NameSource.CityService
-                or NameSource.Building
-                => true,
-            _ => false
-        };
+            return source switch
+            {
+                NameSource.TransportStation
+                    or NameSource.TransportDepot
+                    or NameSource.FireStation
+                    or NameSource.PoliceStation
+                    or NameSource.School
+                    or NameSource.Hospital
+                    or NameSource.Park
+                    or NameSource.Electricity
+                    or NameSource.Water
+                    or NameSource.Sewage
+                    or NameSource.Admin
+                    or NameSource.RoadFacility
+                    or NameSource.Garbage
+                    or NameSource.Disaster
+                    or NameSource.Deathcare
+                    or NameSource.Telecom
+                    or NameSource.Post
+                    or NameSource.Parking
+                    or NameSource.CityService
+                    => true,
+                _ => false
+            };
+        }
+
+        public static bool IsBuilding(this NameSource source)
+        {
+            return source switch
+            {
+                NameSource.TransportStation
+                    or NameSource.TransportDepot
+                    or NameSource.FireStation
+                    or NameSource.PoliceStation
+                    or NameSource.School
+                    or NameSource.Hospital
+                    or NameSource.Park
+                    or NameSource.Electricity
+                    or NameSource.Water
+                    or NameSource.Sewage
+                    or NameSource.Admin
+                    or NameSource.RoadFacility
+                    or NameSource.Garbage
+                    or NameSource.Disaster
+                    or NameSource.Deathcare
+                    or NameSource.Telecom
+                    or NameSource.Post
+                    or NameSource.Parking
+                    or NameSource.CityService
+                    or NameSource.Building
+                    => true,
+                _ => false
+            };
+        }
     }
 }

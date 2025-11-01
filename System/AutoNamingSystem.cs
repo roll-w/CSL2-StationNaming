@@ -25,100 +25,101 @@ using StationNaming.System.Utils;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public partial class AutoNamingSystem : GameSystemBase
+namespace StationNaming.System
 {
-    private EntityQuery _createdQuery;
-    private NameSystem _nameSystem;
-
-    protected override void OnUpdate()
+    public partial class AutoNamingSystem : GameSystemBase
     {
-        if (!Mod.GetInstance().GetSettings().Enable)
-        {
-            return;
-        }
+        private EntityQuery _createdQuery;
+        private NameSystem _nameSystem;
 
-        if (!Mod.GetInstance().GetSettings().AutoNaming)
+        protected override void OnUpdate()
         {
-            return;
-        }
-
-        var entities = _createdQuery.ToEntityArray(Allocator.Temp);
-
-        foreach (var entity in entities)
-        {
-            if (!EntityManager.HasBuffer<NameCandidate>(entity))
+            if (!Mod.GetInstance().GetSettings().Enable)
             {
-                continue;
+                return;
             }
 
-            var candidates = EntityManager
-                .GetBuffer<NameCandidate>(entity);
-            var candidate = ChooseCandidate(candidates);
+            if (!Mod.GetInstance().GetSettings().AutoNaming)
+            {
+                return;
+            }
 
-            _nameSystem.SetCustomName(entity, candidate.Name.ToString());
+            var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
-            EntityManager.RemoveComponent<ToAutoNaming>(entity);
-            EntityManager.RemoveComponent<Selected>(entity);
+            foreach (var entity in entities)
+            {
+                if (!EntityManager.HasBuffer<NameCandidate>(entity))
+                {
+                    continue;
+                }
 
-            var entityNaming = new ManualSelectNaming(candidate);
-            var association = new NamingAssociation(entity);
+                var candidates = EntityManager
+                    .GetBuffer<NameCandidate>(entity);
+                var candidate = ChooseCandidate(candidates);
 
-            EntityManager.AddComponentData(entity, entityNaming);
-            AddAssociations(association, candidate.Refers);
+                _nameSystem.SetCustomName(entity, candidate.Name.ToString());
 
-            candidates.Clear();
+                EntityManager.RemoveComponent<ToAutoNaming>(entity);
+                EntityManager.RemoveComponent<Selected>(entity);
+
+                var entityNaming = new ManualSelectNaming(candidate);
+                var association = new NamingAssociation(entity);
+
+                EntityManager.AddComponentData(entity, entityNaming);
+                AddAssociations(association, candidate.Refers);
+
+                candidates.Clear();
+            }
         }
-    }
 
-    private void AddAssociations(
-        NamingAssociation association,
-        INativeList<NameSourceRefer> refers
-    )
-    {
-        var refersLength = refers.Length;
-        if (refersLength == 0)
+        private void AddAssociations(
+            NamingAssociation association,
+            INativeList<NameSourceRefer> refers
+        )
         {
-            return;
+            var refersLength = refers.Length;
+            if (refersLength == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < refersLength; i++)
+            {
+                var refer = refers[i];
+
+                SystemUtils.GetBuffer<NamingAssociation>(
+                    EntityManager,
+                    refer.Refer
+                ).Add(association);
+            }
         }
 
-        for (var i = 0; i < refersLength; i++)
+        private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates)
         {
-            var refer = refers[i];
-
-            SystemUtils.GetBuffer<NamingAssociation>(
-                EntityManager,
-                refer.Refer
-            ).Add(association);
+            return candidates[0];
         }
-    }
 
-    private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates)
-    {
-        return candidates[0];
-    }
-
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-
-        _nameSystem = World.DefaultGameObjectInjectionWorld
-            .GetOrCreateSystemManaged<NameSystem>();
-
-        _createdQuery = GetEntityQuery(new EntityQueryDesc
+        protected override void OnCreate()
         {
-            All =
-            [
-                ComponentType.ReadOnly<Selected>(),
-                ComponentType.ReadOnly<ToAutoNaming>()
-            ],
-            None =
-            [
-                ComponentType.ReadOnly<Deleted>()
-            ]
-        });
+            base.OnCreate();
 
-        RequireForUpdate(_createdQuery);
+            _nameSystem = World.DefaultGameObjectInjectionWorld
+                .GetOrCreateSystemManaged<NameSystem>();
+
+            _createdQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<Selected>(),
+                    ComponentType.ReadOnly<ToAutoNaming>()
+                },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Deleted>()
+                }
+            });
+
+            RequireForUpdate(_createdQuery);
+        }
     }
 }

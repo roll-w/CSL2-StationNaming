@@ -30,71 +30,72 @@ using Game.UI;
 using Unity.Collections;
 using Unity.Entities;
 
-namespace StationNaming.System;
-
-public partial class GeneralBuildingNamingSystem : GameSystemBase
+namespace StationNaming.System
 {
-    private EntityQuery _buildingQuery;
-
-    private NameSystem _nameSystem;
-    private PrefabSystem _prefabSystem;
-    private StopNameHelper _stopNameHelper;
-
-    protected override void OnUpdate()
+    public partial class GeneralBuildingNamingSystem : GameSystemBase
     {
-        var settings = Mod.GetInstance().GetSettings();
-        if (!settings.Enable)
+        private EntityQuery _buildingQuery;
+
+        private NameSystem _nameSystem;
+        private PrefabSystem _prefabSystem;
+        private StopNameHelper _stopNameHelper;
+
+        protected override void OnUpdate()
         {
-            return;
-        }
-
-        var options = settings.ToNameOptions();
-        _stopNameHelper.ApplyTo(options);
-
-        var searchDepth = settings.SearchDepth;
-        try
-        {
-            var buildings = _buildingQuery.ToEntityArray(Allocator.Temp);
-
-            foreach (var entity in buildings)
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
-                var candidates =
-                    _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
+                return;
+            }
+
+            var options = settings.ToNameOptions();
+            _stopNameHelper.ApplyTo(options);
+
+            var searchDepth = settings.SearchDepth;
+            try
+            {
+                var buildings = _buildingQuery.ToEntityArray(Allocator.Temp);
+
+                foreach (var entity in buildings)
+                {
+                    var candidates =
+                        _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
+                }
+            }
+            catch (Exception e)
+            {
+                Mod.GetLogger().Error(e);
             }
         }
-        catch (Exception e)
+
+        protected override void OnCreate()
         {
-            Mod.GetLogger().Error(e);
+            base.OnCreate();
+            _nameSystem = World.DefaultGameObjectInjectionWorld
+                .GetOrCreateSystemManaged<NameSystem>();
+            _prefabSystem = World.DefaultGameObjectInjectionWorld
+                .GetExistingSystemManaged<PrefabSystem>();
+            _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
+
+            _buildingQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<Building>()
+                },
+                Any = new[]
+                {
+                    ComponentType.ReadOnly<Highlighted>(),
+                    ComponentType.ReadOnly<Selected>()
+                },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Deleted>(),
+                    ComponentType.ReadOnly<Temp>()
+                }
+            });
+
+            RequireForUpdate(_buildingQuery);
         }
-    }
-
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-        _nameSystem = World.DefaultGameObjectInjectionWorld
-            .GetOrCreateSystemManaged<NameSystem>();
-        _prefabSystem = World.DefaultGameObjectInjectionWorld
-            .GetExistingSystemManaged<PrefabSystem>();
-        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
-
-        _buildingQuery = GetEntityQuery(new EntityQueryDesc
-        {
-            All =
-            [
-                ComponentType.ReadOnly<Building>()
-            ],
-            Any =
-            [
-                ComponentType.ReadOnly<Highlighted>(),
-                ComponentType.ReadOnly<Selected>()
-            ],
-            None =
-            [
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Temp>()
-            ]
-        });
-
-        RequireForUpdate(_buildingQuery);
     }
 }

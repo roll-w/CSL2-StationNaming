@@ -29,84 +29,85 @@ using Unity.Entities;
 using OutsideConnection = Game.Objects.OutsideConnection;
 using TransportStation = Game.Buildings.TransportStation;
 
-namespace StationNaming.System;
-
-public partial class TransportStationNamingSystem : GameSystemBase
+namespace StationNaming.System
 {
-    private EntityQuery _stationQuery;
-
-    private NameSystem _nameSystem;
-    private PrefabSystem _prefabSystem;
-    private StopNameHelper _stopNameHelper;
-
-    protected override void OnUpdate()
+    public partial class TransportStationNamingSystem : GameSystemBase
     {
-        var settings = Mod.GetInstance().GetSettings();
-        if (!settings.Enable)
+        private EntityQuery _stationQuery;
+
+        private NameSystem _nameSystem;
+        private PrefabSystem _prefabSystem;
+        private StopNameHelper _stopNameHelper;
+
+        protected override void OnUpdate()
         {
-            return;
-        }
-
-        var options = settings.ToNameOptions();
-        _stopNameHelper.ApplyTo(options);
-
-        var searchDepth = settings.SearchDepth;
-        try
-        {
-            var stations = _stationQuery.ToEntityArray(Allocator.Temp);
-
-            foreach (var entity in stations)
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
-                var candidates =
-                    _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
+                return;
+            }
+
+            var options = settings.ToNameOptions();
+            _stopNameHelper.ApplyTo(options);
+
+            var searchDepth = settings.SearchDepth;
+            try
+            {
+                var stations = _stationQuery.ToEntityArray(Allocator.Temp);
+
+                foreach (var entity in stations)
+                {
+                    var candidates =
+                        _stopNameHelper.SetCandidatesForBuilding(entity, searchDepth);
+                }
+            }
+            catch (Exception e)
+            {
+                Mod.GetLogger().Error(e);
             }
         }
-        catch (Exception e)
+
+        protected override void OnCreate()
         {
-            Mod.GetLogger().Error(e);
+            base.OnCreate();
+
+            _nameSystem = World.DefaultGameObjectInjectionWorld
+                .GetOrCreateSystemManaged<NameSystem>();
+            _prefabSystem = World.DefaultGameObjectInjectionWorld
+                .GetExistingSystemManaged<PrefabSystem>();
+            _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
+
+            _stationQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<TransportStation>(),
+                },
+                Any = new[]
+                {
+                    ComponentType.ReadOnly<Highlighted>(),
+                    ComponentType.ReadOnly<Selected>(),
+                    ComponentType.ReadOnly<Created>()
+                },
+                None = new[]
+                {
+                    ComponentType.ReadOnly<Deleted>(),
+                    ComponentType.ReadOnly<Temp>(),
+                    ComponentType.ReadOnly<OutsideConnection>()
+                }
+            });
+
+            RequireForUpdate(_stationQuery);
         }
-    }
 
-    protected override void OnCreate()
-    {
-        base.OnCreate();
-
-        _nameSystem = World.DefaultGameObjectInjectionWorld
-            .GetOrCreateSystemManaged<NameSystem>();
-        _prefabSystem = World.DefaultGameObjectInjectionWorld
-            .GetExistingSystemManaged<PrefabSystem>();
-        _stopNameHelper = new StopNameHelper(EntityManager, _nameSystem, _prefabSystem);
-
-        _stationQuery = GetEntityQuery(new EntityQueryDesc
+        public override int GetUpdateInterval(SystemUpdatePhase phase)
         {
-            All =
-            [
-                ComponentType.ReadOnly<TransportStation>(),
-            ],
-            Any =
-            [
-                ComponentType.ReadOnly<Highlighted>(),
-                ComponentType.ReadOnly<Selected>(),
-                ComponentType.ReadOnly<Created>()
-            ],
-            None =
-            [
-                ComponentType.ReadOnly<Deleted>(),
-                ComponentType.ReadOnly<Temp>(),
-                ComponentType.ReadOnly<OutsideConnection>()
-            ]
-        });
+            return 1;
+        }
 
-        RequireForUpdate(_stationQuery);
-    }
-
-    public override int GetUpdateInterval(SystemUpdatePhase phase)
-    {
-        return 1;
-    }
-
-    public override int GetUpdateOffset(SystemUpdatePhase phase)
-    {
-        return -1;
+        public override int GetUpdateOffset(SystemUpdatePhase phase)
+        {
+            return -1;
+        }
     }
 }
