@@ -157,6 +157,14 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFormat]")
                 .AddTranslation(LocaleCode.EnUs, "Road format."),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DefaultAutoNamingSource]")
+                .AddTranslation(LocaleCode.EnUs, "Default Auto Naming Source")
+                .AddTranslation(LocaleCode.ZhHans, "默认自动命名来源")
+                .AddTranslation(LocaleCode.ZhHant, "預設自動命名來源"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DefaultAutoNamingSource]")
+                .AddTranslation(LocaleCode.EnUs, "Preferred source used when picking the default name. If not found, the first candidate is used.")
+                .AddTranslation(LocaleCode.ZhHans, "选择默认命名时优先使用的来源。如不存在则使用候选列表的第一个结果。")
+                .AddTranslation(LocaleCode.ZhHant, "選擇預設命名時優先使用的來源。若不存在則使用候選列表的第一個結果。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoUpdate]")
                 .AddTranslation(LocaleCode.EnUs, "Auto Update Name")
                 .AddTranslation(LocaleCode.ZhHans, "自动更新站名")
@@ -460,7 +468,8 @@ namespace StationNaming.Setting
                     "When enabled, allow generate name candidates from surrounding deathcare facilities. ")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，允许从殡仪设施中生成名称候选。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從殯儀設施中生成名稱候選。"),
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomSource]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomSource]")
                 .AddTranslation(LocaleCode.EnUs, "Telecom Facility Source")
                 .AddTranslation(LocaleCode.ZhHans, "电信设施来源")
                 .AddTranslation(LocaleCode.ZhHant, "電信設施來源"),

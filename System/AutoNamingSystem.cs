@@ -21,6 +21,7 @@
 using Game;
 using Game.Common;
 using Game.UI;
+using Game.Routes;
 using StationNaming.System.Utils;
 using Unity.Collections;
 using Unity.Entities;
@@ -34,20 +35,28 @@ namespace StationNaming.System
 
         protected override void OnUpdate()
         {
-            if (!Mod.GetInstance().GetSettings().Enable)
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
                 return;
             }
 
-            if (!Mod.GetInstance().GetSettings().AutoNaming)
+            if (!settings.AutoNaming)
             {
                 return;
             }
+
+            var defaultSource = settings.GetDefaultAutoNamingSource();
 
             var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
             foreach (var entity in entities)
             {
+                // Only apply preferred source to transport stops; others use default order
+                var preferredSource = EntityManager.HasComponent<TransportStop>(entity)
+                    ? defaultSource
+                    : NameSource.None;
+
                 if (!EntityManager.HasBuffer<NameCandidate>(entity))
                 {
                     continue;
@@ -55,7 +64,7 @@ namespace StationNaming.System
 
                 var candidates = EntityManager
                     .GetBuffer<NameCandidate>(entity);
-                var candidate = ChooseCandidate(candidates);
+                var candidate = ChooseCandidate(candidates, preferredSource);
 
                 _nameSystem.SetCustomName(entity, candidate.Name.ToString());
 
@@ -94,8 +103,23 @@ namespace StationNaming.System
             }
         }
 
-        private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates)
+        private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates, NameSource defaultSource)
         {
+            if (defaultSource != NameSource.None)
+            {
+                foreach (var candidate in candidates)
+                {
+                    var refers = candidate.Refers;
+                    for (var i = 0; i < refers.Length; i++)
+                    {
+                        if (refers[i].Source == defaultSource)
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
             return candidates[0];
         }
 
