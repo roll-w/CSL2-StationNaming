@@ -33,7 +33,7 @@ namespace StationNaming.Setting
         SectionGeneral, SectionSources, SectionTargets
     )]
     [SettingsUIShowGroupName(
-        GroupStable, GroupStops, GroupExperimental, GroupBuilding,
+        GroupStops, GroupExperimental, GroupBuilding,
         GroupSpawnable, GroupDistrict, GroupRoad, GroupTransport,
         GroupSchool, GroupFireStation, GroupPoliceStation,
         GroupHospital, GroupPark, GroupElectricity,
@@ -138,39 +138,13 @@ namespace StationNaming.Setting
         [SettingsUITextInput]
         public string Suffix { get; set; } = "";
 
-        private NameSource _defaultAutoNamingSource = NameSource.None;
-
-        private static bool IsAllowedDefaultSource(NameSource source) =>
-            source == NameSource.None
-            || source == NameSource.Owner
-            || source == NameSource.Road
-            || source == NameSource.Intersection
-            || source == NameSource.District;
-
-        public bool IsStopDefaultSourceDisabled() => !AutoNaming || !TransportStopAutoNaming;
-
-        [SettingsUISection(SectionTargets, GroupTransport)]
-        [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsStopDefaultSourceDisabled))]
-        [SettingsUIDropdown(typeof(DefaultAutoNamingSourceProvider), nameof(DefaultAutoNamingSourceProvider.GetOptions))]
-        public int DefaultAutoNamingSource
-        {
-            get => (int)_defaultAutoNamingSource;
-            set
-            {
-                var source = (NameSource)value;
-                _defaultAutoNamingSource = IsAllowedDefaultSource(source)
-                    ? source
-                    : NameSource.None;
-            }
-        }
-
-        public NameSource GetDefaultAutoNamingSource() => _defaultAutoNamingSource;
-
         [SettingsUISection(SectionGeneral, GroupStable)]
         public bool AutoUpdate { get; set; } = true;
 
         [SettingsUISection(SectionGeneral, GroupStable)]
         public bool AutoNaming { get; set; } = true;
+
+        public bool IsAutoNamingDisabled() => !AutoNaming;
 
         [SettingsUISection(SectionSources, GroupDistrict)]
         public bool EnableDistrict { get; set; } = true;
@@ -425,7 +399,69 @@ namespace StationNaming.Setting
         [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsBuildingNameDisabled))]
         public bool AdminSource { get; set; } = true;
 
-        public bool IsAutoNamingDisabled() => !AutoNaming;
+        private NameSource _stopNameSourcePriority1 = NameSource.Owner;
+        private NameSource _stopNameSourcePriority2 = NameSource.Intersection;
+        private NameSource _stopNameSourcePriority3 = NameSource.Road;
+
+        private static bool IsAllowedDefaultSource(NameSource source) =>
+            source == NameSource.None
+            || source == NameSource.Owner
+            || source == NameSource.Road
+            || source == NameSource.Intersection
+            || source == NameSource.District;
+
+        public bool IsStopDefaultSourceDisabled() => !AutoNaming || !TransportStopAutoNaming;
+
+        [SettingsUISection(SectionTargets, GroupTransport)]
+        [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsStopDefaultSourceDisabled))]
+        [SettingsUIDropdown(typeof(DefaultAutoNamingSourceProvider), nameof(DefaultAutoNamingSourceProvider.GetOptions))]
+        [SettingsUIAdvanced]
+        public int StopNameSourcePriority1
+        {
+            get => (int)_stopNameSourcePriority1;
+            set
+            {
+                var source = (NameSource)value;
+                _stopNameSourcePriority1 = IsAllowedDefaultSource(source) ? source : NameSource.None;
+            }
+        }
+
+        [SettingsUISection(SectionTargets, GroupTransport)]
+        [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsStopDefaultSourceDisabled))]
+        [SettingsUIDropdown(typeof(DefaultAutoNamingSourceProvider), nameof(DefaultAutoNamingSourceProvider.GetOptions))]
+        [SettingsUIAdvanced]
+        public int StopNameSourcePriority2
+        {
+            get => (int)_stopNameSourcePriority2;
+            set
+            {
+                var source = (NameSource)value;
+                _stopNameSourcePriority2 = IsAllowedDefaultSource(source) ? source : NameSource.None;
+            }
+        }
+
+        [SettingsUISection(SectionTargets, GroupTransport)]
+        [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsStopDefaultSourceDisabled))]
+        [SettingsUIDropdown(typeof(DefaultAutoNamingSourceProvider), nameof(DefaultAutoNamingSourceProvider.GetOptions))]
+        [SettingsUIAdvanced]
+        public int StopNameSourcePriority3
+        {
+            get => (int)_stopNameSourcePriority3;
+            set
+            {
+                var source = (NameSource)value;
+                _stopNameSourcePriority3 = IsAllowedDefaultSource(source) ? source : NameSource.None;
+            }
+        }
+
+        public NameSource[] GetStopNameSourcePriorities()
+        {
+            var list = new List<NameSource>();
+            if (_stopNameSourcePriority1 != NameSource.None) list.Add(_stopNameSourcePriority1);
+            if (_stopNameSourcePriority2 != NameSource.None) list.Add(_stopNameSourcePriority2);
+            if (_stopNameSourcePriority3 != NameSource.None) list.Add(_stopNameSourcePriority3);
+            return list.ToArray();
+        }
 
         [SettingsUISection(SectionTargets, GroupTransport)]
         [SettingsUIDisableByCondition(typeof(StationNamingSettings), nameof(IsAutoNamingDisabled))]
@@ -556,7 +592,6 @@ namespace StationNaming.Setting
             Suffix = "";
             AutoUpdate = true;
             AutoNaming = true;
-            DefaultAutoNamingSource = (int)NameSource.None;
 
             BuildingName = true;
             BuildingNameWithCurrentRoad = true;
@@ -623,6 +658,10 @@ namespace StationNaming.Setting
             ParkingAutoNaming = true;
             RoadFacilityAutoNaming = true;
             AdminAutoNaming = true;
+
+            StopNameSourcePriority1 = (int)NameSource.Owner;
+            StopNameSourcePriority2 = (int)NameSource.Intersection;
+            StopNameSourcePriority3 = (int)NameSource.Road;
         }
 
         public void SetSources(bool enable = false)
@@ -848,11 +887,11 @@ namespace StationNaming.Setting
             {
                 return new DropdownItem<int>[]
                 {
-                    new() { value = (int)NameSource.None, displayName = "None" },
-                    new() { value = (int)NameSource.Owner, displayName = "Owner" },
-                    new() { value = (int)NameSource.Road, displayName = "Road" },
-                    new() { value = (int)NameSource.Intersection, displayName = "Intersection" },
-                    new() { value = (int)NameSource.District, displayName = "District" },
+                    new() { value = (int)NameSource.None, displayName = "StationNaming.NameSource[None]" },
+                    new() { value = (int)NameSource.Owner, displayName = "StationNaming.NameSource[Owner]" },
+                    new() { value = (int)NameSource.Road, displayName = "StationNaming.NameSource[Road]" },
+                    new() { value = (int)NameSource.Intersection, displayName = "StationNaming.NameSource[Intersection]" },
+                    new() { value = (int)NameSource.District, displayName = "StationNaming.NameSource[District]" },
                 };
             }
         }

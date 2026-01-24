@@ -1039,6 +1039,32 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "None")
                 .AddTranslation(LocaleCode.ZhHans, "None")
                 .AddTranslation(LocaleCode.ZhHant, "None"),
+
+            // Stop name source priorities
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority1]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 1")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 1")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 1"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority1]")
+                .AddTranslation(LocaleCode.EnUs, "The first priority source for auto naming transport stops. If not found, try the next priority.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第一优先来源。如不存在则尝试下一优先级。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第一優先來源。若不存在則嘗試下一優先級。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority2]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 2")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 2")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 2"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority2]")
+                .AddTranslation(LocaleCode.EnUs, "The second priority source for auto naming transport stops. If not found, try the next priority.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第二优先来源。如不存在则尝试下一优先级。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第二優先來源。若不存在則嘗試下一優先級。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority3]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 3")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 3")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 3"),
+            new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority3]")
+                .AddTranslation(LocaleCode.EnUs, "The third priority source for auto naming transport stops. If none found, use the first candidate.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第三优先来源。如均不存在则使用候选列表的第一个。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第三優先來源。若均不存在則使用候選列表的第一個。"),
         };
 
         public static void LoadTranslations(StationNamingSettings settings)

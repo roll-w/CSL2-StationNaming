@@ -46,17 +46,12 @@ namespace StationNaming.System
                 return;
             }
 
-            var defaultSource = settings.GetDefaultAutoNamingSource();
+            var stopSourcePriorities = settings.GetStopNameSourcePriorities();
 
             var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
             foreach (var entity in entities)
             {
-                // Only apply preferred source to transport stops; others use default order
-                var preferredSource = EntityManager.HasComponent<TransportStop>(entity)
-                    ? defaultSource
-                    : NameSource.None;
-
                 if (!EntityManager.HasBuffer<NameCandidate>(entity))
                 {
                     continue;
@@ -64,7 +59,11 @@ namespace StationNaming.System
 
                 var candidates = EntityManager
                     .GetBuffer<NameCandidate>(entity);
-                var candidate = ChooseCandidate(candidates, preferredSource);
+
+                // Only apply priority sources to transport stops; others use default order
+                var candidate = EntityManager.HasComponent<TransportStop>(entity)
+                    ? ChooseCandidateByPriority(candidates, stopSourcePriorities)
+                    : candidates[0];
 
                 _nameSystem.SetCustomName(entity, candidate.Name.ToString());
 
@@ -101,6 +100,26 @@ namespace StationNaming.System
                     refer.Refer
                 ).Add(association);
             }
+        }
+
+        private static NameCandidate ChooseCandidateByPriority(DynamicBuffer<NameCandidate> candidates, NameSource[] priorities)
+        {
+            foreach (var priority in priorities)
+            {
+                foreach (var candidate in candidates)
+                {
+                    var refers = candidate.Refers;
+                    for (var i = 0; i < refers.Length; i++)
+                    {
+                        if (refers[i].Source == priority)
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return candidates[0];
         }
 
         private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates, NameSource defaultSource)
