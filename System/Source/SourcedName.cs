@@ -20,33 +20,22 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Collections.Generic;
-using Game.UI;
 using Unity.Entities;
 
 namespace StationNaming.System.Source
 {
-    public interface INameSourceProvider
+    public struct SourcedName
     {
-        /// <summary>
-        /// Resolve a display name from this name source.
-        /// Returns a human-readable name or null/empty when no name can be resolved.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="manager"></param>
-        /// <param name="nameSystem"></param>
-        /// <param name="contextEntity">Context entity for name resolution, e.g., the entity being named.</param>
-        /// <param name="nameSource"></param>
-        /// <returns>
-        /// A collection of sourced names resolved from the given name source.
-        /// </returns>
-        ICollection<SourcedName> GetName(World world, EntityManager manager, NameSystem nameSystem, Entity contextEntity, NameSource nameSource);
+        public string Name;
+        public Entity Source;
+        public NameSource NameSource;
 
-        /// <summary>
-        /// Check if this provider supports the given name source.
-        /// </summary>
-        /// <param name="nameSource"></param>
-        /// <returns></returns>
-        bool Supports(NameSource nameSource);
+
+        public SourcedName(string name, Entity source, NameSource nameSource)
+        {
+            Name = name;
+            Source = source;
+            NameSource = nameSource;
+        }
     }
 }

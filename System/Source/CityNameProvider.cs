@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Collections.Generic;
 using Game.City;
 using Game.UI;
 using Unity.Entities;
@@ -28,11 +29,15 @@ namespace StationNaming.System.Source
 {
     public class CityNameProvider : INameSourceProvider
     {
-        public string GetName(World world, EntityManager manager, NameSystem nameSystem)
+        public ICollection<SourcedName> GetName(World world, EntityManager manager, NameSystem nameSystem,
+            Entity contextEntity,
+            NameSource nameSource)
         {
             var cityConfigurationSystem = world.GetOrCreateSystemManaged<CityConfigurationSystem>();
             var cityName = cityConfigurationSystem.cityName;
-            return cityName;
+            // TODO: find the root entity of the city, or mounting an entity to city?
+            //   Needs find a way to trigger update when city changes.
+            return new[] { new SourcedName(cityName, Entity.Null, NameSource.City) };
         }
 
         public bool Supports(NameSource nameSource)

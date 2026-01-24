@@ -21,32 +21,21 @@
 // SOFTWARE.
 
 using System.Collections.Generic;
-using Game.UI;
-using Unity.Entities;
 
 namespace StationNaming.System.Source
 {
-    public interface INameSourceProvider
+    public static class NameProviderFactory
     {
-        /// <summary>
-        /// Resolve a display name from this name source.
-        /// Returns a human-readable name or null/empty when no name can be resolved.
-        /// </summary>
-        /// <param name="world"></param>
-        /// <param name="manager"></param>
-        /// <param name="nameSystem"></param>
-        /// <param name="contextEntity">Context entity for name resolution, e.g., the entity being named.</param>
-        /// <param name="nameSource"></param>
-        /// <returns>
-        /// A collection of sourced names resolved from the given name source.
-        /// </returns>
-        ICollection<SourcedName> GetName(World world, EntityManager manager, NameSystem nameSystem, Entity contextEntity, NameSource nameSource);
+        private static readonly Dictionary<NameSource, INameSourceProvider> Providers =
+            new()
+            {
+                { NameSource.District, new DistrictNameSourceProvider() },
+                { NameSource.City, new CityNameProvider() }
+            };
 
-        /// <summary>
-        /// Check if this provider supports the given name source.
-        /// </summary>
-        /// <param name="nameSource"></param>
-        /// <returns></returns>
-        bool Supports(NameSource nameSource);
+        public static INameSourceProvider GetNameSourceProvider(NameSource nameSource)
+        {
+            return Providers[nameSource];
+        }
     }
 }
