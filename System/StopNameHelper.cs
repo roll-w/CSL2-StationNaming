@@ -34,7 +34,7 @@ namespace StationNaming.System
 {
     public class StopNameHelper
     {
-        private NameOptions NameOptions { get; set; } = new NameOptions();
+        private NameOptions NameOptions { get; set; } = new();
 
         private readonly NameFormatter _nameFormatter;
         private readonly NameSystem _nameSystem;
@@ -128,13 +128,16 @@ namespace StationNaming.System
 
         public static Entity RetrieveOwner(EntityManager entityManager, Entity entity)
         {
-            if (!entityManager.HasComponent<Owner>(entity))
+            while (true)
             {
-                return entity;
-            }
+                if (!entityManager.HasComponent<Owner>(entity))
+                {
+                    return entity;
+                }
 
-            var owner = entityManager.GetComponentData<Owner>(entity);
-            return RetrieveOwner(entityManager, owner.m_Owner);
+                var owner = entityManager.GetComponentData<Owner>(entity);
+                entity = owner.m_Owner;
+            }
         }
 
         private IEnumerable<NameCandidate> AddCandidatesIfRoadStop(Entity stop,
@@ -148,8 +151,7 @@ namespace StationNaming.System
         {
             HashSet<NameCandidate> nameCandidates = new HashSet<NameCandidate>();
 
-            var collectEdges = EdgeUtils.CollectEdges(
-                _entityManager, edge, depth);
+            var collectEdges = EdgeUtils.CollectIntersections(edge, _entityManager, depth);
 
             var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
             var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);
@@ -197,7 +199,7 @@ namespace StationNaming.System
 
             foreach (var roadEdge in roadEdges)
             {
-                List<NameSourceRefer> refers = new List<NameSourceRefer> { new NameSourceRefer(root, NameSource.Road) };
+                var refers = new List<NameSourceRefer> { new(root, NameSource.Road) };
                 var node = roadEdge.Edge;
 
                 var connectedEdges = _entityManager.GetBuffer<ConnectedEdge>(node);
@@ -344,10 +346,10 @@ namespace StationNaming.System
                 currentRoad.Edge, _entityManager
             );
 
-            List<NameSourceRefer> refers = new List<NameSourceRefer>
+            var refers = new List<NameSourceRefer>
             {
-                new NameSourceRefer(roadEdgeRoot, NameSource.Road),
-                new NameSourceRefer(building, source)
+                new(roadEdgeRoot, NameSource.Road),
+                new(building, source)
             };
 
             candidates.Add(NameCandidate.Of(
@@ -398,7 +400,7 @@ namespace StationNaming.System
                 return new List<NameCandidate> { GenerateNameCandidate(candidate, target) };
             }
 
-            List<NameCandidate> res = new List<NameCandidate>();
+            var res = new List<NameCandidate>();
             if (NameOptions.SeparateDistrictPrefix)
             {
                 res.Add(GenerateNameCandidate(candidate, target));
@@ -407,7 +409,7 @@ namespace StationNaming.System
             var districtRefer = new NameSourceRefer(districtEntity, NameSource.District);
             var refers = candidate.Refers;
 
-            List<NameSourceRefer> newRefers = new List<NameSourceRefer> { districtRefer };
+            var newRefers = new List<NameSourceRefer> { districtRefer };
             foreach (var r in refers)
             {
                 newRefers.Add(r);
@@ -436,7 +438,7 @@ namespace StationNaming.System
             }
 
             var districtRefer = new NameSourceRefer(districtEntity, NameSource.District);
-            List<NameSourceRefer> refers = new List<NameSourceRefer> { districtRefer };
+            var refers = new List<NameSourceRefer> { districtRefer };
             var name = _nameFormatter.FormatRefers(refers, target);
 
             candidate = NameCandidate.Of(
@@ -477,7 +479,7 @@ namespace StationNaming.System
             return candidates.OrderBy(candidate =>
                 candidate.Refers.Length == 0
                     ? NameSource.None
-                    : candidate.Refers[candidate.Refers.Length - 1].Source
+                    : candidate.Refers[^1].Source
             );
         }
 

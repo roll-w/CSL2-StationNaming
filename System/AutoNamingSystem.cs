@@ -68,8 +68,27 @@ namespace StationNaming.System
                 EntityManager.AddComponentData(entity, entityNaming);
                 AddAssociations(association, candidate.Refers);
 
-                candidates.Clear();
+                ReleaseCandidates(candidates, candidate);
             }
+        }
+
+
+        private static void ReleaseCandidates(
+            DynamicBuffer<NameCandidate> candidates,
+            NameCandidate chosen
+        )
+        {
+            for (var i = 0; i < candidates.Length; i++)
+            {
+                var candidate = candidates[i];
+                if (candidate.Equals(chosen))
+                {
+                    continue;
+                }
+                NameCandidate.Release(ref candidate);
+            }
+
+            candidates.Clear();
         }
 
         private void AddAssociations(

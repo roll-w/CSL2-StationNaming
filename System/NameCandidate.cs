@@ -32,7 +32,7 @@ namespace StationNaming.System
     public struct NameCandidate : IBufferElementData,
         ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable
     {
-        public FixedString512Bytes Name;
+        public FixedString512Bytes Name;// TODO: change to BlobAssetReference<NameBlob> for better memory usage
         public NativeList<NameSourceRefer> Refers;
         public Direction Direction;
         public EdgeType EdgeType;
@@ -336,6 +336,14 @@ namespace StationNaming.System
             return new NameCandidate(
                 name, refers, direction, edgeType
             );
+        }
+
+        public static void Release(ref NameCandidate candidate)
+        {
+            if (candidate.Refers.IsCreated)
+            {
+                candidate.Refers.Dispose();
+            }
         }
     }
 
