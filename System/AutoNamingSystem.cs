@@ -34,12 +34,13 @@ namespace StationNaming.System
 
         protected override void OnUpdate()
         {
-            if (!Mod.GetInstance().GetSettings().Enable)
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
                 return;
             }
 
-            if (!Mod.GetInstance().GetSettings().AutoNaming)
+            if (!settings.AutoNaming)
             {
                 return;
             }
@@ -53,8 +54,7 @@ namespace StationNaming.System
                     continue;
                 }
 
-                var candidates = EntityManager
-                    .GetBuffer<NameCandidate>(entity);
+                var candidates = EntityManager.GetBuffer<NameCandidate>(entity);
                 var candidate = ChooseCandidate(candidates);
 
                 _nameSystem.SetCustomName(entity, candidate.Name.ToString());

@@ -83,7 +83,7 @@ namespace StationNaming.System
             return CheckSetting(nameSource);
         }
 
-        private bool CheckSetting(NameSource nameSource)
+        private static bool CheckSetting(NameSource nameSource)
         {
             var settings = Mod.GetInstance().GetSettings();
             return nameSource switch

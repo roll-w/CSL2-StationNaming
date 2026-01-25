@@ -26,6 +26,7 @@ using Game.Modding;
 using Game.SceneFlow;
 using StationNaming.Setting;
 using StationNaming.System;
+using StationNaming.System.Search;
 
 namespace StationNaming
 {
@@ -68,6 +69,7 @@ namespace StationNaming
             updateSystem.UpdateAt<TransportStopNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAt<GeneralBuildingNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateBefore<AutoUpdateNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateBefore<SearchRadiusEntitiesSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAfter<AutoNamingSystem>(SystemUpdatePhase.UIUpdate);
         }
 

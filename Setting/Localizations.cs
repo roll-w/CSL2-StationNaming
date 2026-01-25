@@ -25,8 +25,7 @@ namespace StationNaming.Setting
 {
     public static class Localizations
     {
-        private static readonly Translation[] Translations = new Translation[]
-        {
+        private static readonly Translation[] Translations = {
             new Translation("Options.SECTION[StationNaming.StationNaming.Mod]")
                 .AddTranslation(LocaleCode.EnUs, "Station Naming")
                 .AddTranslation(LocaleCode.ZhHans, "站点命名")
@@ -55,6 +54,19 @@ namespace StationNaming.Setting
                     "搜索名称候选的最大深度，影响附近建筑名称来源生成。搜索深度根据道路节点确定，在节点过于密集的道路上实际的搜索范围会变小。不建议设置过大，以免影响游戏性能。")
                 .AddTranslation(LocaleCode.ZhHant,
                     "搜索名稱候選的最大深度，影響附近建築名稱來源生成。搜索深度根據道路節點確定，在節點過於密集的道路上實際的搜索範圍會變小。不建議設置過大，以免影響遊戲性能。"),
+            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SearchRadius]")
+                .AddTranslation(LocaleCode.EnUs, "Search Radius")
+                .AddTranslation(LocaleCode.ZhHans, "搜索半径")
+                .AddTranslation(LocaleCode.ZhHant, "搜索半徑"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.SearchRadius]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The radius to search for name candidates, affecting the generation of name sources for nearby buildings. " +
+                    "It is recommended to set a moderate value to balance performance and naming effect.")
+                .AddTranslation(LocaleCode.ZhHans,
+                    "搜索名称候选的半径，影响附近建筑名称来源生成。建议设置为适中的数值，以平衡性能和命名效果。")
+                .AddTranslation(LocaleCode.ZhHant,
+                    "搜索名稱候選的半徑，影響附近建築名稱來源生成。建議設置為適中的數值，以平衡性能和命名效果。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ReverseRoadOrder]")
                 .AddTranslation(LocaleCode.EnUs, "Reverse Name Order")
                 .AddTranslation(LocaleCode.ZhHans, "反转名称顺序")

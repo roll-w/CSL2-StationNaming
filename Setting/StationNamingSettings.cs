@@ -131,6 +131,10 @@ namespace StationNaming.Setting
         public int SearchDepth { get; set; } = 2;
 
         [SettingsUISection(SectionGeneral, GroupStable)]
+        [SettingsUISlider(max = 400, min = 40, step = 1)]
+        public float SearchRadius { get; set; } = 120f;
+
+        [SettingsUISection(SectionGeneral, GroupStable)]
         [SettingsUITextInput]
         public string Prefix { get; set; } = "";
 
