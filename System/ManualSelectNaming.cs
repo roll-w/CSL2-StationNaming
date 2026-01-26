@@ -24,8 +24,8 @@ using Unity.Entities;
 
 namespace StationNaming.System
 {
-    public struct ManualSelectNaming : IComponentData, ISerializable,
-        IEquatable<ManualSelectNaming>
+    public struct ManualSelectNaming : ICleanupComponentData, ISerializable,
+        IEquatable<ManualSelectNaming>, ISelfReleasable
     {
         public NameCandidate SelectedName;
 
@@ -62,6 +62,11 @@ namespace StationNaming.System
         public override string ToString()
         {
             return $"{nameof(SelectedName)}: {SelectedName}";
+        }
+
+        public void Release()
+        {
+            SelectedName.Release();
         }
     }
 }

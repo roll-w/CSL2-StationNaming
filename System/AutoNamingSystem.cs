@@ -62,33 +62,15 @@ namespace StationNaming.System
                 EntityManager.RemoveComponent<ToAutoNaming>(entity);
                 EntityManager.RemoveComponent<Selected>(entity);
 
-                var entityNaming = new ManualSelectNaming(candidate);
+                var entityNaming = new ManualSelectNaming(candidate.DeepCopy());
                 var association = new NamingAssociation(entity);
 
                 EntityManager.AddComponentData(entity, entityNaming);
+                SystemUtils.AddComponent<ManualSelectNamingTag>(EntityManager, entity);
                 AddAssociations(association, candidate.Refers);
 
-                ReleaseCandidates(candidates, candidate);
+                EntityManager.RemoveComponent<NameCandidateTag>(entity);
             }
-        }
-
-
-        private static void ReleaseCandidates(
-            DynamicBuffer<NameCandidate> candidates,
-            NameCandidate chosen
-        )
-        {
-            for (var i = 0; i < candidates.Length; i++)
-            {
-                var candidate = candidates[i];
-                if (candidate.Equals(chosen))
-                {
-                    continue;
-                }
-                NameCandidate.Release(ref candidate);
-            }
-
-            candidates.Clear();
         }
 
         private void AddAssociations(

@@ -28,6 +28,7 @@ using Game.Objects;
 using Game.Prefabs;
 using Game.UI;
 using StationNaming.Setting;
+using StationNaming.System.Utils;
 using Unity.Entities;
 
 namespace StationNaming.System
@@ -149,7 +150,7 @@ namespace StationNaming.System
         private IEnumerable<NameCandidate> SetCandidatesIfRoad(
             Entity target, Entity edge, int depth, bool includeSelf = false)
         {
-            HashSet<NameCandidate> nameCandidates = new HashSet<NameCandidate>();
+            var nameCandidates = new HashSet<NameCandidate>();
 
             var collectEdges = EdgeUtils.CollectIntersections(edge, _entityManager, depth);
 
@@ -174,7 +175,7 @@ namespace StationNaming.System
 
             if (NameOptions.BuildingName)
             {
-                HashSet<Entity> visitedBuildings = new HashSet<Entity>();
+                var visitedBuildings = new HashSet<Entity>();
                 foreach (var roadEdge in roadEdges)
                 {
                     CollectBuildingNames(
@@ -363,8 +364,11 @@ namespace StationNaming.System
             Entity target
         )
         {
-            var nameCandidates = _entityManager.AddBuffer<NameCandidate>(target);
-            nameCandidates.Clear();
+            SystemUtils.AddComponent<NameCandidateTag>(_entityManager, target);
+            var nameCandidates = SystemUtils.SafeAddBuffer<NameCandidate>(
+                _entityManager,
+                target
+            );
             foreach (var nameCandidate in SortBySource(candidates))
             {
                 var postProcessed = PostProcessNameCandidate(nameCandidate, target);

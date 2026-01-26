@@ -28,11 +28,16 @@ using Unity.Entities;
 
 namespace StationNaming.System
 {
-    [InternalBufferCapacity(0)]
-    public struct NameCandidate : IBufferElementData,
-        ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable
+    public struct NameBlob
     {
-        public FixedString512Bytes Name;// TODO: change to BlobAssetReference<NameBlob> for better memory usage
+        public BlobString Value;
+    }
+
+    [InternalBufferCapacity(0)]
+    public struct NameCandidate : ICleanupBufferElementData,
+        ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable, ISelfReleasable
+    {
+        public FixedString512Bytes Name; // TODO: change to BlobAssetReference<NameBlob> for better memory usage
         public NativeList<NameSourceRefer> Refers;
         public Direction Direction;
         public EdgeType EdgeType;
@@ -83,7 +88,7 @@ namespace StationNaming.System
 
         public List<NameSourceRefer> RefersToList()
         {
-            List<NameSourceRefer> refers = new List<NameSourceRefer>();
+            var refers = new List<NameSourceRefer>();
             foreach (var refer in Refers)
             {
                 refers.Add(refer);
@@ -150,6 +155,14 @@ namespace StationNaming.System
             return $"Candidate['{Name}'({Refers}-{Direction})]";
         }
 
+        public void Release()
+        {
+            if (Refers.IsCreated)
+            {
+                Refers.Dispose();
+            }
+        }
+
         public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
         {
             writer.Write(SerialVersion.Version3.ToFormatString());
@@ -181,6 +194,8 @@ namespace StationNaming.System
                 {
                     Refers.Add(refer);
                 }
+
+                refers.Dispose();
 
                 reader.Read(out uint direction);
                 Direction = (Direction)direction;
@@ -338,12 +353,20 @@ namespace StationNaming.System
             );
         }
 
-        public static void Release(ref NameCandidate candidate)
+        public NameCandidate DeepCopy()
         {
-            if (candidate.Refers.IsCreated)
+            var refers = new NativeList<NameSourceRefer>(
+                Refers.Length,
+                Allocator.Persistent
+            );
+            foreach (var refer in Refers)
             {
-                candidate.Refers.Dispose();
+                refers.Add(refer);
             }
+
+            return new NameCandidate(
+                Name.ToString(), refers, Direction, EdgeType
+            );
         }
     }
 
