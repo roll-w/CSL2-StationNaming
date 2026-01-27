@@ -20,6 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Game;
 using StationNaming.System.Utils;
 using Unity.Collections;
 using Unity.Entities;
@@ -29,15 +30,15 @@ namespace StationNaming.System.Cleanup
     /// <summary>
     /// System to clean up unused buffers and components.
     /// </summary>
-    public partial class CleanupSystem : SystemBase
+    public partial class CleanupSystem : GameSystemBase
     {
         private EntityQuery _selectedQuery;
         private EntityQuery _nameCandidatesQuery;
         private EntityQuery _manualSelectNamingQuery;
 
-
         protected override void OnUpdate()
         {
+            Mod.GetLogger().Info("CleanupSystem started.");
             var selectedEntities = _selectedQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in selectedEntities)
             {
@@ -47,12 +48,16 @@ namespace StationNaming.System.Cleanup
             var nameCandidateEntities = _nameCandidatesQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in nameCandidateEntities)
             {
+                Mod.GetLogger().Info($"Entity {entity} has NameCandidate buffer but no NameCandidateTag. Cleaning up.");
                 SystemUtils.TryCleanRemoveBuffer<NameCandidate>(EntityManager, entity);
             }
 
             var manualSelectNamingEntities = _manualSelectNamingQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in manualSelectNamingEntities)
             {
+                Mod.GetLogger()
+                    .Info(
+                        $"Entity {entity} has ManualSelectNaming component but no ManualSelectNamingTag. Cleaning up.");
                 SystemUtils.TryCleanRemoveComponent<ManualSelectNaming>(EntityManager, entity);
             }
         }
@@ -79,7 +84,7 @@ namespace StationNaming.System.Cleanup
             {
                 All = new[]
                 {
-                    ComponentType.ReadOnly<NameCandidate>(),
+                    ComponentType.ReadOnly<NameCandidate>()
                 },
                 None = new[]
                 {
@@ -91,7 +96,7 @@ namespace StationNaming.System.Cleanup
             {
                 All = new[]
                 {
-                    ComponentType.ReadOnly<ManualSelectNaming>(),
+                    ComponentType.ReadOnly<ManualSelectNaming>()
                 },
                 None = new[]
                 {
@@ -99,7 +104,7 @@ namespace StationNaming.System.Cleanup
                 }
             });
 
-            RequireForUpdate(_manualSelectNamingQuery);
+            RequireForUpdate(_selectedQuery);
             RequireForUpdate(_nameCandidatesQuery);
             RequireForUpdate(_manualSelectNamingQuery);
         }

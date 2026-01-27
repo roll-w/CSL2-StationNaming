@@ -53,6 +53,7 @@ namespace StationNaming.System.Utils
 
             var buffer = entityManager.GetBuffer<T>(entity);
             buffer.Clear();
+            entityManager.RemoveComponent<T>(entity);
         }
 
         public static void TryCleanRemoveBuffer<T>(
@@ -72,6 +73,7 @@ namespace StationNaming.System.Utils
             }
 
             buffer.Clear();
+            entityManager.RemoveComponent<T>(entity);
         }
 
         public static void TryCleanRemoveComponent<T>(EntityManager entityManager, Entity entity)
