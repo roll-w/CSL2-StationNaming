@@ -4,12 +4,12 @@ import {Icon, PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui
 import {call, trigger, useValue} from "cs2/api";
 import {Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
+import {useLocalization} from "cs2/l10n";
 import NameCandidate = StationNaming.NameCandidate;
 import SerializedNameCandidate = StationNaming.SerializedNameCandidate;
 import ModName = StationNaming.ModName;
 import nameSourceToString = StationNaming.nameSourceToString;
 import toNameCandidate = StationNaming.toNameCandidate;
-import {useLocalization} from "cs2/l10n";
 import getTranslationKeyOf = StationNaming.getTranslationKeyOf;
 import combineNameSource = StationNaming.combineNameSource;
 import NameSource = StationNaming.NameSource;
@@ -34,6 +34,17 @@ const getNameCandidates = async (selectedEntity: Entity): Promise<any> => {
         selectedEntity) as unknown as Promise<SerializedNameCandidate[]>
 }
 
+const getManualSelected = async (selectedEntity: Entity): Promise<any> => {
+    return await call(
+        ModName,
+        "getManualSelected",
+        selectedEntity) as unknown as Promise<SerializedNameCandidate>
+}
+
+const buttonClass = "button_UgX item-mouse-states_Fmi item-focused_FuT"
+const okIcon = "Media/Game/Icons/DemandFactorPositive.svg"
+const removeIcon = "Media/Game/Misc/DemandFactorNegative.svg"
+
 const CandidatesFoldout = (props: {
     name: string | null,
     selectedEntity: Entity,
@@ -41,8 +52,6 @@ const CandidatesFoldout = (props: {
     initialExpanded?: boolean | undefined
 }) => {
     const {translate} = useLocalization();
-
-    const buttonClass = "button_UgX item-mouse-states_Fmi item-focused_FuT"
 
     return (
         <PanelFoldout initialExpanded={props.initialExpanded || false} header={
@@ -64,7 +73,7 @@ const CandidatesFoldout = (props: {
                             </button>
                             <button className={buttonClass}
                                     onClick={() => setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)}>
-                                ✓
+                                <Icon src={okIcon}/>
                             </button>
                         </div>
                     }
@@ -88,6 +97,8 @@ const CandidatesComponent = () => {
     const [spawnableCandidates, setSpawnableCandidates] =
         useState<SerializedNameCandidate[]>([])
 
+    const [manualSelected, setManualSelected] = useState<SerializedNameCandidate | null>(null)
+
     useEffect(() => {
         async function fetchCandidates() {
             if (!showCandidates) {
@@ -96,10 +107,42 @@ const CandidatesComponent = () => {
 
             const candidates = await getNameCandidates(selectedEntity)
             setNameCandidates(candidates)
+            const manual = await getManualSelected(selectedEntity)
+            // normalize empty result
+            if (manual && manual.Name) {
+                setManualSelected(manual)
+            } else {
+                setManualSelected(null)
+            }
         }
 
         fetchCandidates();
     }, [selectedEntity])
+
+    // separate block for current manual selection UI
+    const ManualSelectedBlock = () => {
+        if (!manualSelected) return <></>
+
+        const source = nameSourceToString(combineNameSource(manualSelected))
+
+        return (
+            <PanelSectionRow
+                left={manualSelected.Name + " [" + translate(getTranslationKeyOf(source, "NameSource")) + "]"}
+                right={
+                    <div className={"row_aZw"}>
+                        <button className={buttonClass}
+                                onClick={() => navigateToCandidate(StationNaming.toNameCandidate(manualSelected))}>
+                            <Icon src={"Media/Game/Icons/MapMarker.svg"}/>
+                        </button>
+                        <button className={buttonClass}
+                                onClick={() => trigger(ModName, "removeManualSelected", selectedEntity)}>
+                            <Icon src={removeIcon}/>
+                        </button>
+                    </div>
+                }
+            />
+        )
+    }
 
     useEffect(() => {
         const generalCandidates = nameCandidates.filter(
@@ -130,6 +173,7 @@ const CandidatesComponent = () => {
                 }</div>
             </Tooltip>
         }>
+            <ManualSelectedBlock/>
             <PanelSectionRow
                 left={translate(
                     getTranslationKeyOf("NameCandidates"),
@@ -140,6 +184,8 @@ const CandidatesComponent = () => {
                     (generalCandidates || []).length
                 }
             />
+
+            {/* show current manual selection separately */}
 
             <CandidatesFoldout
                 name={translate(getTranslationKeyOf("Candidates"))}
