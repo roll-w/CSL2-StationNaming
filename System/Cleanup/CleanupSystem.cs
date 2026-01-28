@@ -38,7 +38,6 @@ namespace StationNaming.System.Cleanup
 
         protected override void OnUpdate()
         {
-            Mod.GetLogger().Info("CleanupSystem started.");
             var selectedEntities = _selectedQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in selectedEntities)
             {
@@ -48,16 +47,12 @@ namespace StationNaming.System.Cleanup
             var nameCandidateEntities = _nameCandidatesQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in nameCandidateEntities)
             {
-                Mod.GetLogger().Info($"Entity {entity} has NameCandidate buffer but no NameCandidateTag. Cleaning up.");
                 SystemUtils.TryCleanRemoveBuffer<NameCandidate>(EntityManager, entity);
             }
 
             var manualSelectNamingEntities = _manualSelectNamingQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in manualSelectNamingEntities)
             {
-                Mod.GetLogger()
-                    .Info(
-                        $"Entity {entity} has ManualSelectNaming component but no ManualSelectNamingTag. Cleaning up.");
                 SystemUtils.TryCleanRemoveComponent<ManualSelectNaming>(EntityManager, entity);
             }
         }
@@ -104,9 +99,7 @@ namespace StationNaming.System.Cleanup
                 }
             });
 
-            RequireForUpdate(_selectedQuery);
-            RequireForUpdate(_nameCandidatesQuery);
-            RequireForUpdate(_manualSelectNamingQuery);
+            RequireAnyForUpdate(_selectedQuery, _nameCandidatesQuery, _manualSelectNamingQuery);
         }
     }
 }
