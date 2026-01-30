@@ -1,7 +1,7 @@
 declare module "cs2/bindings" {
-  import { ChartDataset } from 'chart.js';
-  
-  export interface ServiceBudget {
+	import {ChartDataset} from 'chart.js';
+
+	export interface ServiceBudget {
   	id: string;
   	value: number;
   }
@@ -122,7 +122,12 @@ declare module "cs2/bindings" {
   	PingPong = 4,
   	ClampForever = 8
   }
-  export interface IKeyframe {
+
+	export interface IKeyframeMetadata {
+		deviationBase?: number;
+	}
+
+	export interface IKeyframe extends IKeyframeMetadata {
   	time: number;
   	value: number;
   	inTangent: number;
@@ -132,21 +137,33 @@ declare module "cs2/bindings" {
   	weightedMode: WeightedMode;
   	readonly?: boolean;
   }
-  export interface AnimationCurve {
+
+	export interface AnimationCurveMetadata<T = string> {
+		id?: string;
+		color?: string;
+		handleColor?: string;
+		hidePath?: boolean;
+		deviationFrom?: T;
+		min?: T;
+		max?: T;
+		hidden?: boolean;
+		readonly?: boolean;
+		legend?: string;
+		hideTooltip?: boolean;
+		showCursor?: boolean;
+		lockAxis?: "x" | "y";
+	}
+
+	export interface AnimationCurve extends AnimationCurveMetadata {
   	keys: IKeyframe[];
   	preWrapMode: WrapMode;
   	postWrapMode: WrapMode;
-  	label?: string;
-  	color?: string;
-  	hidePath?: boolean;
-  	deviationFrom?: number;
-  	readonly?: boolean;
   }
   const group = "cinematicCamera";
   export interface CinematicCameraCurveModifier {
   	id: string;
   	index: number;
-  	curve: AnimationCurve;
+	  curve: AnimationCurve | null;
   	min: number;
   	max: number;
   	groupIndex?: number;
@@ -193,7 +210,11 @@ declare module "cs2/bindings" {
   const modifierAnimationCurveData$: ValueBinding<CinematicCameraCurveModifier[]>;
   const useCinematicCameraBindings: (label: string, activeIndex: number) => {
   	onAddKeyframe: (time: number, value: number, curveIndex?: number | undefined) => Promise<number>;
-  	onMoveKeyframe: (index: number, keyframe: IKeyframe, smooth?: boolean, curveIndex?: number | undefined) => Promise<number>;
+	  onMoveKeyframe: (index: number, keyframe: IKeyframe, meta: {
+		  smooth?: boolean;
+		  curveIndex?: number;
+		  prevKeyframe: IKeyframe;
+	  }) => Promise<number>;
   	onRemoveKeyframe: (_index: number, _curveIndex?: number | undefined) => void;
   	onSetKeyframes: (_keyframes: IKeyframe[], _curveIndex?: number | undefined) => never;
   };
@@ -215,7 +236,8 @@ declare module "cs2/bindings" {
   	factor: string;
   	weight: number;
   }
-  const seasonNameId$: ValueBinding<string | null>;
+
+	const seasonName$: ValueBinding<string | null>;
   const weather$: ValueBinding<WeatherType>;
   const temperature$: ValueBinding<number>;
   export interface Season {
@@ -275,423 +297,6 @@ declare module "cs2/bindings" {
   	amount: number;
   	dailyInterestRate: number;
   	dailyPayment: number;
-  }
-  const maxProgress$: ValueBinding<number>;
-  const resourceCategories$: ValueBinding<ResourceCategory[]>;
-  const resourceDetails$: MapBinding<Entity, ResourceDetails>;
-  const resources$: MapBinding<Entity, Resource>;
-  const services$: MapBinding<Entity, Service>;
-  const resourceData$: MapBinding<Entity, ResourceData>;
-  export interface ResourceCategory {
-  	entity: Entity;
-  	name: string;
-  	resources: Resource[];
-  }
-  export interface Resource {
-  	entity: Entity;
-  	name: string;
-  	icon: string;
-  	tradable: boolean;
-  	producer: ProductionLink;
-  	consumers: ProductionLink[];
-  }
-  export interface ProductionLink {
-  	name: string;
-  	icon: string;
-  }
-  export interface ResourceDetails {
-  	inputs: Entity[][];
-  	outputs: Entity[];
-  	serviceOutputs: Entity[];
-  }
-  export interface ResourceData {
-  	production: number;
-  	surplus: number;
-  	deficit: number;
-  }
-  export interface Service {
-  	entity: Entity;
-  	name: string;
-  	icon: string;
-  }
-  interface Service$1 {
-  	entity: Entity;
-  	name: string;
-  	icon: string;
-  	locked: boolean;
-  	budget: number;
-  }
-  export interface ServiceDetails {
-  	entity: Entity;
-  	name: string;
-  	icon: string;
-  	locked: boolean;
-  	budgetAdjustable: boolean;
-  	budgetPercentage: number;
-  	efficiency: number;
-  	upkeep: number;
-  	fees: ServiceFee$1[];
-  }
-  interface ServiceFee$1 {
-  	resource: number;
-  	name: string;
-  	fee: number;
-  	min: number;
-  	max: number;
-  	adjustable: boolean;
-  	importable: boolean;
-  	exportable: boolean;
-  	incomeInternal: number;
-  	incomeExports: number;
-  	expenseImports: number;
-  	consumptionMultiplier: number;
-  	efficiencyMultiplier: number;
-  	happinessEffect: number;
-  }
-  const services$$1: ValueBinding<Service$1[]>;
-  const serviceDetails$: MapBinding<Entity, ServiceDetails | null>;
-  function setServiceBudget(service: Entity, percentage: number): void;
-  function setServiceFee(resource: number, amount: number): void;
-  function resetService(service: Entity): void;
-  export interface EventInfo {
-  	id: string;
-  	icon: string;
-  	date: number;
-  	data: EventData[] | null;
-  	effects: EventData[] | null;
-  }
-  export interface EventData {
-  	type: string;
-  	value: number;
-  }
-  const eventMap$: MapBinding<Entity, EventInfo>;
-  const events$: ValueBinding<Entity[]>;
-  function onOpenJournal(): void;
-  function onCloseJournal(): void;
-  export enum GameScreen {
-  	main = 0,
-  	freeCamera = 1,
-  	pauseMenu = 10,
-  	saveGame = 11,
-  	newGame = 12,
-  	loadGame = 13,
-  	options = 14
-  }
-  const activeGameScreen$: ValueBinding<GameScreen>;
-  const setActiveGameScreen: (screen: GameScreen) => void;
-  const canUseSaveSystem$: ValueBinding<boolean>;
-  function showMainScreen(): void;
-  function showPauseScreen(): void;
-  function showFreeCameraScreen(): void;
-  export enum LayoutPosition {
-  	Undefined = 0,
-  	Left = 1,
-  	Center = 2,
-  	Right = 3
-  }
-  const activeGamePanel$: ValueBinding<GamePanel | null>;
-  const blockingPanelActive$: ValueBinding<boolean>;
-  const activePanelPosition$: ValueBinding<LayoutPosition>;
-  const toggleGamePanel: (panelType: string) => void;
-  const showGamePanel: (panelType: string) => void;
-  const closeGamePanel: (panelType: string) => void;
-  const closeActiveGamePanel: () => void;
-  export enum GamePanelType {
-  	InfoviewMenu = "Game.UI.InGame.InfoviewMenu",
-  	Progression = "Game.UI.InGame.ProgressionPanel",
-  	Economy = "Game.UI.InGame.EconomyPanel",
-  	CityInfo = "Game.UI.InGame.CityInfoPanel",
-  	Statistics = "Game.UI.InGame.StatisticsPanel",
-  	TransportationOverview = "Game.UI.InGame.TransportationOverviewPanel",
-  	Chirper = "Game.UI.InGame.ChirperPanel",
-  	LifePath = "Game.UI.InGame.LifePathPanel",
-  	Journal = "Game.UI.InGame.JournalPanel",
-  	Radio = "Game.UI.InGame.RadioPanel",
-  	PhotoMode = "Game.UI.InGame.PhotoModePanel",
-  	CinematicCamera = "Game.UI.InGame.CinematicCameraPanel",
-  	Notifications = "Game.UI.InGame.NotificationsPanel"
-  }
-  export interface GamePanels {
-  	[GamePanelType.InfoviewMenu]: InfoviewMenu;
-  	[GamePanelType.Progression]: ProgressionPanel;
-  	[GamePanelType.Economy]: EconomyPanel;
-  	[GamePanelType.CityInfo]: CityInfoPanel;
-  	[GamePanelType.Statistics]: StatisticsPanel;
-  	[GamePanelType.TransportationOverview]: TransportationOverviewPanel;
-  	[GamePanelType.Chirper]: ChirperPanel;
-  	[GamePanelType.LifePath]: LifePathPanel;
-  	[GamePanelType.Journal]: JournalPanel;
-  	[GamePanelType.Radio]: RadioPanel;
-  	[GamePanelType.PhotoMode]: PhotoModePanel;
-  	[GamePanelType.Notifications]: NotificationsPanel;
-  }
-  export type GamePanel = TypeFromMap<GamePanels>;
-  function toggleInfoviewMenu(): void;
-  export interface InfoviewMenu {
-  }
-  export interface TabbedGamePanel {
-  	selectedTab: number;
-  }
-  export interface ProgressionPanel extends TabbedGamePanel {
-  }
-  export enum ProgressionPanelTab {
-  	Development = 0,
-  	Milestones = 1,
-  	Achievements = 2
-  }
-  const showProgressionPanel: (tab: number) => void;
-  export interface EconomyPanel extends TabbedGamePanel {
-  }
-  export enum EconomyPanelTab {
-  	Budget = 0,
-  	Loan = 1,
-  	Taxation = 2,
-  	Services = 3,
-  	Production = 4
-  }
-  const showEconomyPanel: (tab: number) => void;
-  export interface CityInfoPanel extends TabbedGamePanel {
-  }
-  export enum CityInfoPanelTab {
-  	Demand = 0,
-  	Policies = 1
-  }
-  const showCityInfoPanel: (tab: number) => void;
-  export interface StatisticsPanel {
-  }
-  export interface TransportationOverviewPanel extends TabbedGamePanel {
-  }
-  const showTransportationOverviewPanel: (tab: number) => void;
-  export enum TransportationOverviewPanelTab {
-  	PublicTransport = 0,
-  	Cargo = 1
-  }
-  export interface ChirperPanel {
-  }
-  export interface LifePathPanel {
-  	selectedEntity: Entity;
-  }
-  function toggleLifePathPanel(): void;
-  function showLifePathList(): void;
-  const showLifePathDetail: (entity: Entity) => void;
-  export interface JournalPanel {
-  }
-  export interface RadioPanel {
-  }
-  function toggleRadioPanel(): void;
-  function toggleTransportationOverviewPanel(): void;
-  export interface PhotoModePanel {
-  }
-  export interface CinematicCameraPanel {
-  }
-  export interface NotificationsPanel {
-  }
-  export enum Unit {
-  	Integer = "integer",
-  	IntegerRounded = "integerRounded",
-  	IntegerPerMonth = "integerPerMonth",
-  	IntegerPerHour = "integerPerHour",
-  	FloatSingleFraction = "floatSingleFraction",
-  	FloatTwoFractions = "floatTwoFractions",
-  	FloatThreeFractions = "floatThreeFractions",
-  	Percentage = "percentage",
-  	PercentageSingleFraction = "percentageSingleFraction",
-  	Angle = "angle",
-  	Length = "length",
-  	Area = "area",
-  	Volume = "volume",
-  	VolumePerMonth = "volumePerMonth",
-  	Weight = "weight",
-  	WeightPerCell = "weightPerCell",
-  	WeightPerMonth = "weightPerMonth",
-  	Power = "power",
-  	Energy = "energy",
-  	DataRate = "dataRate",
-  	DataBytes = "dataBytes",
-  	DataMegabytes = "dataMegabytes",
-  	Money = "money",
-  	MoneyPerCell = "moneyPerCell",
-  	MoneyPerMonth = "moneyPerMonth",
-  	MoneyPerHour = "moneyPerHour",
-  	MoneyPerDistance = "moneyPerDistance",
-  	MoneyPerDistancePerMonth = "moneyPerDistancePerMonth",
-  	BodiesPerMonth = "bodiesPerMonth",
-  	XP = "xp",
-  	Temperature = "temperature",
-  	NetElevation = "netElevation",
-  	ScreenFrequency = "screenFrequency",
-  	Custom = "custom"
-  }
-  export enum LocElementType {
-  	Bounds = "Game.UI.Localization.LocalizedBounds",
-  	Fraction = "Game.UI.Localization.LocalizedFraction",
-  	Number = "Game.UI.Localization.LocalizedNumber",
-  	String = "Game.UI.Localization.LocalizedString"
-  }
-  export interface LocElements {
-  	[LocElementType.Bounds]: LocalizedBounds;
-  	[LocElementType.Fraction]: LocalizedFraction;
-  	[LocElementType.Number]: LocalizedNumber;
-  	[LocElementType.String]: LocalizedString;
-  }
-  export type LocElement = TypeFromMap<LocElements>;
-  export interface LocalizedBounds {
-  	min: number;
-  	max: number;
-  	unit?: Unit;
-  }
-  export interface LocalizedFraction {
-  	value: number;
-  	total: number;
-  	unit?: Unit;
-  }
-  export interface LocalizedNumber {
-  	value: number;
-  	unit?: Unit;
-  	signed: boolean;
-  }
-  export interface LocalizedString {
-  	id: string | null;
-  	value: string | null;
-  	args: Record<string, LocElement> | null;
-  }
-  export type NumericProperty = NumberProperty | Number2Property | NumberRangeProperty;
-  const NUMBER_PROPERTY = "Game.UI.Common.NumberProperty";
-  export interface NumberProperty {
-  	labelId: string;
-  	unit: Unit;
-  	value: number;
-  	signed: boolean;
-  	icon?: string;
-  	valueIcon?: string;
-  }
-  const NUMBER2_PROPERTY = "Game.UI.Common.Number2Property";
-  export interface Number2Property {
-  	labelId: string;
-  	unit: Unit;
-  	value: Number2;
-  	signed: boolean;
-  	icon?: string;
-  	valueIcon?: string;
-  }
-  export interface NumberRangeProperty {
-  	labelId: string;
-  	unit: Unit;
-  	minValue: number;
-  	maxValue: number;
-  	signed: boolean;
-  	icon?: string;
-  	valueIcon?: string;
-  }
-  const STRING_PROPERTY = "Game.UI.Common.StringProperty";
-  export interface StringProperty {
-  	labelId: string;
-  	valueId: string;
-  	icon?: string;
-  	valueIcon?: string;
-  }
-  export type Properties = {
-  	[NUMBER_PROPERTY]: NumberProperty;
-  	[NUMBER2_PROPERTY]: Number2Property;
-  	[STRING_PROPERTY]: StringProperty;
-  };
-  export enum PrefabEffectType {
-  	CityModifier = "prefabs.CityModifierEffect",
-  	LocalModifier = "prefabs.LocalModifierEffect",
-  	LeisureProvider = "prefabs.LeisureProviderEffect",
-  	AdjustHappinessEffect = "prefabs.AdjustHappinessEffect"
-  }
-  export interface PrefabEffects {
-  	[PrefabEffectType.CityModifier]: CityModifierEffect;
-  	[PrefabEffectType.LocalModifier]: LocalModifierEffect;
-  	[PrefabEffectType.LeisureProvider]: LeisureProviderEffect;
-  	[PrefabEffectType.AdjustHappinessEffect]: AdjustHappinessEffect;
-  }
-  export type PrefabEffect = TypeFromMap<PrefabEffects>;
-  export interface CityModifierEffect {
-  	modifiers: CityModifier[];
-  }
-  export interface CityModifier {
-  	type: CityModifierType;
-  	delta: number;
-  	unit: Unit;
-  }
-  export enum CityModifierType {
-  	Attractiveness = "Attractiveness",
-  	CrimeAccumulation = "CrimeAccumulation",
-  	PoliceStationUpkeep = "PoliceStationUpkeep",
-  	DisasterWarningTime = "DisasterWarningTime",
-  	DisasterDamageRate = "DisasterDamageRate",
-  	DiseaseProbability = "DiseaseProbability",
-  	ParkEntertainment = "ParkEntertainment",
-  	CriminalMonitorProbability = "CriminalMonitorProbability",
-  	IndustrialAirPollution = "IndustrialAirPollution",
-  	IndustrialGroundPollution = "IndustrialGroundPollution",
-  	IndustrialGarbage = "IndustrialGarbage",
-  	RecoveryFailChange = "RecoveryFailChange",
-  	OreResourceAmount = "OreResourceAmount",
-  	OilResourceAmount = "OilResourceAmount",
-  	UniversityInterest = "UniversityInterest",
-  	OfficeSoftwareDemand = "OfficeSoftwareDemand",
-  	IndustrialElectronicsDemand = "IndustrialElectronicsDemand",
-  	OfficeSoftwareEfficiency = "OfficeSoftwareEfficiency",
-  	IndustrialElectronicsEfficiency = "IndustrialElectronicsEfficiency",
-  	TelecomCapacity = "TelecomCapacity",
-  	Entertainment = "Entertainment",
-  	HighwayTrafficSafety = "HighwayTrafficSafety",
-  	PrisonTime = "PrisonTime",
-  	CrimeProbability = "CrimeProbability",
-  	CollegeGraduation = "CollegeGraduation",
-  	UniversityGraduation = "UniversityGraduation",
-  	ImportCost = "ImportCost",
-  	LoanInterest = "LoanInterest",
-  	BuildingLevelingCost = "BuildingLevelingCost",
-  	ExportCost = "ExportCost",
-  	TaxiStartingFee = "TaxiStartingFee",
-  	IndustrialEfficiency = "IndustrialEfficiency",
-  	OfficeEfficiency = "OfficeEfficiency",
-  	PollutionHealthAffect = "PollutionHealthAffect",
-  	HospitalEfficiency = "HospitalEfficiency"
-  }
-  export interface LocalModifierEffect {
-  	modifiers: LocalModifier[];
-  }
-  export interface LocalModifier {
-  	type: LocalModifierType;
-  	delta: number;
-  	unit: Unit;
-  	radius: number;
-  }
-  export enum LocalModifierType {
-  	CrimeAccumulation = "CrimeAccumulation",
-  	ForestFireResponseTime = "ForestFireResponseTime",
-  	ForestFireHazard = "ForestFireHazard",
-  	Wellbeing = "Wellbeing",
-  	Health = "Health"
-  }
-  export interface LeisureProviderEffect {
-  	providers: LeisureProvider[];
-  }
-  export interface LeisureProvider {
-  	type: LeisureType;
-  	efficiency: number;
-  }
-  export enum LeisureType {
-  	Meals = "Meals",
-  	Entertainment = "Entertainment",
-  	Commercial = "Commercial",
-  	CityIndoors = "CityIndoors",
-  	Travel = "Travel",
-  	CityPark = "CityPark",
-  	CityBeach = "CityBeach",
-  	Attractions = "Attractions",
-  	Relaxation = "Relaxation",
-  	Sightseeing = "Sightseeing"
-  }
-  export interface AdjustHappinessEffect {
-  	targets: string[];
-  	wellbeingEffect: number;
-  	healthEffect: number;
   }
   export enum UISound {
   	selectItem = "select-item",
@@ -775,6 +380,7 @@ declare module "cs2/bindings" {
   	"Select Route": Action;
   	"Remove Operating District": Action;
   	"Upgrades Menu": Action;
+	  "Upgrades Menu Secondary": Action;
   	"Purchase Map Tile": Action;
   	"Unfollow Citizen": Action;
   	"Like Chirp": Action;
@@ -789,6 +395,7 @@ declare module "cs2/bindings" {
   	"Focus Line Panel": Action;
   	"Focus Occupants Panel": Action;
   	"Focus Info Panel": Action;
+	  "Quaternary Action": Action;
   	"Close": Action;
   	"Back": Action;
   	"Leave Underground Mode": Action;
@@ -876,6 +483,87 @@ declare module "cs2/bindings" {
   }
   export type InputAction = keyof InputActionsDefinition;
   export type InputActionName = InputAction | string;
+
+	export enum Unit {
+		Integer = "integer",
+		IntegerRounded = "integerRounded",
+		IntegerPerMonth = "integerPerMonth",
+		IntegerPerHour = "integerPerHour",
+		FloatSingleFraction = "floatSingleFraction",
+		FloatTwoFractions = "floatTwoFractions",
+		FloatThreeFractions = "floatThreeFractions",
+		Percentage = "percentage",
+		PercentageSingleFraction = "percentageSingleFraction",
+		PercentagePrecise = "percentagePrecise",
+		Angle = "angle",
+		Length = "length",
+		Area = "area",
+		Volume = "volume",
+		VolumePerMonth = "volumePerMonth",
+		Weight = "weight",
+		WeightPerCell = "weightPerCell",
+		WeightPerMonth = "weightPerMonth",
+		Power = "power",
+		Energy = "energy",
+		DataRate = "dataRate",
+		DataBytes = "dataBytes",
+		DataMegabytes = "dataMegabytes",
+		Money = "money",
+		MoneyPerCell = "moneyPerCell",
+		MoneyPerMonth = "moneyPerMonth",
+		MoneyPerHour = "moneyPerHour",
+		MoneyPerDistance = "moneyPerDistance",
+		MoneyPerDistancePerMonth = "moneyPerDistancePerMonth",
+		BodiesPerMonth = "bodiesPerMonth",
+		XP = "xp",
+		Temperature = "temperature",
+		TemperaturePrecise = "temperaturePrecise",
+		NetElevation = "netElevation",
+		ScreenFrequency = "screenFrequency",
+		Height = "height",
+		Custom = "custom",
+		DurationSeconds = "durationSeconds"
+	}
+
+	export enum LocElementType {
+		Bounds = "Game.UI.Localization.LocalizedBounds",
+		Fraction = "Game.UI.Localization.LocalizedFraction",
+		Number = "Game.UI.Localization.LocalizedNumber",
+		String = "Game.UI.Localization.LocalizedString"
+	}
+
+	export interface LocElements {
+		[LocElementType.Bounds]: LocalizedBounds;
+		[LocElementType.Fraction]: LocalizedFraction;
+		[LocElementType.Number]: LocalizedNumber;
+		[LocElementType.String]: LocalizedString;
+	}
+
+	export type LocElement = TypeFromMap<LocElements>;
+
+	export interface LocalizedBounds {
+		min: number;
+		max: number;
+		unit?: Unit;
+	}
+
+	export interface LocalizedFraction {
+		value: number;
+		total: number;
+		unit?: Unit;
+	}
+
+	export interface LocalizedNumber {
+		value: number;
+		unit?: Unit;
+		signed: boolean;
+	}
+
+	export interface LocalizedString {
+		id: string | null;
+		value: string | null;
+		args: Record<string, LocElement> | null;
+	}
   export enum WidgetType {
   	Column = "Game.UI.Widgets.Column",
   	Row = "Game.UI.Widgets.Row",
@@ -929,7 +617,6 @@ declare module "cs2/bindings" {
   	PopupValueField = "Game.UI.Widgets.PopupValueField",
   	DropdownField = "Game.UI.Widgets.DropdownField",
   	DirectoryPickerButton = "Game.UI.Widgets.DirectoryPickerButton",
-  	SeasonsField = "Game.UI.Widgets.SeasonsField",
   	ImageField = "Game.UI.Widgets.ImageField"
   }
   export type PathSegment = string | number;
@@ -949,6 +636,10 @@ declare module "cs2/bindings" {
   export interface TooltipTarget {
   	tooltip?: LocElement | null;
   }
+
+	export interface UITag {
+		uiTag?: string | null;
+	}
   export interface WidgetTutorialTarget {
   	tutorialTag: string | null;
   }
@@ -964,7 +655,8 @@ declare module "cs2/bindings" {
   	Title = 0,
   	Container = 1
   }
-  export interface Group extends Named, TooltipTarget {
+
+	export interface Group extends Named, TooltipTarget, UITag {
   	tooltipPos?: TooltipPos;
   }
   export interface Field<T> extends BaseWidget, Named, TooltipTarget, WidgetTutorialTarget {
@@ -1021,22 +713,25 @@ declare module "cs2/bindings" {
   	hdr?: boolean;
   	showAlpha: boolean;
   }
-  export interface EnumField extends Field<LongNumber>, WarningSign {
-  	enumMembers: EnumMember<LongNumber>[];
-  }
-  export interface EnumMember<T> {
-  	value: T;
-  	displayName: LocElement;
-  	disabled?: boolean;
-  }
   export interface DropdownField<T> extends Field<T>, WarningSign {
   	items: DropdownItem<T>[];
   }
   export interface DropdownItem<T> {
   	value: T;
   	displayName: LocElement;
+	  tooltip?: LocElement;
+	  icon?: string;
+	  iconTint?: string;
   	disabled?: boolean;
   }
+
+	export interface EnumField extends Field<LongNumber>, WarningSign {
+		enumMembers: EnumMember<LongNumber>[];
+	}
+
+	export interface EnumMember<T> extends DropdownItem<T> {
+		value: T;
+	}
   export interface Widget<P> {
   	path: string | number;
   	props: P;
@@ -1086,6 +781,515 @@ declare module "cs2/bindings" {
   function calculateDateFromTicks(settings: TimeSettings, ticks: number): SimulationDate;
   function calculateDateTimeFromTicks(settings: TimeSettings, ticks: number): SimulationDateTime;
   function calculateMinutesSinceMidnightFromTicks(settings: TimeSettings, ticks: number): number;
+
+	const selectedResource$: {
+		readonly listeners: {
+			listener: BindingListener<Entity> | undefined;
+			set: (listener: BindingListener<Entity>) => void;
+			call: (newValue: Entity) => void;
+		}[];
+		disposed: boolean;
+		_value: Entity;
+		readonly registered: boolean;
+		readonly value: Entity;
+		subscribe: (listener?: BindingListener<Entity> | undefined) => {
+			readonly value: Entity;
+			setChangeListener: (listener: BindingListener<Entity>) => void;
+			dispose(): void;
+		};
+		dispose: () => void;
+		update: (newValue: Entity) => void;
+	};
+	const selectedResourceCategory$: {
+		readonly listeners: {
+			listener: BindingListener<Entity> | undefined;
+			set: (listener: BindingListener<Entity>) => void;
+			call: (newValue: Entity) => void;
+		}[];
+		disposed: boolean;
+		_value: Entity;
+		readonly registered: boolean;
+		readonly value: Entity;
+		subscribe: (listener?: BindingListener<Entity> | undefined) => {
+			readonly value: Entity;
+			setChangeListener: (listener: BindingListener<Entity>) => void;
+			dispose(): void;
+		};
+		dispose: () => void;
+		update: (newValue: Entity) => void;
+	};
+	const maxProgress$: ValueBinding<number>;
+	const resourceCategories$: ValueBinding<ResourceCategory[]>;
+	const resourceDetails$: MapBinding<Entity, ResourceDetails>;
+	const resources$: MapBinding<Entity, Resource>;
+	const services$: MapBinding<Entity, Service>;
+	const serviceUpkeepConsumption$: MapBinding<Entity, number>;
+	const consumptionProduction$: MapBinding<Entity, Number2>;
+	const importExport$: MapBinding<Entity, number>;
+	const storedResource$: MapBinding<Entity, number>;
+	const maxProduction$: MapBinding<Entity, number>;
+	const productionChainData$: ValueBinding<ProductionChainData[]>;
+	const finalConsumption$: MapBinding<FinalConsumptionQuery, FinalConsumption>;
+
+	export enum FinalConsumer {
+		Citizens = 1,
+		Retail = 3,
+		Commercial = 4,
+		Industrial = 5,
+		Office = 6,
+		Heating = 7,
+		LevelUp = 8,
+		Count = 9
+	}
+
+	export interface FinalConsumption {
+		consumer: FinalConsumer;
+		consumption: number;
+	}
+
+	export interface FinalConsumptionQuery {
+		resource: Entity;
+		consumer: FinalConsumer;
+	}
+
+	export interface ResourceCategory {
+		entity: Entity;
+		name: string;
+		resources: Resource[];
+	}
+
+	export interface Resource {
+		entity: Entity;
+		name: string;
+		icon: string;
+		weight: number;
+		tradable: boolean;
+		unit: Unit;
+		producer: ProductionLink;
+		consumers: ProductionLink[];
+	}
+
+	export interface ProductionLink {
+		name: string;
+		icon: string;
+	}
+
+	export interface ResourceDetails {
+		inputs: Entity[][];
+		outputs: Entity[];
+		serviceOutputs: Entity[];
+	}
+
+	export interface ResourceData {
+		production: number;
+		surplus: number;
+		deficit: number;
+	}
+
+	export interface Service {
+		entity: Entity;
+		name: string;
+		icon: string;
+	}
+
+	export interface ResourceValue {
+		entity: Entity;
+		resource: string;
+		value: number;
+	}
+
+	export interface ProductionChainData {
+		consume1: ResourceValue;
+		consume2: ResourceValue;
+		produce: ResourceValue;
+	}
+
+	interface Service$1 {
+		entity: Entity;
+		name: string;
+		icon: string;
+		locked: boolean;
+		budget: number;
+	}
+
+	export interface ServiceDetails {
+		entity: Entity;
+		name: string;
+		icon: string;
+		locked: boolean;
+		budgetAdjustable: boolean;
+		budgetPercentage: number;
+		efficiency: number;
+		upkeep: number;
+		fees: ServiceFee$1[];
+	}
+
+	interface ServiceFee$1 {
+		resource: number;
+		name: string;
+		fee: number;
+		min: number;
+		max: number;
+		adjustable: boolean;
+		importable: boolean;
+		exportable: boolean;
+		incomeInternal: number;
+		incomeExports: number;
+		expenseImports: number;
+		consumptionMultiplier: number;
+		efficiencyMultiplier: number;
+		happinessEffect: number;
+	}
+
+	const services$$1: ValueBinding<Service$1[]>;
+	const serviceDetails$: MapBinding<Entity, ServiceDetails | null>;
+
+	function setServiceBudget(service: Entity, percentage: number): void;
+
+	function setServiceFee(resource: number, amount: number): void;
+
+	function resetService(service: Entity): void;
+
+	export interface EventInfo {
+		id: string;
+		icon: string;
+		date: number;
+		data: EventData[] | null;
+		effects: EventData[] | null;
+	}
+
+	export interface EventData {
+		type: string;
+		value: number;
+	}
+
+	const eventMap$: MapBinding<Entity, EventInfo>;
+	const events$: ValueBinding<Entity[]>;
+
+	function onOpenJournal(): void;
+
+	function onCloseJournal(): void;
+
+	export enum GameScreen {
+		main = 0,
+		freeCamera = 1,
+		pauseMenu = 10,
+		saveGame = 11,
+		newGame = 12,
+		loadGame = 13,
+		options = 14
+	}
+
+	const activeGameScreen$: ValueBinding<GameScreen>;
+	const setActiveGameScreen: (screen: GameScreen) => void;
+	const canUseSaveSystem$: ValueBinding<boolean>;
+
+	function showMainScreen(): void;
+
+	function showPauseScreen(): void;
+
+	function showFreeCameraScreen(): void;
+
+	export enum LayoutPosition {
+		Undefined = 0,
+		Left = 1,
+		Center = 2,
+		Right = 3
+	}
+
+	const activeGamePanel$: ValueBinding<GamePanel | null>;
+	const blockingPanelActive$: ValueBinding<boolean>;
+	const activePanelPosition$: ValueBinding<LayoutPosition>;
+	const toggleGamePanel: (panelType: string) => void;
+	const showGamePanel: (panelType: string) => void;
+	const closeGamePanel: (panelType: string) => void;
+	const closeActiveGamePanel: () => void;
+
+	export enum GamePanelType {
+		InfoviewMenu = "Game.UI.InGame.InfoviewMenu",
+		Progression = "Game.UI.InGame.ProgressionPanel",
+		Economy = "Game.UI.InGame.EconomyPanel",
+		CityInfo = "Game.UI.InGame.CityInfoPanel",
+		Statistics = "Game.UI.InGame.StatisticsPanel",
+		TransportationOverview = "Game.UI.InGame.TransportationOverviewPanel",
+		Chirper = "Game.UI.InGame.ChirperPanel",
+		LifePath = "Game.UI.InGame.LifePathPanel",
+		Journal = "Game.UI.InGame.JournalPanel",
+		Radio = "Game.UI.InGame.RadioPanel",
+		PhotoMode = "Game.UI.InGame.PhotoModePanel",
+		CinematicCamera = "Game.UI.InGame.CinematicCameraPanel",
+		Notifications = "Game.UI.InGame.NotificationsPanel"
+	}
+
+	export interface GamePanels {
+		[GamePanelType.InfoviewMenu]: InfoviewMenu;
+		[GamePanelType.Progression]: ProgressionPanel;
+		[GamePanelType.Economy]: EconomyPanel;
+		[GamePanelType.CityInfo]: CityInfoPanel;
+		[GamePanelType.Statistics]: StatisticsPanel;
+		[GamePanelType.TransportationOverview]: TransportationOverviewPanel;
+		[GamePanelType.Chirper]: ChirperPanel;
+		[GamePanelType.LifePath]: LifePathPanel;
+		[GamePanelType.Journal]: JournalPanel;
+		[GamePanelType.Radio]: RadioPanel;
+		[GamePanelType.PhotoMode]: PhotoModePanel;
+		[GamePanelType.Notifications]: NotificationsPanel;
+	}
+
+	export type GamePanel = TypeFromMap<GamePanels>;
+
+	function toggleInfoviewMenu(): void;
+
+	export interface InfoviewMenu {
+	}
+
+	export interface TabbedGamePanel {
+		selectedTab: number;
+	}
+
+	export interface ProgressionPanel extends TabbedGamePanel {
+	}
+
+	export enum ProgressionPanelTab {
+		Development = 0,
+		Milestones = 1,
+		Achievements = 2
+	}
+
+	const showProgressionPanel: (tab: number) => void;
+
+	export interface EconomyPanel extends TabbedGamePanel {
+	}
+
+	export enum EconomyPanelTab {
+		Budget = 0,
+		Loan = 1,
+		Taxation = 2,
+		Services = 3,
+		Production = 4
+	}
+
+	const showEconomyPanel: (tab: number) => void;
+
+	export interface CityInfoPanel extends TabbedGamePanel {
+	}
+
+	export enum CityInfoPanelTab {
+		Demand = 0,
+		Policies = 1
+	}
+
+	const showCityInfoPanel: (tab: number) => void;
+
+	export interface StatisticsPanel {
+	}
+
+	export interface TransportationOverviewPanel extends TabbedGamePanel {
+	}
+
+	const showTransportationOverviewPanel: (tab: number) => void;
+
+	export enum TransportationOverviewPanelTab {
+		PublicTransport = 0,
+		Cargo = 1
+	}
+
+	export interface ChirperPanel {
+	}
+
+	export interface LifePathPanel {
+		selectedEntity: Entity;
+	}
+
+	function toggleLifePathPanel(): void;
+
+	function showLifePathList(): void;
+
+	const showLifePathDetail: (entity: Entity) => void;
+
+	export interface JournalPanel {
+	}
+
+	export interface RadioPanel {
+	}
+
+	function toggleRadioPanel(): void;
+
+	function toggleTransportationOverviewPanel(): void;
+
+	export interface PhotoModePanel {
+	}
+
+	export interface CinematicCameraPanel {
+	}
+
+	export interface NotificationsPanel {
+	}
+
+	export type NumericProperty = NumberProperty | Number2Property | NumberRangeProperty;
+	const NUMBER_PROPERTY = "Game.UI.Common.NumberProperty";
+
+	export interface NumberProperty {
+		labelId: string;
+		unit: Unit;
+		value: number;
+		signed: boolean;
+		icon?: string;
+		valueIcon?: string;
+	}
+
+	const NUMBER2_PROPERTY = "Game.UI.Common.Number2Property";
+
+	export interface Number2Property {
+		labelId: string;
+		unit: Unit;
+		value: Number2;
+		signed: boolean;
+		icon?: string;
+		valueIcon?: string;
+	}
+
+	export interface NumberRangeProperty {
+		labelId: string;
+		unit: Unit;
+		minValue: number;
+		maxValue: number;
+		signed: boolean;
+		icon?: string;
+		valueIcon?: string;
+	}
+
+	const STRING_PROPERTY = "Game.UI.Common.StringProperty";
+
+	export interface StringProperty {
+		labelId: string;
+		valueId: string;
+		icon?: string;
+		valueIcon?: string;
+	}
+
+	export type Properties = {
+		[NUMBER_PROPERTY]: NumberProperty;
+		[NUMBER2_PROPERTY]: Number2Property;
+		[STRING_PROPERTY]: StringProperty;
+	};
+
+	export enum PrefabEffectType {
+		CityModifier = "prefabs.CityModifierEffect",
+		LocalModifier = "prefabs.LocalModifierEffect",
+		LeisureProvider = "prefabs.LeisureProviderEffect",
+		AdjustHappinessEffect = "prefabs.AdjustHappinessEffect"
+	}
+
+	export interface PrefabEffects {
+		[PrefabEffectType.CityModifier]: CityModifierEffect;
+		[PrefabEffectType.LocalModifier]: LocalModifierEffect;
+		[PrefabEffectType.LeisureProvider]: LeisureProviderEffect;
+		[PrefabEffectType.AdjustHappinessEffect]: AdjustHappinessEffect;
+	}
+
+	export type PrefabEffect = TypeFromMap<PrefabEffects>;
+
+	export interface CityModifierEffect {
+		modifiers: CityModifier[];
+	}
+
+	export interface CityModifier {
+		type: CityModifierType;
+		delta: number;
+		unit: Unit;
+	}
+
+	export enum CityModifierType {
+		Attractiveness = "Attractiveness",
+		CrimeAccumulation = "CrimeAccumulation",
+		PoliceStationUpkeep = "PoliceStationUpkeep",
+		DisasterWarningTime = "DisasterWarningTime",
+		DisasterDamageRate = "DisasterDamageRate",
+		DiseaseProbability = "DiseaseProbability",
+		ParkEntertainment = "ParkEntertainment",
+		CriminalMonitorProbability = "CriminalMonitorProbability",
+		IndustrialAirPollution = "IndustrialAirPollution",
+		IndustrialGroundPollution = "IndustrialGroundPollution",
+		IndustrialGarbage = "IndustrialGarbage",
+		RecoveryFailChange = "RecoveryFailChange",
+		OreResourceAmount = "OreResourceAmount",
+		OilResourceAmount = "OilResourceAmount",
+		UniversityInterest = "UniversityInterest",
+		OfficeSoftwareDemand = "OfficeSoftwareDemand",
+		IndustrialElectronicsDemand = "IndustrialElectronicsDemand",
+		OfficeSoftwareEfficiency = "OfficeSoftwareEfficiency",
+		IndustrialElectronicsEfficiency = "IndustrialElectronicsEfficiency",
+		TelecomCapacity = "TelecomCapacity",
+		Entertainment = "Entertainment",
+		HighwayTrafficSafety = "HighwayTrafficSafety",
+		PrisonTime = "PrisonTime",
+		CrimeProbability = "CrimeProbability",
+		CollegeGraduation = "CollegeGraduation",
+		UniversityGraduation = "UniversityGraduation",
+		ImportCost = "ImportCost",
+		LoanInterest = "LoanInterest",
+		BuildingLevelingCost = "BuildingLevelingCost",
+		ExportCost = "ExportCost",
+		TaxiStartingFee = "TaxiStartingFee",
+		IndustrialEfficiency = "IndustrialEfficiency",
+		OfficeEfficiency = "OfficeEfficiency",
+		PollutionHealthAffect = "PollutionHealthAffect",
+		HospitalEfficiency = "HospitalEfficiency",
+		IndustrialFishInputEfficiency = "IndustrialFishInputEfficiency",
+		IndustrialFishHubEfficiency = "IndustrialFishHubEfficiency",
+		CityServiceImportCost = "CityServiceImportCost",
+		CityServiceBuildingBaseUpkeepCost = "CityServiceBuildingBaseUpkeepCost",
+		CrimeResponseTime = "CrimeResponseTime",
+		TaxHappiness = "TaxHappiness"
+	}
+
+	export interface LocalModifierEffect {
+		modifiers: LocalModifier[];
+	}
+
+	export interface LocalModifier {
+		type: LocalModifierType;
+		delta: number;
+		unit: Unit;
+		radius: number;
+	}
+
+	export enum LocalModifierType {
+		CrimeAccumulation = "CrimeAccumulation",
+		ForestFireResponseTime = "ForestFireResponseTime",
+		ForestFireHazard = "ForestFireHazard",
+		Wellbeing = "Wellbeing",
+		Health = "Health"
+	}
+
+	export interface LeisureProviderEffect {
+		providers: LeisureProvider[];
+	}
+
+	export interface LeisureProvider {
+		type: LeisureType;
+		efficiency: number;
+	}
+
+	export enum LeisureType {
+		Meals = "Meals",
+		Entertainment = "Entertainment",
+		Commercial = "Commercial",
+		CityIndoors = "CityIndoors",
+		Travel = "Travel",
+		CityPark = "CityPark",
+		CityBeach = "CityBeach",
+		Attractions = "Attractions",
+		Relaxation = "Relaxation",
+		Sightseeing = "Sightseeing"
+	}
+
+	export interface AdjustHappinessEffect {
+		targets: string[];
+		wellbeingEffect: number;
+		healthEffect: number;
+	}
   const CONSUMPTION_PROPERTY = "prefabs.ConsumptionProperty";
   export interface ConsumptionProperty {
   	electricityConsumption: number;
@@ -1161,6 +1365,7 @@ declare module "cs2/bindings" {
   	icon: string;
   	requirement: string;
   	minimumCount: number;
+	  isUpgrade: boolean;
   }
   export interface ZoneBuiltRequirement extends PrefabRequirementBase {
   	labelId: string | null;
@@ -1192,6 +1397,17 @@ declare module "cs2/bindings" {
   	resourceType: string;
   	minimumProducedAmount: number;
   }
+
+	export interface TransportRequirement extends PrefabRequirementBase {
+		labelId: string | null;
+		progress: number;
+		icon: string;
+		name: string;
+		transportType: string;
+		filterID: string;
+		minimumTransportedCargo: number;
+		minimumTransportedPassenger: number;
+	}
   export interface ObjectBuiltRequirement extends UnlockRequirement {
   	name: string;
   	minimumCount: number;
@@ -1209,9 +1425,11 @@ declare module "cs2/bindings" {
   	ZoneBuilt = "prefabs.ZoneBuiltRequirement",
   	Citizen = "prefabs.CitizenRequirement",
   	Processing = "prefabs.ProcessingRequirement",
+	Transport = "prefabs.TransportRequirement",
   	ObjectBuilt = "prefabs.ObjectBuiltRequirement",
   	Unlock = "prefabs.UnlockRequirement",
-  	Tutorial = "prefabs.TutorialRequirement"
+	Tutorial = "prefabs.TutorialRequirement",
+	PrefabUnlocked = "prefabs.PrefabUnlockedRequirement"
   }
   export interface PrefabRequirements {
   	[PrefabRequirementType.Milestone]: MilestoneRequirement;
@@ -1220,9 +1438,11 @@ declare module "cs2/bindings" {
   	[PrefabRequirementType.ZoneBuilt]: ZoneBuiltRequirement;
   	[PrefabRequirementType.Citizen]: CitizenRequirement;
   	[PrefabRequirementType.Processing]: ProcessingRequirement;
+	  [PrefabRequirementType.Transport]: TransportRequirement;
   	[PrefabRequirementType.ObjectBuilt]: ObjectBuiltRequirement;
   	[PrefabRequirementType.Unlock]: UnlockRequirement;
   	[PrefabRequirementType.Tutorial]: TutorialRequirement;
+	  [PrefabRequirementType.PrefabUnlocked]: UnlockRequirement;
   }
   export type PrefabRequirement = TypeFromMap<PrefabRequirements>;
   export interface Theme {
@@ -1277,6 +1497,8 @@ declare module "cs2/bindings" {
   	economyPanelLoansTab: string;
   	economyPanelProductionPage: string;
   	economyPanelProductionResources: string;
+	  economyPanelProductionDiagram: string;
+	  economyPanelProductionData: string;
   	economyPanelProductionTab: string;
   	economyPanelServicesBudget: string;
   	economyPanelServicesList: string;
@@ -1375,6 +1597,9 @@ declare module "cs2/bindings" {
   	toolOptionsThemes: string;
   	toolOptionsAssetPacks: string;
   	toolOptionsUnderground: string;
+	  toolOptionsWaterShowSourceNames: string;
+	  toolOptionsWaterSimulateBackdrop: string;
+	  toolOptionsWaterSimSpeed: string;
   	transportationOverviewPanel: string;
   	transportationOverviewPanelButton: string;
   	transportationOverviewPanelLegend: string;
@@ -1392,14 +1617,21 @@ declare module "cs2/bindings" {
   	actionHints: string;
   	assetImportButton: string;
   	editorInfoViewsPanel: string;
+	  editorCameraControls: string;
   	resetTODButton: string;
   	simulationPlayButton: string;
   	tutorialsToggle: string;
+	  editorPauseMenuButton: string;
   	workspaceTitleBar: string;
+	  bulldozerButton: string;
+	  waterSettingsTitle: string;
   	selectProjectRoot: string;
   	selectAssets: string;
   	selectTemplate: string;
   	importButton: string;
+	  addObjectButton: string;
+	  filterMenu: string;
+	  favoriteStar: string;
   }
   export interface Infoview {
   	entity: Entity;
@@ -1422,6 +1654,7 @@ declare module "cs2/bindings" {
   export interface Infomode {
   	entity: Entity;
   	id: string;
+	  editor: boolean;
   	uiTag: string;
   	active: boolean;
   	priority: number;
@@ -1464,6 +1697,12 @@ declare module "cs2/bindings" {
   const sewageAvailability$: ValueBinding<IndicatorValue>;
   const waterAvailability$: ValueBinding<IndicatorValue>;
   const waterTrade$: ValueBinding<IndicatorValue>;
+	const averageWealth$: ValueBinding<string>;
+	const averageIncome$: ValueBinding<number>;
+	const averageRent$: ValueBinding<number>;
+	const averageUpkeep$: ValueBinding<number>;
+	const averageResourceCost$: ValueBinding<number>;
+	const averageFees$: ValueBinding<number>;
   const elementaryEligible$: ValueBinding<number>;
   const highSchoolEligible$: ValueBinding<number>;
   const collegeEligible$: ValueBinding<number>;
@@ -1503,6 +1742,8 @@ declare module "cs2/bindings" {
   const parkingIncome$: ValueBinding<number>;
   const parkedCars$: ValueBinding<number>;
   const parkingAvailability$: ValueBinding<IndicatorValue>;
+	const bikeParkingAvailability$: ValueBinding<IndicatorValue>;
+	const bikeParking$: ValueBinding<Number2>;
   const trafficFlow$: ValueBinding<number[]>;
   const averageGroundPollution$: ValueBinding<IndicatorValue>;
   const averageAirPollution$: ValueBinding<IndicatorValue>;
@@ -1568,6 +1809,9 @@ declare module "cs2/bindings" {
   const fertilityExtractionRate$: ValueBinding<number>;
   const forestRenewalRate$: ValueBinding<number>;
   const fertilityRenewalRate$: ValueBinding<number>;
+	const availableFish$: ValueBinding<number>;
+	const fishExtractionRate$: ValueBinding<number>;
+	const fishRenewalRate$: ValueBinding<number>;
   const workplacesData$: ValueBinding<ChartData>;
   const employeesData$: ValueBinding<ChartData>;
   const worksplaces$: ValueBinding<number>;
@@ -1836,6 +2080,7 @@ declare module "cs2/bindings" {
   	index: number;
   	major: boolean;
   	locked: boolean;
+	  isVictory?: boolean;
   }
   export interface MilestoneDetails {
   	entity: Entity;
@@ -1850,6 +2095,7 @@ declare module "cs2/bindings" {
   	accentColor: Color;
   	textColor: Color;
   	locked: boolean;
+	  isVictory: boolean;
   }
   const defaultMilestoneDetails: MilestoneDetails;
   export interface Feature {
@@ -1908,8 +2154,12 @@ declare module "cs2/bindings" {
   const milestoneDetails$: MapBinding<Entity, MilestoneDetails | null>;
   const milestoneUnlocks$: MapBinding<Entity, MilestoneUnlock[]>;
   const unlockDetails$: MapBinding<Entity, UnlockDetails | null>;
+	const unlockAll$: ValueBinding<boolean>;
+	const reachedPopulationGoal$: ValueBinding<boolean>;
+	const victoryPopupShown$: ValueBinding<boolean>;
   const unlockedSignatures$: ValueBinding<Entity[]>;
-  function clearUnlockedSignatures(): void;
+
+	function removeUnlockedSignature(): void;
   const radioEnabled$: ValueBinding<boolean>;
   const volume$: ValueBinding<number>;
   const paused$: ValueBinding<boolean>;
@@ -1969,9 +2219,9 @@ declare module "cs2/bindings" {
   const selectedUITag$: ValueBinding<string>;
   const activeSelection$: ValueBinding<boolean>;
   const selectedInfoPosition$: ValueBinding<Number2>;
-  const topSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
-  const middleSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
-  const bottomSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
+	const topSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (ContentPrerequisiteSection & Typed<SectionType.ContentPrerequisite>) | (PdxModsSection & Typed<SectionType.PdxMods>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (TradedResourcesSection & Typed<SectionType.TradedResourcesSection>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (ExtractorVehicleSection & Typed<SectionType.ExtractorVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
+	const middleSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (ContentPrerequisiteSection & Typed<SectionType.ContentPrerequisite>) | (PdxModsSection & Typed<SectionType.PdxMods>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (TradedResourcesSection & Typed<SectionType.TradedResourcesSection>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (ExtractorVehicleSection & Typed<SectionType.ExtractorVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
+	const bottomSections$: ValueBinding<((ResourceSection & Typed<SectionType.Resource>) | (LocalServicesSection & Typed<SectionType.LocalServices>) | (ActionsSection & Typed<SectionType.Actions>) | (DescriptionSection & Typed<SectionType.Description>) | (ContentPrerequisiteSection & Typed<SectionType.ContentPrerequisite>) | (PdxModsSection & Typed<SectionType.PdxMods>) | (DeveloperSection & Typed<SectionType.Developer>) | (ResidentsSection & Typed<SectionType.Residents>) | (HouseholdSidebarSection & Typed<SectionType.HouseholdSidebar>) | (DistrictsSection & Typed<SectionType.Districts>) | (TitleSection & Typed<SectionType.Title>) | (NotificationsSection & Typed<SectionType.Notifications>) | (PoliciesSection & Typed<SectionType.Policies>) | (ProfitabilitySection & Typed<SectionType.Profitability>) | (AverageHappinessSection & Typed<SectionType.AverageHappiness>) | (ScheduleSection & Typed<SectionType.Schedule>) | (LineSection & Typed<SectionType.Line>) | (LinesSection & Typed<SectionType.Lines>) | (ColorSection & Typed<SectionType.Color>) | (LineVisualizerSection & Typed<SectionType.LineVisualizer>) | (TicketPriceSection & Typed<SectionType.TicketPrice>) | (VehicleCountSection & Typed<SectionType.VehicleCount>) | (AttractivenessSection & Typed<SectionType.Attractiveness>) | (EfficiencySection & Typed<SectionType.Efficiency>) | (EmployeesSection & Typed<SectionType.Employees>) | (UpkeepSection & Typed<SectionType.Upkeep>) | (LevelSection & Typed<SectionType.Level>) | (EducationSection & Typed<SectionType.Education>) | (PollutionSection & Typed<SectionType.Pollution>) | (HealthcareSection & Typed<SectionType.Healthcare>) | (DeathcareSection & Typed<SectionType.Deathcare>) | (GarbageSection & Typed<SectionType.Garbage>) | (PoliceSection & Typed<SectionType.Police>) | (VehiclesSection & Typed<SectionType.Vehicles>) | (DispatchedVehiclesSection & Typed<SectionType.DispatchedVehicles>) | (ElectricitySection & Typed<SectionType.Electricity>) | (TransformerSection & Typed<SectionType.Transformer>) | (BatterySection & Typed<SectionType.Battery>) | (WaterSection & Typed<SectionType.Water>) | (SewageSection & Typed<SectionType.Sewage>) | (FireSection & Typed<SectionType.Fire>) | (PrisonSection & Typed<SectionType.Prison>) | (ShelterSection & Typed<SectionType.Shelter>) | (ParkingSection & Typed<SectionType.Parking>) | (ParkSection & Typed<SectionType.Park>) | (MailSection & Typed<SectionType.Mail>) | (RoadSection & Typed<SectionType.Road>) | (CompanySection & Typed<SectionType.Company>) | (StorageSection & Typed<SectionType.Storage>) | (TradedResourcesSection & Typed<SectionType.TradedResourcesSection>) | (PrivateVehicleSection & Typed<SectionType.PrivateVehicle>) | (PublicTransportVehicleSection & Typed<SectionType.PublicTransportVehicle>) | (CargoTransportVehicleSection & Typed<SectionType.CargoTransportVehicle>) | (DeliveryVehicleSection & Typed<SectionType.DeliveryVehicle>) | (HealthcareVehicleSection & Typed<SectionType.HealthcareVehicle>) | (FireVehicleSection & Typed<SectionType.FireVehicle>) | (PoliceVehicleSection & Typed<SectionType.PoliceVehicle>) | (MaintenanceVehicleSection & Typed<SectionType.MaintenanceVehicle>) | (DeathcareVehicleSection & Typed<SectionType.DeathcareVehicle>) | (PostVehicleSection & Typed<SectionType.PostVehicle>) | (GarbageVehicleSection & Typed<SectionType.GarbageVehicle>) | (ExtractorVehicleSection & Typed<SectionType.ExtractorVehicle>) | (PassengersSection & Typed<SectionType.Passengers>) | (CargoSection & Typed<SectionType.Cargo>) | (StatusSection & Typed<SectionType.Status>) | (CitizenSection & Typed<SectionType.Citizen>) | (SelectVehiclesSection & Typed<SectionType.SelectVehicles>) | (DestroyedBuildingSection & Typed<SectionType.DestroyedBuilding>) | (DestroyedTreeSection & Typed<SectionType.DestroyedTree>) | (ComfortSection & Typed<SectionType.Comfort>) | (UpgradesSection & Typed<SectionType.Upgrades>) | (UpgradePropertiesSection & Typed<SectionType.UpgradeProperties>) | null)[]>;
   const titleSection$: ValueBinding<TitleSection | null>;
   const developerSection$: ValueBinding<DeveloperSection | null>;
   const lineVisualizerSection$: ValueBinding<LineVisualizerSection | null>;
@@ -1986,6 +2236,8 @@ declare module "cs2/bindings" {
   	LocalServices = "Game.UI.InGame.LocalServicesSection",
   	Actions = "Game.UI.InGame.ActionsSection",
   	Description = "Game.UI.InGame.DescriptionSection",
+	ContentPrerequisite = "Game.UI.InGame.ContentPrerequisiteSection",
+	PdxMods = "Game.UI.InGame.PdxModsSection",
   	Developer = "Game.UI.InGame.DeveloperSection",
   	Residents = "Game.UI.InGame.ResidentsSection",
   	HouseholdSidebar = "Game.UI.InGame.HouseholdSidebarSection",
@@ -2029,6 +2281,7 @@ declare module "cs2/bindings" {
   	Road = "Game.UI.InGame.RoadSection",
   	Company = "Game.UI.InGame.CompanySection",
   	Storage = "Game.UI.InGame.StorageSection",
+	TradedResourcesSection = "Game.UI.InGame.TradedResourcesSection",
   	PrivateVehicle = "Game.UI.InGame.PrivateVehicleSection",
   	PublicTransportVehicle = "Game.UI.InGame.PublicTransportVehicleSection",
   	CargoTransportVehicle = "Game.UI.InGame.CargoTransportVehicleSection",
@@ -2040,6 +2293,7 @@ declare module "cs2/bindings" {
   	DeathcareVehicle = "Game.UI.InGame.DeathcareVehicleSection",
   	PostVehicle = "Game.UI.InGame.PostVehicleSection",
   	GarbageVehicle = "Game.UI.InGame.GarbageVehicleSection",
+	ExtractorVehicle = "Game.UI.InGame.ExtractorVehicleSection",
   	Passengers = "Game.UI.InGame.PassengersSection",
   	Cargo = "Game.UI.InGame.CargoSection",
   	Load = "Game.UI.InGame.LoadSection",
@@ -2059,6 +2313,8 @@ declare module "cs2/bindings" {
   	[SectionType.LocalServices]: LocalServicesSection;
   	[SectionType.Actions]: ActionsSection;
   	[SectionType.Description]: DescriptionSection;
+	  [SectionType.ContentPrerequisite]: ContentPrerequisiteSection;
+	  [SectionType.PdxMods]: PdxModsSection;
   	[SectionType.Developer]: DeveloperSection;
   	[SectionType.Residents]: ResidentsSection;
   	[SectionType.HouseholdSidebar]: HouseholdSidebarSection;
@@ -2102,6 +2358,7 @@ declare module "cs2/bindings" {
   	[SectionType.Road]: RoadSection;
   	[SectionType.Company]: CompanySection;
   	[SectionType.Storage]: StorageSection;
+	  [SectionType.TradedResourcesSection]: TradedResourcesSection;
   	[SectionType.PrivateVehicle]: PrivateVehicleSection;
   	[SectionType.PublicTransportVehicle]: PublicTransportVehicleSection;
   	[SectionType.CargoTransportVehicle]: CargoTransportVehicleSection;
@@ -2113,6 +2370,7 @@ declare module "cs2/bindings" {
   	[SectionType.DeathcareVehicle]: DeathcareVehicleSection;
   	[SectionType.PostVehicle]: PostVehicleSection;
   	[SectionType.GarbageVehicle]: GarbageVehicleSection;
+	  [SectionType.ExtractorVehicle]: ExtractorVehicleSection;
   	[SectionType.Passengers]: PassengersSection;
   	[SectionType.Cargo]: CargoSection;
   	[SectionType.Load]: LoadSection;
@@ -2158,22 +2416,41 @@ declare module "cs2/bindings" {
   	localeId: string;
   	effects: PrefabEffect[];
   }
+
+	export interface ContentPrerequisiteSection extends SelectedInfoSectionBase {
+		contentPrefab: string;
+		modContentPrefab: string;
+	}
+
+	export interface PdxModsSection extends SelectedInfoSectionBase {
+		modId: number | null;
+	}
   export interface DeveloperSection extends SelectedInfoSectionBase {
   	subsections: DeveloperSubsection[];
   }
   export interface ResidentsSection extends SelectedInfoSectionBase {
   	isHousehold: boolean;
+	  isDistrict: boolean;
   	householdCount: number;
   	maxHouseholds: number;
   	residentCount: number;
   	petCount: number;
   	wealthKey: string;
+	  wealthData: HouseholdWealthData;
   	residence: Name;
   	residenceEntity: Entity;
   	residenceKey: string;
   	educationData: ChartData;
   	ageData: ChartData;
   }
+
+	export interface HouseholdWealthData {
+		income: number;
+		rent: number;
+		upkeep: number;
+		resourceCost: number;
+		fees: number;
+	}
   export interface HouseholdSidebarSection extends SelectedInfoSectionBase {
   	variant: HouseholdSidebarVariant;
   	residence: HouseholdSidebarItem;
@@ -2241,10 +2518,11 @@ declare module "cs2/bindings" {
   	vehicleCountMax: number;
   }
   export interface SelectVehiclesSection extends SelectedInfoSectionBase {
-  	primaryVehicle: VehiclePrefab | null;
-  	secondaryVehicle: VehiclePrefab | null;
-  	primaryVehicles: VehiclePrefab[];
-  	secondaryVehicles: VehiclePrefab[] | null;
+	  routePrefab: string;
+	  selectedPrimaryVehicles: VehiclePrefab[];
+	  selectedSecondaryVehicles: VehiclePrefab[];
+	  availablePrimaryVehicles: VehiclePrefab[];
+	  availableSecondaryVehicles: VehiclePrefab[];
   }
   export interface AttractivenessSection extends SelectedInfoSectionBase {
   	attractiveness: number;
@@ -2272,6 +2550,7 @@ declare module "cs2/bindings" {
   	maxLevel: number;
   	isUnderConstruction: boolean;
   	progress: number;
+	  zone: string;
   }
   export interface EducationSection extends SelectedInfoSectionBase {
   	studentCount: number;
@@ -2382,12 +2661,12 @@ declare module "cs2/bindings" {
   	MailBox = 1
   }
   export interface RoadSection extends SelectedInfoSectionBase {
-  	volumeData: number[];
-  	flowData: number[];
+	  volumeData?: number[];
+	  flowData?: number[];
   	length: number;
-  	bestCondition: number;
-  	worstCondition: number;
-  	condition: number;
+	  bestCondition?: number;
+	  worstCondition?: number;
+	  condition?: number;
   	upkeep: number;
   }
   export interface CompanySection extends SelectedInfoSectionBase {
@@ -2396,14 +2675,42 @@ declare module "cs2/bindings" {
   	input1: string | null;
   	input2: string | null;
   	output: string | null;
+	  outputUnit: Unit | null;
   	sells: string | null;
   	stores: string | null;
-  	customers: Number2 | null;
+	  hotelGuests: Number2 | null;
+	  isCommercial?: boolean;
+	  isStorage?: boolean;
+	  BankBalance: number;
+	  DailyCustomers: number;
+	  ElectricityPaid: number;
+	  GarbageFeePaid: number;
+	  Income: number;
+	  MaxNumberOfCustomers: number;
+	  Profit: number;
+	  RentPaid: number;
+	  ResourcesBoughtPaid: number;
+	  SewageFeePaid: number;
+	  TaxesPaid: number;
+	  WagesPaid: number;
+	  WaterFeePaid: number;
+	  ProductionRate: number;
+	  industrialType: string | null;
   }
   export interface StorageSection extends SelectedInfoSectionBase {
   	stored: number;
   	capacity: number;
-  	resources: Resource$1[];
+	  status: string;
+	  storageType: string;
+	  rawMaterials: Resource$1[];
+	  processedGoods: Resource$1[];
+	  mail: Resource$1[];
+  }
+
+	export interface TradedResourcesSection extends SelectedInfoSectionBase {
+		rawMaterials: Resource$1[];
+		processedGoods: Resource$1[];
+		mail: Resource$1[];
   }
   export interface DestroyedBuildingSection extends SelectedInfoSectionBase {
   	destroyer: string | null;
@@ -2454,6 +2761,7 @@ declare module "cs2/bindings" {
   }
   export interface PublicTransportVehicleSection extends VehicleWithLineSection {
   	vehicleKey: string;
+	  showDestination: boolean;
   }
   export interface CargoTransportVehicleSection extends VehicleWithLineSection {
   }
@@ -2486,6 +2794,10 @@ declare module "cs2/bindings" {
   export interface GarbageVehicleSection extends VehicleSection {
   	vehicleKey: string;
   }
+
+	export interface ExtractorVehicleSection extends VehicleSection {
+		vehicleKey: string;
+  }
   export interface PassengersSection extends SelectedInfoSectionBase {
   	expanded: boolean;
   	passengers: number;
@@ -2497,7 +2809,9 @@ declare module "cs2/bindings" {
   	expanded: boolean;
   	cargo: number;
   	capacity: number;
-  	resources: Resource$1[];
+	  rawMaterials: Resource$1[];
+	  processedGoods: Resource$1[];
+	  mail: Resource$1[];
   	cargoKey: string;
   }
   export interface LoadSection extends SelectedInfoSectionBase {
@@ -2605,6 +2919,7 @@ declare module "cs2/bindings" {
   interface Resource$1 {
   	key: string;
   	amount: number;
+	  status: string;
   }
   export interface SelectedInfoSectionProps {
   	group: string;
@@ -2618,6 +2933,12 @@ declare module "cs2/bindings" {
   	entity: Entity;
   	active: boolean;
   }
+
+	export enum LineType {
+		Passenger = 0,
+		Cargo = 1,
+		Work = 2
+	}
   export type LineItem = LineStop | LineVehicle;
   const LINE_STOP = "Game.UI.InGame.LineVisualizerSection+LineStop";
   export interface LineStop extends Typed<typeof LINE_STOP> {
@@ -2625,7 +2946,8 @@ declare module "cs2/bindings" {
   	name: Name;
   	position: number;
   	cargo: number;
-  	isCargo: boolean;
+	  capacity: number;
+	  type: LineType;
   	isOutsideConnection: boolean;
   }
   const LINE_VEHICLE = "Game.UI.InGame.LineVisualizerSection+LineVehicle";
@@ -2635,7 +2957,7 @@ declare module "cs2/bindings" {
   	position: number;
   	cargo: number;
   	capacity: number;
-  	isCargo: boolean;
+	  type: LineType;
   }
   export interface LineSegment {
   	start: number;
@@ -2652,8 +2974,10 @@ declare module "cs2/bindings" {
   	entity: Entity;
   	id: string;
   	locked: boolean;
+	  multiunit: boolean;
   	requirements: PrefabRequirement[];
   	thumbnail: string;
+	  objectRequirementIcons: string[] | null;
   }
   export interface LocalServiceBuilding {
   	name: Name;
@@ -2728,6 +3052,8 @@ declare module "cs2/bindings" {
   const statUnlockingRequirements$: MapBinding<Entity, UnlockingRequirements>;
   const updatesPerDay$: ValueBinding<number>;
   function addStat(stat: StatItem): void;
+
+	function addStatChildren(stat: StatItem): void;
   function removeStat(stat: StatItem): void;
   function clearStats(): void;
   function setSampleRange(range: number): void;
@@ -2812,6 +3138,7 @@ declare module "cs2/bindings" {
   const TERRAIN_TOOL = "Terrain Tool";
   const SELECTION_TOOL = "Selection Tool";
   const ROUTE_TOOL = "Route Tool";
+	const WATER_TOOL = "Water Tool";
   export interface Tool {
   	id: string;
   	modeIndex: number;
@@ -2839,11 +3166,18 @@ declare module "cs2/bindings" {
   	icon: string;
   	priority: number;
   }
-  function selectBrush(brush: Entity): void;
-  function setBrushSize(size: number): void;
-  function setBrushStrength(strength: number): void;
-  function setBrushAngle(angle: number): void;
-  function setBrushHeight(angle: number): void;
+
+	const selectBrush: (brush: Entity) => void;
+	const setBrushSize: (size: number) => void;
+	const setBrushStrength: (strength: number) => void;
+	const setBrushAngle: (angle: number) => void;
+	const setBrushHeight: (height: number) => void;
+	const waterSimSpeed$: ValueBinding<number>;
+	const simulateBackdropWater$: ValueBinding<boolean>;
+	const showWaterSourceNames$: ValueBinding<boolean>;
+	const setWaterSimSpeed: (value: number) => void;
+	const setSimulateBackdropWater: (state: boolean) => void;
+	const setShowWaterSourceNames: (state: boolean) => void;
   export interface ToolbarGroup {
   	entity: Entity;
   	children: ToolbarItem[];
@@ -2876,6 +3210,7 @@ declare module "cs2/bindings" {
   interface Asset$1 {
   	entity: Entity;
   	name: string;
+	  priority: number;
   	icon: string;
   	dlc: string | null;
   	theme: string | null;
@@ -2925,6 +3260,7 @@ declare module "cs2/bindings" {
   const selectAsset: (asset: Entity, updateTool: boolean) => void;
   const clearAssetSelection: () => void;
   const toggleToolOptions: (isActive: boolean) => void;
+	const CompareAssetsByPriority: (a: Asset$1, b: Asset$1) => number;
   const population$$1: ValueBinding<number>;
   const populationDelta$: ValueBinding<number>;
   const money$: ValueBinding<number>;
@@ -3026,6 +3362,7 @@ declare module "cs2/bindings" {
   const completeListOutro: () => void;
   const activateTutorialTag: (tag: string, active: boolean) => void;
   const triggerTutorialTag: (trigger: string) => void;
+	const untriggerTutorialTag: (trigger: string) => void;
   const useTutorialTagActivation: (uiTag: string | undefined, active?: boolean) => void;
   const useTutorialTagTrigger: (uiTag: string | undefined, active?: boolean) => void;
   function useTutorialTag(uiTag: string | undefined, active?: boolean): void;
@@ -3052,6 +3389,7 @@ declare module "cs2/bindings" {
   	entity: Entity;
   	name: string;
   	shown: boolean;
+	  force: boolean;
   	locked: boolean;
   	children: AdvisorItem[];
   }
@@ -3065,6 +3403,7 @@ declare module "cs2/bindings" {
   	icon: string | null;
   	type: AdvisorItemType;
   	shown: boolean;
+	  force: boolean;
   	locked: boolean;
   	children: AdvisorItem[];
   }
@@ -3084,6 +3423,7 @@ declare module "cs2/bindings" {
   	active: boolean;
   	completed: boolean;
   	shown: boolean;
+	  force: boolean;
   	mandatory: boolean;
   	advisorActivation: boolean;
   	phases: TutorialPhase[];
@@ -3101,6 +3441,7 @@ declare module "cs2/bindings" {
   	type: TutorialPhaseType;
   	active: boolean;
   	shown: boolean;
+	  force: boolean;
   	completed: boolean;
   	forcesCompletion: boolean;
   	isBranch: boolean;
@@ -3176,7 +3517,7 @@ declare module "cs2/bindings" {
   	export { Factor, commercialDemand$, commercialFactors$, happiness$, happinessFactors$, industrialDemand$, industrialFactors$, officeDemand$, officeFactors$, residentialHighDemand$, residentialHighFactors$, residentialLowDemand$, residentialLowFactors$, residentialMediumDemand$, residentialMediumFactors$ };
   }
   export namespace climate {
-  	export { Season, WeatherType, seasonNameId$, temperature$, weather$ };
+	  export {Season, WeatherType, seasonName$, temperature$, weather$};
   }
   export namespace economyBudget {
   	export { BudgetItem, BudgetSource, expenseItems$, expenseValues$, getItemValue, incomeItems$, incomeValues$, totalExpenses$, totalIncome$ };
@@ -3185,7 +3526,33 @@ declare module "cs2/bindings" {
   	export { Loan, acceptLoanOffer, currentLoan$, loanLimit$, loanOffer$, requestLoanOffer, resetLoanOffer };
   }
   export namespace production {
-  	export { ProductionLink, Resource, ResourceCategory, ResourceData, ResourceDetails, Service, maxProgress$, resourceCategories$, resourceData$, resourceDetails$, resources$, services$ };
+	  export {
+		  FinalConsumer,
+		  FinalConsumption,
+		  FinalConsumptionQuery,
+		  ProductionChainData,
+		  ProductionLink,
+		  Resource,
+		  ResourceCategory,
+		  ResourceData,
+		  ResourceDetails,
+		  ResourceValue,
+		  Service,
+		  consumptionProduction$,
+		  finalConsumption$,
+		  importExport$,
+		  maxProduction$,
+		  maxProgress$,
+		  productionChainData$,
+		  resourceCategories$,
+		  resourceDetails$,
+		  resources$,
+		  selectedResource$,
+		  selectedResourceCategory$,
+		  serviceUpkeepConsumption$,
+		  services$,
+		  storedResource$
+	  };
   }
   export namespace service {
   	export { Service$1 as Service, ServiceDetails, ServiceFee$1 as ServiceFee, resetService, serviceDetails$, services$$1 as services$, setServiceBudget, setServiceFee };
@@ -3197,7 +3564,158 @@ declare module "cs2/bindings" {
   	export { ChirperPanel, CinematicCameraPanel, CityInfoPanel, CityInfoPanelTab, EconomyPanel, EconomyPanelTab, GamePanel, GamePanelType, GamePanels, GameScreen, InfoviewMenu, JournalPanel, LayoutPosition, LifePathPanel, NotificationsPanel, PhotoModePanel, ProgressionPanel, ProgressionPanelTab, RadioPanel, StatisticsPanel, TabbedGamePanel, TransportationOverviewPanel, TransportationOverviewPanelTab, activeGamePanel$, activeGameScreen$, activePanelPosition$, blockingPanelActive$, canUseSaveSystem$, closeActiveGamePanel, closeGamePanel, setActiveGameScreen, showCityInfoPanel, showEconomyPanel, showFreeCameraScreen, showGamePanel, showLifePathDetail, showLifePathList, showMainScreen, showPauseScreen, showProgressionPanel, showTransportationOverviewPanel, toggleGamePanel, toggleInfoviewMenu, toggleLifePathPanel, toggleRadioPanel, toggleTransportationOverviewPanel };
   }
   export namespace infoview {
-  	export { CargoSummary, ChartData, IndicatorValue, PassengerSummary, TransportSummaries, activeInfoview$, ageData$, arrestedCriminals$, attractiveness$, availableFertility$, availableForest$, availableOil$, availableOre$, averageAirPollution$, averageCrimeProbability$, averageFireHazard$, averageGroundPollution$, averageHealth$, averageHotelPrice$, averageLandValue$, averageNoisePollution$, averageWaterPollution$, batteryCharge$, birthRate$, cemeteryAvailability$, cemeteryCapacity$, cemeteryUse$, clearActiveInfoview, closeInfoviewMenu, collectedMail$, collegeAvailability$, collegeCapacity$, collegeEligible$, collegeStudents$, commercialLevels$, commercialProfitability$, crimePerMonth$, crimeProbability$, crimeProducers$, criminals$, deathRate$, deathcareAvailability$, deliveredMail$, educationData$, electricityAvailability$, electricityConsumption$, electricityExport$, electricityImport$, electricityProduction$, electricityTrade$, electricityTransmission$, electricityTransmitted$, elementaryAvailability$, elementaryCapacity$, elementaryEligible$, elementaryStudents$, employed$, employeesData$, escapedRate$, fertilityExtractionRate$, fertilityRenewalRate$, forestExtractionRate$, forestRenewalRate$, garbageProcessingRate$, garbageProductionRate$, healthcareAvailability$, highSchoolAvailability$, highSchoolCapacity$, highSchoolEligible$, highSchoolStudents$, homeless$, homelessness$, inJail$, inPrison$, industrialLevels$, industrialProfitability$, infoviews$, jailAvailability$, jailCapacity$, jobs$, landfillAvailability$, landfillCapacity$, mailProductionRate$, movedAway$, movedIn$, officeLevels$, officeProfitability$, oilExtractionRate$, oreExtractionRate$, parkedCars$, parkingAvailability$, parkingCapacity$, parkingIncome$, patientCapacity$, patientCount$, population$, postServiceAvailability$, prisonAvailability$, prisonCapacity$, prisoners$, processingAvailability$, processingRate$, residentialLevels$, setActiveInfoview, setInfomodeActive, sewageAvailability$, sewageCapacity$, sewageConsumption$, sewageExport$, shelterAvailability$, shelterCapacity$, shelteredCount$, sickCount$, storedGarbage$, topExportColors$, topExportData$, topExportNames$, topImportColors$, topImportData$, topImportNames$, tourismRate$, trafficFlow$, transportSummaries$, unemployment$, universityAvailability$, universityCapacity$, universityEligible$, universityStudents$, useInfoviewToggle, waterAvailability$, waterCapacity$, waterConsumption$, waterExport$, waterImport$, waterTrade$, weatherEffect$, workers$, workplacesData$, worksplaces$ };
+	  export {
+		  CargoSummary,
+		  ChartData,
+		  IndicatorValue,
+		  PassengerSummary,
+		  TransportSummaries,
+		  activeInfoview$,
+		  ageData$,
+		  arrestedCriminals$,
+		  attractiveness$,
+		  availableFertility$,
+		  availableFish$,
+		  availableForest$,
+		  availableOil$,
+		  availableOre$,
+		  averageAirPollution$,
+		  averageCrimeProbability$,
+		  averageFees$,
+		  averageFireHazard$,
+		  averageGroundPollution$,
+		  averageHealth$,
+		  averageHotelPrice$,
+		  averageIncome$,
+		  averageLandValue$,
+		  averageNoisePollution$,
+		  averageRent$,
+		  averageResourceCost$,
+		  averageUpkeep$,
+		  averageWaterPollution$,
+		  averageWealth$,
+		  batteryCharge$,
+		  bikeParking$,
+		  bikeParkingAvailability$,
+		  birthRate$,
+		  cemeteryAvailability$,
+		  cemeteryCapacity$,
+		  cemeteryUse$,
+		  clearActiveInfoview,
+		  closeInfoviewMenu,
+		  collectedMail$,
+		  collegeAvailability$,
+		  collegeCapacity$,
+		  collegeEligible$,
+		  collegeStudents$,
+		  commercialLevels$,
+		  commercialProfitability$,
+		  crimePerMonth$,
+		  crimeProbability$,
+		  crimeProducers$,
+		  criminals$,
+		  deathRate$,
+		  deathcareAvailability$,
+		  deliveredMail$,
+		  educationData$,
+		  electricityAvailability$,
+		  electricityConsumption$,
+		  electricityExport$,
+		  electricityImport$,
+		  electricityProduction$,
+		  electricityTrade$,
+		  electricityTransmission$,
+		  electricityTransmitted$,
+		  elementaryAvailability$,
+		  elementaryCapacity$,
+		  elementaryEligible$,
+		  elementaryStudents$,
+		  employed$,
+		  employeesData$,
+		  escapedRate$,
+		  fertilityExtractionRate$,
+		  fertilityRenewalRate$,
+		  fishExtractionRate$,
+		  fishRenewalRate$,
+		  forestExtractionRate$,
+		  forestRenewalRate$,
+		  garbageProcessingRate$,
+		  garbageProductionRate$,
+		  healthcareAvailability$,
+		  highSchoolAvailability$,
+		  highSchoolCapacity$,
+		  highSchoolEligible$,
+		  highSchoolStudents$,
+		  homeless$,
+		  homelessness$,
+		  inJail$,
+		  inPrison$,
+		  industrialLevels$,
+		  industrialProfitability$,
+		  infoviews$,
+		  jailAvailability$,
+		  jailCapacity$,
+		  jobs$,
+		  landfillAvailability$,
+		  landfillCapacity$,
+		  mailProductionRate$,
+		  movedAway$,
+		  movedIn$,
+		  officeLevels$,
+		  officeProfitability$,
+		  oilExtractionRate$,
+		  oreExtractionRate$,
+		  parkedCars$,
+		  parkingAvailability$,
+		  parkingCapacity$,
+		  parkingIncome$,
+		  patientCapacity$,
+		  patientCount$,
+		  population$,
+		  postServiceAvailability$,
+		  prisonAvailability$,
+		  prisonCapacity$,
+		  prisoners$,
+		  processingAvailability$,
+		  processingRate$,
+		  residentialLevels$,
+		  setActiveInfoview,
+		  setInfomodeActive,
+		  sewageAvailability$,
+		  sewageCapacity$,
+		  sewageConsumption$,
+		  sewageExport$,
+		  shelterAvailability$,
+		  shelterCapacity$,
+		  shelteredCount$,
+		  sickCount$,
+		  storedGarbage$,
+		  topExportColors$,
+		  topExportData$,
+		  topExportNames$,
+		  topImportColors$,
+		  topImportData$,
+		  topImportNames$,
+		  tourismRate$,
+		  trafficFlow$,
+		  transportSummaries$,
+		  unemployment$,
+		  universityAvailability$,
+		  universityCapacity$,
+		  universityEligible$,
+		  universityStudents$,
+		  useInfoviewToggle,
+		  waterAvailability$,
+		  waterCapacity$,
+		  waterConsumption$,
+		  waterExport$,
+		  waterImport$,
+		  waterTrade$,
+		  weatherEffect$,
+		  workers$,
+		  workplacesData$,
+		  worksplaces$
+	  };
   }
   export namespace infoviewTypes {
   	export { ActiveInfoview, Infomode, InfomodeColorLegend, InfomodeGradientLegend, Infoview };
@@ -3224,7 +3742,22 @@ declare module "cs2/bindings" {
   	export { CONSUMPTION_PROPERTY, ConsumptionProperty, ELECTRICITY_PROPERTY, ElectricityProperty, POLLUTION_PROPERTY, Pollution, PollutionProperty, PrefabProperties, PrefabProperty, TRANSPORT_STOP_PROPERTY, TransportStopProperty, UPKEEPNUMBER2_PROPERTY, UPKEEPNUMBER_PROPERTY, UpkeepNumber2Property, UpkeepNumberProperty, Voltage };
   }
   export namespace prefabRequirements {
-  	export { AreaType, CitizenRequirement, DevTreeNodeRequirement, MilestoneRequirement, ObjectBuiltRequirement, PrefabRequirement, PrefabRequirementType, PrefabRequirements, ProcessingRequirement, StrictObjectBuiltRequirement, TutorialRequirement, UnlockRequirement, ZoneBuiltRequirement };
+	  export {
+		  AreaType,
+		  CitizenRequirement,
+		  DevTreeNodeRequirement,
+		  MilestoneRequirement,
+		  ObjectBuiltRequirement,
+		  PrefabRequirement,
+		  PrefabRequirementType,
+		  PrefabRequirements,
+		  ProcessingRequirement,
+		  StrictObjectBuiltRequirement,
+		  TransportRequirement,
+		  TutorialRequirement,
+		  UnlockRequirement,
+		  ZoneBuiltRequirement
+	  };
   }
   export namespace devTree {
   	export { DevTreeNode, DevTreeNodeDetails, DevTreeService, DevTreeServiceDetails, devPoints$, nodeDetails$, nodes$, purchaseNode, selectedDevTree$, selectedNode$, serviceDetails$$1 as serviceDetails$, services$$2 as services$ };
@@ -3233,19 +3766,202 @@ declare module "cs2/bindings" {
   	export { UnlockingProps, isFeatureLocked, lockedFeatures$, useFeatureLocked, useFeatureUnlocking };
   }
   export namespace milestone {
-  	export { Asset, Feature, Milestone, MilestoneDetails, MilestoneUnlock, MilestoneUnlockType, MilestoneUnlocks, Policy, Service$2 as Service, UnlockDetails, XpMessage, achievedMilestone$, achievedMilestoneXP$, clearUnlockedMilestone, defaultMilestoneDetails, maxMilestoneReached$, milestoneDetails$, milestoneUnlocks$, milestones$, nextMilestoneXP$, totalXP$, unlockDetails$, unlockedMilestone$, xpMessageAdded$ };
+	  export {
+		  Asset,
+		  Feature,
+		  Milestone,
+		  MilestoneDetails,
+		  MilestoneUnlock,
+		  MilestoneUnlockType,
+		  MilestoneUnlocks,
+		  Policy,
+		  Service$2 as Service,
+		  UnlockDetails,
+		  XpMessage,
+		  achievedMilestone$,
+		  achievedMilestoneXP$,
+		  clearUnlockedMilestone,
+		  defaultMilestoneDetails,
+		  maxMilestoneReached$,
+		  milestoneDetails$,
+		  milestoneUnlocks$,
+		  milestones$,
+		  nextMilestoneXP$,
+		  reachedPopulationGoal$,
+		  totalXP$,
+		  unlockAll$,
+		  unlockDetails$,
+		  unlockedMilestone$,
+		  victoryPopupShown$,
+		  xpMessageAdded$
+	  };
   }
   export namespace signatureBuilding {
-  	export { clearUnlockedSignatures, unlockedSignatures$ };
+	  export {removeUnlockedSignature, unlockedSignatures$};
   }
   export namespace radio {
   	export { RadioClip, RadioNetwork, RadioProgram, RadioStation, currentSegment$, emergencyFocusable$, emergencyMessage$, emergencyMode$, focusEmergency, muted$, networks$, paused$, playNext, playPrevious, radioEnabled$, segmentChanged$, selectNetwork, selectStation, selectedNetwork$, selectedStation$, setMuted, setPaused, setSkipAds, setVolume, skipAds$, stations$, toggleMuted, togglePaused, toggleSkipAds, volume$ };
   }
   export namespace selectedInfo {
-  	export { ActionsSection, AnimalSection, AttractivenessFactor, AttractivenessSection, AverageHappinessSection, BatterySection, CapacityInfo, CargoSection, CargoTransportVehicleSection, CitizenSection, ColorSection, ComfortSection, CompanySection, DeathcareSection, DeathcareVehicleSection, DeliveryVehicleSection, DescriptionSection, DestroyedBuildingSection, DestroyedTreeSection, DeveloperSection, DeveloperSubsection, DeveloperSubsectionType, DeveloperSubsections, DispatchedVehiclesSection, District, DistrictsSection, DummyHumanSection, EducationSection, EfficiencyFactor, EfficiencySection, ElectricitySection, EmployeesSection, FireSection, FireVehicleSection, GarbageSection, GarbageVehicleSection, GenericInfo, HealthcareSection, HealthcareVehicleSection, HouseholdSidebarItem, HouseholdSidebarSection, HouseholdSidebarVariant, InfoList, Item, LINE_STOP, LINE_VEHICLE, LevelSection, Line, LineItem, LineSection, LineSegment, LineStop, LineVehicle, LineVisualizerSection, LinesSection, LoadSection, LocalServiceBuilding, LocalServicesSection, Location$1 as Location, MailSection, MailSectionType, MaintenanceVehicleSection, NotificationsSection, ParkSection, ParkingSection, PassengersSection, PoliceSection, PoliceVehicleSection, PoliciesSection, Pollution$1 as Pollution, PollutionSection, PostVehicleSection, PrisonSection, PrivateVehicleSection, ProfitabilitySection, PublicTransportVehicleSection, ResidentsSection, Resource$1 as Resource, ResourceSection, RoadSection, ScheduleSection, SectionType, SelectVehiclesSection, SelectedInfoSection, SelectedInfoSectionBase, SelectedInfoSectionProps, SelectedInfoSections, SewageSection, ShelterSection, StatusSection, StorageSection, TicketPriceSection, TitleSection, TransformerSection, Upgrade, UpgradeInfo, UpgradePropertiesSection, UpgradeType, UpgradesSection, UpkeepItem, UpkeepSection, Vehicle, VehicleCountSection, VehiclePrefab, VehicleSectionProps, VehicleWithLineSectionProps, VehiclesSection, WaterSection, activeSelection$, bottomSections$, clearSelection, developerSection$, householdSidebarSection$, lineVisualizerSection$, middleSections$, selectEntity, selectedEntity$, selectedInfoPosition$, selectedRoute$, selectedTrailerController$, selectedUITag$, setSelectedRoute, titleSection$, tooltipTags$, topSections$, useGeneratedTooltipParagraphs, useTooltipParagraph, useTooltipParagraphs };
+	  export {
+		  ActionsSection,
+		  AnimalSection,
+		  AttractivenessFactor,
+		  AttractivenessSection,
+		  AverageHappinessSection,
+		  BatterySection,
+		  CapacityInfo,
+		  CargoSection,
+		  CargoTransportVehicleSection,
+		  CitizenSection,
+		  ColorSection,
+		  ComfortSection,
+		  CompanySection,
+		  ContentPrerequisiteSection,
+		  DeathcareSection,
+		  DeathcareVehicleSection,
+		  DeliveryVehicleSection,
+		  DescriptionSection,
+		  DestroyedBuildingSection,
+		  DestroyedTreeSection,
+		  DeveloperSection,
+		  DeveloperSubsection,
+		  DeveloperSubsectionType,
+		  DeveloperSubsections,
+		  DispatchedVehiclesSection,
+		  District,
+		  DistrictsSection,
+		  DummyHumanSection,
+		  EducationSection,
+		  EfficiencyFactor,
+		  EfficiencySection,
+		  ElectricitySection,
+		  EmployeesSection,
+		  ExtractorVehicleSection,
+		  FireSection,
+		  FireVehicleSection,
+		  GarbageSection,
+		  GarbageVehicleSection,
+		  GenericInfo,
+		  HealthcareSection,
+		  HealthcareVehicleSection,
+		  HouseholdSidebarItem,
+		  HouseholdSidebarSection,
+		  HouseholdSidebarVariant,
+		  HouseholdWealthData,
+		  InfoList,
+		  Item,
+		  LINE_STOP,
+		  LINE_VEHICLE,
+		  LevelSection,
+		  Line,
+		  LineItem,
+		  LineSection,
+		  LineSegment,
+		  LineStop,
+		  LineType,
+		  LineVehicle,
+		  LineVisualizerSection,
+		  LinesSection,
+		  LoadSection,
+		  LocalServiceBuilding,
+		  LocalServicesSection,
+		  Location$1 as Location,
+		  MailSection,
+		  MailSectionType,
+		  MaintenanceVehicleSection,
+		  NotificationsSection,
+		  ParkSection,
+		  ParkingSection,
+		  PassengersSection,
+		  PdxModsSection,
+		  PoliceSection,
+		  PoliceVehicleSection,
+		  PoliciesSection,
+		  Pollution$1 as Pollution,
+		  PollutionSection,
+		  PostVehicleSection,
+		  PrisonSection,
+		  PrivateVehicleSection,
+		  ProfitabilitySection,
+		  PublicTransportVehicleSection,
+		  ResidentsSection,
+		  Resource$1 as Resource,
+		  ResourceSection,
+		  RoadSection,
+		  ScheduleSection,
+		  SectionType,
+		  SelectVehiclesSection,
+		  SelectedInfoSection,
+		  SelectedInfoSectionBase,
+		  SelectedInfoSectionProps,
+		  SelectedInfoSections,
+		  SewageSection,
+		  ShelterSection,
+		  StatusSection,
+		  StorageSection,
+		  TicketPriceSection,
+		  TitleSection,
+		  TradedResourcesSection,
+		  TransformerSection,
+		  Upgrade,
+		  UpgradeInfo,
+		  UpgradePropertiesSection,
+		  UpgradeType,
+		  UpgradesSection,
+		  UpkeepItem,
+		  UpkeepSection,
+		  Vehicle,
+		  VehicleCountSection,
+		  VehiclePrefab,
+		  VehicleSectionProps,
+		  VehicleWithLineSectionProps,
+		  VehiclesSection,
+		  WaterSection,
+		  activeSelection$,
+		  bottomSections$,
+		  clearSelection,
+		  developerSection$,
+		  householdSidebarSection$,
+		  lineVisualizerSection$,
+		  middleSections$,
+		  selectEntity,
+		  selectedEntity$,
+		  selectedInfoPosition$,
+		  selectedRoute$,
+		  selectedTrailerController$,
+		  selectedUITag$,
+		  setSelectedRoute,
+		  titleSection$,
+		  tooltipTags$,
+		  topSections$,
+		  useGeneratedTooltipParagraphs,
+		  useTooltipParagraph,
+		  useTooltipParagraphs
+	  };
   }
   export namespace statistics {
-  	export { StatCategory, StatItem, activeCategory$, activeGroup$, addStat, clearStats, removeStat, sampleCount$, sampleRange$, selectedStatistics$, setSampleRange, stacked$, statGroupsMap$, statLabels$, statUnlockingRequirements$, statisticsCategories$, statsData$, updatesPerDay$ };
+	  export {
+		  StatCategory,
+		  StatItem,
+		  activeCategory$,
+		  activeGroup$,
+		  addStat,
+		  addStatChildren,
+		  clearStats,
+		  removeStat,
+		  sampleCount$,
+		  sampleRange$,
+		  selectedStatistics$,
+		  setSampleRange,
+		  stacked$,
+		  statGroupsMap$,
+		  statLabels$,
+		  statUnlockingRequirements$,
+		  statisticsCategories$,
+		  statsData$,
+		  updatesPerDay$
+	  };
   }
   export namespace taxation {
   	export { TaxAreaType, TaxResource, TaxResourceInfo, areaResourceTaxRanges$, areaResources$, areaTaxEffects$, areaTaxIncomes$, areaTaxRates$, areaTypes$, maxTaxRate, minTaxRate, resourceTaxIncomes, resourceTaxRates, setAreaTaxRate, setResourceTaxRate, setTaxRate, taxEffect, taxIncome, taxRate, taxResourceInfos };
@@ -3254,10 +3970,113 @@ declare module "cs2/bindings" {
   	export { LightingState, SimulationDate, SimulationDateTime, SimulationTime, TimeSettings, calculateDateFromDays, calculateDateFromTicks, calculateDateTimeFromTicks, calculateMinutesSinceMidnightFromTicks, calculateTimeFromMinutesSinceMidnight, dateEquals, day$, lightingState$, setSimulationPaused, setSimulationSpeed, simulationPaused$, simulationPausedBarrier$, simulationSpeed$, ticks$, timeSettings$ };
   }
   export namespace tool {
-  	export { AREA_TOOL, BULLDOZE_TOOL, Brush, DEFAULT_TOOL, NET_TOOL, OBJECT_TOOL, ROUTE_TOOL, SELECTION_TOOL, TERRAIN_TOOL, Tool, ToolMode, UPGRADE_TOOL, ZONE_TOOL, activeTool$, allSnapMask$, allowBrush$, availableSnapMask$, brushAngle$, brushHeight$, brushHeightMax$, brushHeightMin$, brushSize$, brushSizeMax$, brushSizeMin$, brushStrength$, brushes$, bulldozeConfirmationRequested$, changeElevation, color$, colorSupported$, confirmBulldoze, distance$, distanceScale$, elevation$, elevationDown, elevationDownDisabled$, elevationRange$, elevationScroll, elevationStep$, elevationUp, elevationUpDisabled$, isEditor$, parallelMode$, parallelModeSupported$, parallelOffset$, replacingTrees$, selectBrush, selectTool, selectToolMode, selectedBrush$, selectedSnapMask$, setBrushAngle, setBrushHeight, setBrushSize, setBrushStrength, setColor, setDistance, setElevationStep, setParallelOffset, setSelectedSnapMask, setUndergroundMode, snapOptionNames$, toggleParallelMode, undergroundMode$, undergroundModeSupported$ };
+	  export {
+		  AREA_TOOL,
+		  BULLDOZE_TOOL,
+		  Brush,
+		  DEFAULT_TOOL,
+		  NET_TOOL,
+		  OBJECT_TOOL,
+		  ROUTE_TOOL,
+		  SELECTION_TOOL,
+		  TERRAIN_TOOL,
+		  Tool,
+		  ToolMode,
+		  UPGRADE_TOOL,
+		  WATER_TOOL,
+		  ZONE_TOOL,
+		  activeTool$,
+		  allSnapMask$,
+		  allowBrush$,
+		  availableSnapMask$,
+		  brushAngle$,
+		  brushHeight$,
+		  brushHeightMax$,
+		  brushHeightMin$,
+		  brushSize$,
+		  brushSizeMax$,
+		  brushSizeMin$,
+		  brushStrength$,
+		  brushes$,
+		  bulldozeConfirmationRequested$,
+		  changeElevation,
+		  color$,
+		  colorSupported$,
+		  confirmBulldoze,
+		  distance$,
+		  distanceScale$,
+		  elevation$,
+		  elevationDown,
+		  elevationDownDisabled$,
+		  elevationRange$,
+		  elevationScroll,
+		  elevationStep$,
+		  elevationUp,
+		  elevationUpDisabled$,
+		  isEditor$,
+		  parallelMode$,
+		  parallelModeSupported$,
+		  parallelOffset$,
+		  replacingTrees$,
+		  selectBrush,
+		  selectTool,
+		  selectToolMode,
+		  selectedBrush$,
+		  selectedSnapMask$,
+		  setBrushAngle,
+		  setBrushHeight,
+		  setBrushSize,
+		  setBrushStrength,
+		  setColor,
+		  setDistance,
+		  setElevationStep,
+		  setParallelOffset,
+		  setSelectedSnapMask,
+		  setShowWaterSourceNames,
+		  setSimulateBackdropWater,
+		  setUndergroundMode,
+		  setWaterSimSpeed,
+		  showWaterSourceNames$,
+		  simulateBackdropWater$,
+		  snapOptionNames$,
+		  toggleParallelMode,
+		  undergroundMode$,
+		  undergroundModeSupported$,
+		  waterSimSpeed$
+	  };
   }
   export namespace toolbar$1 {
-  	export { AgeMask, Asset$1 as Asset, AssetCategory, AssetPack, Theme$1 as Theme, ToolbarGroup, ToolbarItem, ToolbarItemType, ageMask$, assetCategories$, assetPacks$, assets$, clearAssetSelection, selectAsset, selectAssetCategory, selectAssetMenu, selectedAsset$, selectedAssetCategory$, selectedAssetMenu$, selectedAssetPacks$, selectedThemes$, setAgeMask, setSelectedAssetPacks, setSelectedThemes, themes$$1 as themes$, toggleToolOptions, toolbarGroups$, vegetationAges$ };
+	  export {
+		  AgeMask,
+		  Asset$1 as Asset,
+		  AssetCategory,
+		  AssetPack,
+		  CompareAssetsByPriority,
+		  Theme$1 as Theme,
+		  ToolbarGroup,
+		  ToolbarItem,
+		  ToolbarItemType,
+		  ageMask$,
+		  assetCategories$,
+		  assetPacks$,
+		  assets$,
+		  clearAssetSelection,
+		  selectAsset,
+		  selectAssetCategory,
+		  selectAssetMenu,
+		  selectedAsset$,
+		  selectedAssetCategory$,
+		  selectedAssetMenu$,
+		  selectedAssetPacks$,
+		  selectedThemes$,
+		  setAgeMask,
+		  setSelectedAssetPacks,
+		  setSelectedThemes,
+		  themes$$1 as themes$,
+		  toggleToolOptions,
+		  toolbarGroups$,
+		  vegetationAges$
+	  };
   }
   export namespace toolbarBottom {
   	export { cityName$, money$, moneyDelta$, moneyTrendThresholds$, population$$1 as population$, populationDelta$, populationTrendThresholds$, setCityName, unlimitedMoney$ };
@@ -3266,7 +4085,49 @@ declare module "cs2/bindings" {
   	export { TransportLine, TransportLineData, TransportStop, TransportType, cargoTypes$, deleteLine, hideLine, passengerTypes$, renameLine, resetVisibility, selectLine, selectedCargoType$, selectedPassengerType$, setLineActive, setLineColor, setLineSchedule, setSelectedCargoType, setSelectedPassengerType, showLine, toggleHighlight, transportLines$ };
   }
   export namespace tutorial {
-  	export { AdvisorCategory, AdvisorItem, AdvisorItemType, BalloonUITarget, Tutorial, TutorialControlScheme, TutorialList, TutorialPhase, TutorialPhaseType, TutorialTrigger, activateTutorial, activateTutorialPhase, activateTutorialTag, activeTutorial$, activeTutorialList$, activeTutorialPhase$, advisorPanelVisible$, completeActiveTutorial, completeActiveTutorialPhase, completeIntro, completeListIntro, completeListOutro, forceTutorial, listIntroActive$, listOutroActive$, nextTutorial$, setTutorialListFocused, toggleAdvisorPanel, toggleTutorialListFocus, triggerTutorialTag, tutorialCategories$, tutorialGroups$, tutorialIntroActive$, tutorialListFocused$, tutorialPending$, tutorials$, tutorialsEnabled$, useTutorialTag, useTutorialTagActivation, useTutorialTagTrigger };
+	  export {
+		  AdvisorCategory,
+		  AdvisorItem,
+		  AdvisorItemType,
+		  BalloonUITarget,
+		  Tutorial,
+		  TutorialControlScheme,
+		  TutorialList,
+		  TutorialPhase,
+		  TutorialPhaseType,
+		  TutorialTrigger,
+		  activateTutorial,
+		  activateTutorialPhase,
+		  activateTutorialTag,
+		  activeTutorial$,
+		  activeTutorialList$,
+		  activeTutorialPhase$,
+		  advisorPanelVisible$,
+		  completeActiveTutorial,
+		  completeActiveTutorialPhase,
+		  completeIntro,
+		  completeListIntro,
+		  completeListOutro,
+		  forceTutorial,
+		  listIntroActive$,
+		  listOutroActive$,
+		  nextTutorial$,
+		  setTutorialListFocused,
+		  toggleAdvisorPanel,
+		  toggleTutorialListFocus,
+		  triggerTutorialTag,
+		  tutorialCategories$,
+		  tutorialGroups$,
+		  tutorialIntroActive$,
+		  tutorialListFocused$,
+		  tutorialPending$,
+		  tutorials$,
+		  tutorialsEnabled$,
+		  untriggerTutorialTag,
+		  useTutorialTag,
+		  useTutorialTagActivation,
+		  useTutorialTagTrigger
+	  };
   }
   
   export {
