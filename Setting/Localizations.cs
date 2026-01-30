@@ -70,7 +70,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "前缀")
                 .AddTranslation(LocaleCode.ZhHant, "前綴"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Prefix]")
-                .AddTranslation(LocaleCode.EnUs, "The prefix to be added to the station name. Enter {ASSET} to replace with the target asset name, such as \"Train Station\".")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The prefix to be added to the station name. Enter {ASSET} to replace with the target asset name, such as \"Train Station\".")
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的前缀。输入 {ASSET} 以替换为目标资产名称，如\"火车站\"等。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的前綴。輸入 {ASSET} 以替換為目標資產名稱，如\"火車站\"等。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Suffix]")
@@ -113,7 +114,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站牌上的名称的后缀。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站牌上的名稱的後綴。"),
 
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ApplyXfixToTransportStation]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ApplyXfixToTransportStation]")
                 .AddTranslation(LocaleCode.EnUs, "Apply Prefix/Suffix to Stations")
                 .AddTranslation(LocaleCode.ZhHans, "应用前后缀到站点")
                 .AddTranslation(LocaleCode.ZhHant, "應用前後綴到站點"),
@@ -124,7 +126,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "是否将前缀和后缀应用到站点名称中，选中此选项可单独设置对站点的前后缀。")
                 .AddTranslation(LocaleCode.ZhHant, "是否將前綴和後綴應用到站點名稱中，選中此選項可單獨設置對站點的前後綴。"),
 
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationPrefix]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationPrefix]")
                 .AddTranslation(LocaleCode.EnUs, "Transport Station Prefix")
                 .AddTranslation(LocaleCode.ZhHans, "站点前缀")
                 .AddTranslation(LocaleCode.ZhHant, "站點前綴"),
@@ -133,7 +136,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "The prefix to be added to the name on the transport station.")
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站点上的名称的前缀。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站點上的名稱的前綴。"),
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationSuffix]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationSuffix]")
                 .AddTranslation(LocaleCode.EnUs, "Transport Station Suffix")
                 .AddTranslation(LocaleCode.ZhHans, "站点后缀")
                 .AddTranslation(LocaleCode.ZhHant, "站點後綴"),
@@ -917,7 +921,14 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Spawnable Building Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "自长建筑来源候选列表")
                 .AddTranslation(LocaleCode.ZhHant, "自長建築來源候選列表"),
-
+            new Translation("StationNaming.CurrentSelectedNaming")
+                .AddTranslation(LocaleCode.EnUs, "Current Selected Naming")
+                .AddTranslation(LocaleCode.ZhHans, "当前生效的名称")
+                .AddTranslation(LocaleCode.ZhHant, "當前生效的名稱"),
+            new Translation("StationNaming.NoNamingSelected")
+                .AddTranslation(LocaleCode.EnUs, "No naming selected")
+                .AddTranslation(LocaleCode.ZhHans, "未选择命名")
+                .AddTranslation(LocaleCode.ZhHant, "未選擇命名"),
             new Translation("StationNaming.NameSource[Building]")
                 .AddTranslation(LocaleCode.EnUs, "Building")
                 .AddTranslation(LocaleCode.ZhHans, "一般建筑")
