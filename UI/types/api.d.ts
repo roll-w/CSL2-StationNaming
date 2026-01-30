@@ -1,7 +1,7 @@
 declare module "cs2/api" {
-  import { MutableRefObject } from 'react';
-  
-  export interface ValueBinding<T> {
+    import {MutableRefObject} from 'react';
+
+    export interface ValueBinding<T> {
   	readonly value: T;
   	subscribe(listener?: BindingListener<T>): ValueSubscription<T>;
   	dispose(): void;
