@@ -2,6 +2,9 @@
 import React, {useEffect, useState} from "react";
 import {Icon, PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
 import {call, trigger, useValue} from "cs2/api";
+import checkSrc from "./icons/check.svg";
+import closeSrc from "./icons/close.svg";
+import iconStyles from "./icon.module.scss";
 import {Entity} from "cs2/bindings";
 import {StationNaming} from "./base";
 import {useLocalization} from "cs2/l10n";
@@ -19,8 +22,8 @@ import selectedEntity$ = StationNaming.selectedEntity$;
 export const CandidatesSectionKey = "StationNaming.NameCandidates"
 
 const setSelectedCandidate = (candidate: NameCandidate, selectedEntity: Entity) => {
-    call(ModName, "setCandidateFor", selectedEntity, candidate).then(r => {
-    })
+    // return the promise so callers can await and then refresh UI
+    return call(ModName, "setCandidateFor", selectedEntity, candidate) as Promise<any>
 }
 
 const navigateToCandidate = (candidate: NameCandidate) => {
@@ -42,14 +45,15 @@ const getManualSelected = async (selectedEntity: Entity): Promise<any> => {
 }
 
 const buttonClass = "button_UgX item-mouse-states_Fmi item-focused_FuT"
-const okIcon = "Media/Game/Icons/DemandFactorPositive.svg"
-const removeIcon = "Media/Game/Misc/DemandFactorNegative.svg"
+const okIcon = checkSrc
+const removeIcon = closeSrc
 
 const CandidatesFoldout = (props: {
     name: string | null,
     selectedEntity: Entity,
     candidates: SerializedNameCandidate[],
-    initialExpanded?: boolean | undefined
+    initialExpanded?: boolean | undefined,
+    onAfterSet?: () => Promise<void>
 }) => {
     const {translate} = useLocalization();
 
@@ -66,15 +70,20 @@ const CandidatesFoldout = (props: {
                         ))
                         + "]"}
                     right={
-                        <div className={"row_aZw"}>
-                            <button className={buttonClass}
-                                    onClick={() => navigateToCandidate(StationNaming.toNameCandidate(candidate))}>
-                                <Icon src="Media/Game/Icons/MapMarker.svg"/>
-                            </button>
-                            <button className={buttonClass}
-                                    onClick={() => setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)}>
-                                <Icon src={okIcon}/>
-                            </button>
+                        <div>
+                            <div className={"row_aZw"}>
+                                <button className={buttonClass}
+                                        onClick={() => navigateToCandidate(StationNaming.toNameCandidate(candidate))}>
+                                    <Icon src="Media/Game/Icons/MapMarker.svg"/>
+                                </button>
+                                <button className={buttonClass}
+                                        onClick={async () => {
+                                            await setSelectedCandidate(toNameCandidate(candidate), props.selectedEntity)
+                                            if (props.onAfterSet) await props.onAfterSet()
+                                        }}>
+                                    <img src={okIcon} className={iconStyles.icon} alt="OK"/>
+                                </button>
+                            </div>
                         </div>
                     }
                 />
@@ -135,8 +144,13 @@ const CandidatesComponent = () => {
                             <Icon src={"Media/Game/Icons/MapMarker.svg"}/>
                         </button>
                         <button className={buttonClass}
-                                onClick={() => trigger(ModName, "removeManualSelected", selectedEntity)}>
-                            <Icon src={removeIcon}/>
+                                onClick={async () => {
+                                    // use call that removes and returns current manual to avoid race
+                                    const manual = await call(ModName, "removeManualSelectedAndGet", selectedEntity) as unknown as SerializedNameCandidate
+                                    if (manual && manual.Name) setManualSelected(manual)
+                                    else setManualSelected(null)
+                                }}>
+                            <img src={removeIcon} className={iconStyles.icon}/>
                         </button>
                     </div>
                 }
@@ -191,6 +205,11 @@ const CandidatesComponent = () => {
                 name={translate(getTranslationKeyOf("Candidates"))}
                 selectedEntity={selectedEntity}
                 candidates={generalCandidates}
+                onAfterSet={async () => {
+                    const manual = await getManualSelected(selectedEntity)
+                    if (manual && manual.Name) setManualSelected(manual)
+                    else setManualSelected(null)
+                }}
             />
 
             <PanelSectionRow
@@ -207,7 +226,13 @@ const CandidatesComponent = () => {
             <CandidatesFoldout
                 name={translate(getTranslationKeyOf("Candidates"))}
                 selectedEntity={selectedEntity}
-                candidates={spawnableCandidates}/>
+                candidates={spawnableCandidates}
+                onAfterSet={async () => {
+                    const manual = await getManualSelected(selectedEntity)
+                    if (manual && manual.Name) setManualSelected(manual)
+                    else setManualSelected(null)
+                }}
+            />
         </PanelSection>
     )
 }
