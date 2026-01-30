@@ -152,31 +152,38 @@ const CandidatesComponent = () => {
         const source = nameSourceToString(combineNameSource(manualSelected))
 
         return (
-            <PanelSectionRow
-                left={<>
-                    <span>{manualSelected.Name}</span>
-                    <span style={{marginLeft: 8}}>
+            <div>
+                {/*TODO: i18n*/}
+                <PanelSectionRow left={
+                    <span>Current Selected Naming</span>
+                }/>
+                {/*TODO: if none selected, shows "No naming selected"*/}
+                <PanelSectionRow
+                    left={<>
+                        <span>{manualSelected.Name}</span>
+                        <span style={{marginLeft: 8}}>
                         <span
                             className={componentStyles.tag}>{translate(getTranslationKeyOf(source, "NameSource"))}</span>
                     </span>
-                </>}
-                right={
-                    <div className={"row_aZw " + componentStyles.container}>
-                        <button className={buttonClass}
-                                onClick={() => navigateToCandidate(StationNaming.toNameCandidate(manualSelected))}>
-                            <Icon src="Media/Game/Icons/MapMarker.svg" className={componentStyles.icon}/>
-                        </button>
-                        <button className={buttonClass}
-                                onClick={async () => {
-                                    // remove manual selection and refresh local state
-                                    await call(ModName, "removeManualSelected", selectedEntity)
-                                    setManualSelected(null)
-                                }}>
-                            <img src={removeIcon} className={componentStyles.icon}/>
-                        </button>
-                    </div>
-                }
-            />
+                    </>}
+                    right={
+                        <div className={"row_aZw " + componentStyles.container}>
+                            <button className={buttonClass}
+                                    onClick={() => navigateToCandidate(StationNaming.toNameCandidate(manualSelected))}>
+                                <Icon src="Media/Game/Icons/MapMarker.svg" className={componentStyles.icon}/>
+                            </button>
+                            <button className={buttonClass}
+                                    onClick={() => {
+                                        trigger(ModName, "removeManualSelected", selectedEntity)
+                                        setManualSelected(null)
+                                    }}>
+                                <img src={removeIcon} className={componentStyles.icon}/>
+                            </button>
+                        </div>
+                    }
+                />
+            </div>
+
         )
     }, [manualSelected, selectedEntity, translate])
 
