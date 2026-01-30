@@ -108,13 +108,6 @@ namespace StationNaming.System
                 RemoveManualSelected
             ));
 
-            // binding to remove manual selected and return current manual (useful for UI refresh)
-            AddBinding(new CallBinding<Entity, ManagedNameCandidate>(
-                Mod.Name,
-                "removeManualSelectedAndGet",
-                RemoveManualSelectedAndGet
-            ));
-
             Mod.GetLogger().Info("UI binding system initialized.");
         }
 
@@ -343,12 +336,6 @@ namespace StationNaming.System
             }
 
             EntityManager.RemoveComponent<ManualSelectNaming>(entity);
-        }
-
-        internal ManagedNameCandidate RemoveManualSelectedAndGet(Entity entity)
-        {
-            RemoveManualSelected(entity);
-            return GetManualSelected(entity);
         }
     }
 }
