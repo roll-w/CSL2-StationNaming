@@ -94,14 +94,12 @@ namespace StationNaming.System
                 NavigateToCandidate
             ));
 
-            // binding to get current manual selected naming for an entity
             AddBinding(new CallBinding<Entity, ManagedNameCandidate>(
                 Mod.Name,
                 "getManualSelected",
                 GetManualSelected
             ));
 
-            // binding to remove current manual selected naming for an entity
             AddBinding(new TriggerBinding<Entity>(
                 Mod.Name,
                 "removeManualSelected",
