@@ -22,7 +22,6 @@ import selectedEntity$ = StationNaming.selectedEntity$;
 export const CandidatesSectionKey = "StationNaming.NameCandidates"
 
 const setSelectedCandidate = (candidate: NameCandidate, selectedEntity: Entity) => {
-    // return the promise so callers can await and then refresh UI
     return call(ModName, "setCandidateFor", selectedEntity, candidate) as Promise<any>
 }
 
@@ -145,18 +144,17 @@ const CandidatesComponent = () => {
         }
     }, [selectedEntity, showCandidates])
 
-    // separate block for current manual selection UI
     const ManualSelectedBlock = useCallback(() => {
         const headerKey = getTranslationKeyOf("CurrentSelectedNaming")
         const noSelectionKey = getTranslationKeyOf("NoNamingSelected")
 
-        // always render header
         return (
             <div>
-                <PanelSectionRow left={<span>{translate(headerKey)}</span>}
-                                 right={!manualSelected && (
-                                     <span>{translate(noSelectionKey)}</span>
-                                 )}
+                <PanelSectionRow
+                    left={<span>{translate(headerKey)}</span>}
+                    right={!manualSelected && (
+                        <span>{translate(noSelectionKey)}</span>
+                    )}
                 />
                 {manualSelected && (() => {
                     const source = nameSourceToString(combineNameSource(manualSelected))
