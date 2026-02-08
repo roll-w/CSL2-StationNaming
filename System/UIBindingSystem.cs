@@ -94,6 +94,18 @@ namespace StationNaming.System
                 NavigateToCandidate
             ));
 
+            AddBinding(new CallBinding<Entity, ManagedNameCandidate>(
+                Mod.Name,
+                "getManualSelected",
+                GetManualSelected
+            ));
+
+            AddBinding(new TriggerBinding<Entity>(
+                Mod.Name,
+                "removeManualSelected",
+                RemoveManualSelected
+            ));
+
             Mod.GetLogger().Info("UI binding system initialized.");
         }
 
@@ -263,6 +275,59 @@ namespace StationNaming.System
             }
 
             buffer.Add(new NamingAssociation(entity));
+        }
+
+        internal ManagedNameCandidate GetManualSelected(Entity entity)
+        {
+            SetSelectedEntity(entity);
+
+            if (entity == Entity.Null || !EntityManager.HasComponent<ManualSelectNaming>(entity))
+            {
+                return new ManagedNameCandidate("", new List<NameSourceRefer>(), Direction.Init, EdgeType.Same);
+            }
+
+            var manual = EntityManager.GetComponentData<ManualSelectNaming>(entity);
+            return manual.SelectedName;
+        }
+
+        internal void RemoveManualSelected(Entity entity)
+        {
+            if (entity == Entity.Null)
+            {
+                return;
+            }
+
+            if (!EntityManager.HasComponent<ManualSelectNaming>(entity))
+            {
+                return;
+            }
+
+            var manual = EntityManager.GetComponentData<ManualSelectNaming>(entity);
+
+            // remove associations stored on refer entities
+            foreach (var refer in manual.SelectedName.Refers)
+            {
+                if (refer.Refer == Entity.Null)
+                {
+                    continue;
+                }
+
+                if (!EntityManager.HasBuffer<NamingAssociation>(refer.Refer))
+                {
+                    continue;
+                }
+
+                var buffer = EntityManager.GetBuffer<NamingAssociation>(refer.Refer);
+                for (int i = buffer.Length - 1; i >= 0; i--)
+                {
+                    if (buffer[i].Target == entity)
+                    {
+                        buffer.RemoveAt(i);
+                    }
+                }
+            }
+
+            EntityManager.RemoveComponent<ManualSelectNaming>(entity);
         }
     }
 }

@@ -70,7 +70,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "前缀")
                 .AddTranslation(LocaleCode.ZhHant, "前綴"),
             new Translation("Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Prefix]")
-                .AddTranslation(LocaleCode.EnUs, "The prefix to be added to the station name. Enter {ASSET} to replace with the target asset name, such as \"Train Station\".")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The prefix to be added to the station name. Enter {ASSET} to replace with the target asset name, such as \"Train Station\".")
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站点名称的前缀。输入 {ASSET} 以替换为目标资产名称，如\"火车站\"等。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站點名稱的前綴。輸入 {ASSET} 以替換為目標資產名稱，如\"火車站\"等。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.Suffix]")
@@ -113,7 +114,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站牌上的名称的后缀。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站牌上的名稱的後綴。"),
 
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ApplyXfixToTransportStation]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.ApplyXfixToTransportStation]")
                 .AddTranslation(LocaleCode.EnUs, "Apply Prefix/Suffix to Stations")
                 .AddTranslation(LocaleCode.ZhHans, "应用前后缀到站点")
                 .AddTranslation(LocaleCode.ZhHant, "應用前後綴到站點"),
@@ -124,7 +126,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.ZhHans, "是否将前缀和后缀应用到站点名称中，选中此选项可单独设置对站点的前后缀。")
                 .AddTranslation(LocaleCode.ZhHant, "是否將前綴和後綴應用到站點名稱中，選中此選項可單獨設置對站點的前後綴。"),
 
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationPrefix]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationPrefix]")
                 .AddTranslation(LocaleCode.EnUs, "Transport Station Prefix")
                 .AddTranslation(LocaleCode.ZhHans, "站点前缀")
                 .AddTranslation(LocaleCode.ZhHant, "站點前綴"),
@@ -133,7 +136,8 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "The prefix to be added to the name on the transport station.")
                 .AddTranslation(LocaleCode.ZhHans, "要添加到站点上的名称的前缀。")
                 .AddTranslation(LocaleCode.ZhHant, "要添加到站點上的名稱的前綴。"),
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationSuffix]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TransportStationSuffix]")
                 .AddTranslation(LocaleCode.EnUs, "Transport Station Suffix")
                 .AddTranslation(LocaleCode.ZhHans, "站点后缀")
                 .AddTranslation(LocaleCode.ZhHant, "站點後綴"),
@@ -157,6 +161,17 @@ namespace StationNaming.Setting
             new Translation(
                     "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.RoadFormat]")
                 .AddTranslation(LocaleCode.EnUs, "Road format."),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DefaultAutoNamingSource]")
+                .AddTranslation(LocaleCode.EnUs, "Default Auto Naming Source")
+                .AddTranslation(LocaleCode.ZhHans, "默认自动命名来源")
+                .AddTranslation(LocaleCode.ZhHant, "預設自動命名來源"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.DefaultAutoNamingSource]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "Preferred source used when picking the default name. If not found, the first candidate is used.")
+                .AddTranslation(LocaleCode.ZhHans, "选择默认命名时优先使用的来源。如不存在则使用候选列表的第一个结果。")
+                .AddTranslation(LocaleCode.ZhHant, "選擇預設命名時優先使用的來源。若不存在則使用候選列表的第一個結果。"),
             new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.AutoUpdate]")
                 .AddTranslation(LocaleCode.EnUs, "Auto Update Name")
                 .AddTranslation(LocaleCode.ZhHans, "自动更新站名")
@@ -460,7 +475,8 @@ namespace StationNaming.Setting
                     "When enabled, allow generate name candidates from surrounding deathcare facilities. ")
                 .AddTranslation(LocaleCode.ZhHans, "启用后，允许从殡仪设施中生成名称候选。")
                 .AddTranslation(LocaleCode.ZhHant, "啟用後，允許從殯儀設施中生成名稱候選。"),
-            new Translation("Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomSource]")
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.TelecomSource]")
                 .AddTranslation(LocaleCode.EnUs, "Telecom Facility Source")
                 .AddTranslation(LocaleCode.ZhHans, "电信设施来源")
                 .AddTranslation(LocaleCode.ZhHant, "電信設施來源"),
@@ -917,7 +933,14 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "Spawnable Building Candidates")
                 .AddTranslation(LocaleCode.ZhHans, "自长建筑来源候选列表")
                 .AddTranslation(LocaleCode.ZhHant, "自長建築來源候選列表"),
-
+            new Translation("StationNaming.CurrentSelectedNaming")
+                .AddTranslation(LocaleCode.EnUs, "Current Selected Name")
+                .AddTranslation(LocaleCode.ZhHans, "当前生效的名称")
+                .AddTranslation(LocaleCode.ZhHant, "當前生效的名稱"),
+            new Translation("StationNaming.NoNamingSelected")
+                .AddTranslation(LocaleCode.EnUs, "No name selected")
+                .AddTranslation(LocaleCode.ZhHans, "未选择命名")
+                .AddTranslation(LocaleCode.ZhHant, "未選擇命名"),
             new Translation("StationNaming.NameSource[Building]")
                 .AddTranslation(LocaleCode.EnUs, "Building")
                 .AddTranslation(LocaleCode.ZhHans, "一般建筑")
@@ -1030,6 +1053,41 @@ namespace StationNaming.Setting
                 .AddTranslation(LocaleCode.EnUs, "None")
                 .AddTranslation(LocaleCode.ZhHans, "None")
                 .AddTranslation(LocaleCode.ZhHant, "None"),
+
+            // Stop name source priorities
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority1]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 1")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 1")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 1"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority1]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The first priority source for auto naming transport stops. If not found, try the next priority.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第一优先来源。如不存在则尝试下一优先级。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第一優先來源。若不存在則嘗試下一優先級。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority2]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 2")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 2")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 2"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority2]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The second priority source for auto naming transport stops. If not found, try the next priority.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第二优先来源。如不存在则尝试下一优先级。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第二優先來源。若不存在則嘗試下一優先級。"),
+            new Translation(
+                    "Options.OPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority3]")
+                .AddTranslation(LocaleCode.EnUs, "Stop Name Source Priority 3")
+                .AddTranslation(LocaleCode.ZhHans, "站牌命名来源优先级 3")
+                .AddTranslation(LocaleCode.ZhHant, "站牌命名來源優先級 3"),
+            new Translation(
+                    "Options.OPTION_DESCRIPTION[StationNaming.StationNaming.Mod.StationNamingSettings.StopNameSourcePriority3]")
+                .AddTranslation(LocaleCode.EnUs,
+                    "The third priority source for auto naming transport stops. If none found, use the first candidate.")
+                .AddTranslation(LocaleCode.ZhHans, "公交站牌自动命名的第三优先来源。如均不存在则使用候选列表的第一个。")
+                .AddTranslation(LocaleCode.ZhHant, "公交站牌自動命名的第三優先來源。若均不存在則使用候選列表的第一個。"),
         };
 
         public static void LoadTranslations(StationNamingSettings settings)

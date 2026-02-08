@@ -21,6 +21,7 @@
 using Game;
 using Game.Common;
 using Game.UI;
+using Game.Routes;
 using StationNaming.System.Utils;
 using Unity.Collections;
 using Unity.Entities;
@@ -34,15 +35,18 @@ namespace StationNaming.System
 
         protected override void OnUpdate()
         {
-            if (!Mod.GetInstance().GetSettings().Enable)
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
             {
                 return;
             }
 
-            if (!Mod.GetInstance().GetSettings().AutoNaming)
+            if (!settings.AutoNaming)
             {
                 return;
             }
+
+            var stopSourcePriorities = settings.GetStopNameSourcePriorities();
 
             var entities = _createdQuery.ToEntityArray(Allocator.Temp);
 
@@ -55,7 +59,11 @@ namespace StationNaming.System
 
                 var candidates = EntityManager
                     .GetBuffer<NameCandidate>(entity);
-                var candidate = ChooseCandidate(candidates);
+
+                // Only apply priority sources to transport stops; others use default order
+                var candidate = EntityManager.HasComponent<TransportStop>(entity)
+                    ? ChooseCandidateByPriority(candidates, stopSourcePriorities)
+                    : candidates[0];
 
                 _nameSystem.SetCustomName(entity, candidate.Name.ToString());
 
@@ -95,8 +103,43 @@ namespace StationNaming.System
             }
         }
 
-        private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates)
+        private static NameCandidate ChooseCandidateByPriority(DynamicBuffer<NameCandidate> candidates, NameSource[] priorities)
         {
+            foreach (var priority in priorities)
+            {
+                foreach (var candidate in candidates)
+                {
+                    var refers = candidate.Refers;
+                    for (var i = 0; i < refers.Length; i++)
+                    {
+                        if (refers[i].Source == priority)
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
+            return candidates[0];
+        }
+
+        private static NameCandidate ChooseCandidate(DynamicBuffer<NameCandidate> candidates, NameSource defaultSource)
+        {
+            if (defaultSource != NameSource.None)
+            {
+                foreach (var candidate in candidates)
+                {
+                    var refers = candidate.Refers;
+                    for (var i = 0; i < refers.Length; i++)
+                    {
+                        if (refers[i].Source == defaultSource)
+                        {
+                            return candidate;
+                        }
+                    }
+                }
+            }
+
             return candidates[0];
         }
 

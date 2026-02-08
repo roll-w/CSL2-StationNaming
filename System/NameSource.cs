@@ -20,7 +20,7 @@
 
 namespace StationNaming.System
 {
-    public enum NameSource : uint
+    public enum NameSource
     {
         Owner = 0,
         Road,
