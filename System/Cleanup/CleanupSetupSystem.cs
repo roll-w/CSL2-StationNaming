@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 //
 // Copyright (c) 2024 RollW
 //
@@ -28,11 +28,6 @@ namespace StationNaming.System.Cleanup
 {
     /// <summary>
     /// System to perform migration setup before cleanup operations.
-    ///
-    /// This system ensures backward compatibility when new Tags (ManualSelectNamingTag
-    /// and NameCandidateTag) are introduced. It migrates existing data by adding
-    /// the appropriate Tags to entities that have the corresponding components
-    /// but lack the Tags.
     ///
     /// The system creates a global singleton entity with CleanupSetup component
     /// to mark that migration is complete. CleanupSystem will only run after
@@ -117,6 +112,7 @@ namespace StationNaming.System.Cleanup
         {
             base.OnCreate();
             Mod.GetLogger().Info("CleanupSetupSystem created.");
+            Enabled = true;
 
             _nameCandidatesForMigrationQuery = GetEntityQuery(new EntityQueryDesc
             {
@@ -149,8 +145,6 @@ namespace StationNaming.System.Cleanup
                     ComponentType.ReadOnly<CleanupSetup>()
                 }
             });
-
-            RequireAnyForUpdate(_nameCandidatesForMigrationQuery, _manualSelectNamingForMigrationQuery);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace StationNaming
             updateSystem.UpdateAt<GeneralBuildingNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateBefore<AutoUpdateNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAfter<AutoNamingSystem>(SystemUpdatePhase.UIUpdate);
-            updateSystem.UpdateAt<CleanupSetupSystem>(SystemUpdatePhase.LoadSimulation);
+            updateSystem.UpdateAfter<CleanupSetupSystem>(SystemUpdatePhase.GameSimulation);
             updateSystem.UpdateAfter<CleanupSystem>(SystemUpdatePhase.ModificationEnd);
         }
 
