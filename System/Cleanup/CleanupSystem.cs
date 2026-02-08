@@ -35,9 +35,16 @@ namespace StationNaming.System.Cleanup
         private EntityQuery _selectedQuery;
         private EntityQuery _nameCandidatesQuery;
         private EntityQuery _manualSelectNamingQuery;
+        private EntityQuery _cleanupSetupQuery;
 
         protected override void OnUpdate()
         {
+            if (_cleanupSetupQuery.CalculateEntityCount() == 0)
+            {
+                // Setup not yet complete, skip cleanup
+                return;
+            }
+
             var selectedEntities = _selectedQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in selectedEntities)
             {
@@ -61,6 +68,15 @@ namespace StationNaming.System.Cleanup
         {
             base.OnCreate();
             Mod.GetLogger().Info("CleanupSystem created.");
+
+            // Query to check if CleanupSetupSystem has completed migration
+            _cleanupSetupQuery = GetEntityQuery(new EntityQueryDesc
+            {
+                All = new[]
+                {
+                    ComponentType.ReadOnly<CleanupSetup>()
+                }
+            });
 
             // If an entity was not selected, it shouldn't have the NameCandidateTag
             _selectedQuery = GetEntityQuery(new EntityQueryDesc
