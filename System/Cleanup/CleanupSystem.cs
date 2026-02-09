@@ -51,17 +51,23 @@ namespace StationNaming.System.Cleanup
                 EntityManager.RemoveComponent<NameCandidateTag>(entity);
             }
 
+            selectedEntities.Dispose();
+
             var nameCandidateEntities = _nameCandidatesQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in nameCandidateEntities)
             {
                 SystemUtils.TryCleanRemoveBuffer<NameCandidate>(EntityManager, entity);
             }
 
+            nameCandidateEntities.Dispose();
+
             var manualSelectNamingEntities = _manualSelectNamingQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in manualSelectNamingEntities)
             {
                 SystemUtils.TryCleanRemoveComponent<ManualSelectNaming>(EntityManager, entity);
             }
+
+            manualSelectNamingEntities.Dispose();
         }
 
         protected override void OnCreate()

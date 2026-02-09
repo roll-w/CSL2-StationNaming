@@ -78,6 +78,8 @@ namespace StationNaming.System.Cleanup
             {
                 Mod.GetLogger().Info($"CleanupSetupSystem: Migrated {count} NameCandidate entities.");
             }
+
+            entities.Dispose();
         }
 
         private void MigrateManualSelectNamings()
@@ -95,6 +97,8 @@ namespace StationNaming.System.Cleanup
             {
                 Mod.GetLogger().Info($"CleanupSetupSystem: Migrated {count} ManualSelectNaming entities.");
             }
+
+            entities.Dispose();
         }
 
         /// <summary>

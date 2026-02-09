@@ -100,10 +100,9 @@ namespace StationNaming.System
                 copy.Name = updatedName;
 
                 valid.Add(naming);
-                EntityManager.AddComponentData(
-                    target,
-                    new ManualSelectNaming(copy)
-                );
+                selectNaming.SelectedName = copy;
+
+                EntityManager.SetComponentData(target, selectNaming);
 
                 rawNameCandidate.Release();
 
