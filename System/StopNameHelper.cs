@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 RollW
+// Copyright (c) 2024 RollW
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -152,7 +152,7 @@ namespace StationNaming.System
         {
             var nameCandidates = new HashSet<NameCandidate>();
 
-            var collectEdges = EdgeUtils.CollectIntersections(edge, _entityManager, depth);
+            var collectEdges = EdgeUtils.CollectEdges(_entityManager, edge, depth);
 
             var currentRoad = new RoadEdge(Direction.Init, EdgeType.Same, edge);
             var root = EdgeUtils.GetRootEntityForEdge(edge, _entityManager);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 RollW
+// Copyright (c) 2024 RollW
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,16 +28,12 @@ using Unity.Entities;
 
 namespace StationNaming.System
 {
-    public struct NameBlob
-    {
-        public BlobString Value;
-    }
-
     [InternalBufferCapacity(0)]
     public struct NameCandidate : ICleanupBufferElementData,
         ISerializable, IEquatable<NameCandidate>, IJsonWritable, IJsonReadable, ISelfReleasable
     {
-        public FixedString512Bytes Name; // TODO: change to BlobAssetReference<NameBlob> for better memory usage
+        // TODO: use blob asset to reduce memory copy maybe?
+        public FixedString512Bytes Name;
         public NativeList<NameSourceRefer> Refers;
         public Direction Direction;
         public EdgeType EdgeType;
@@ -165,10 +161,14 @@ namespace StationNaming.System
 
         public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
         {
-            writer.Write(SerialVersion.Version3.ToFormatString());
+            writer.Write(SerialVersion.Version4.ToFormatString());
             writer.Write(Name.ToString());
             writer.Write(Refers.Length);
-            writer.Write(Refers.ToArray(Allocator.Temp));
+            for (var i = 0; i < Refers.Length; i++)
+            {
+                writer.Write(Refers[i]);
+            }
+
             writer.Write((uint)Direction);
             writer.Write((uint)EdgeType);
         }
@@ -178,34 +178,64 @@ namespace StationNaming.System
             try
             {
                 reader.Read(out string version);
-                if (!version.StartsWith(SerialVersionExtensions.Prefix))
+                if (!version.StartsWith(SerialVersionExtensions.Prefix) && !version.StartsWith('\0'))
                 {
                     DeserializeToV2(reader, version);
                     return;
                 }
 
-                reader.Read(out string name);
-                Name = name;
-                reader.Read(out int size);
-                var refers = new NativeArray<NameSourceRefer>(size, Allocator.Temp);
-                reader.Read(refers);
-                Refers = new NativeList<NameSourceRefer>(size, Allocator.Persistent);
-                foreach (var refer in refers)
+                if (SerialVersionExtensions.ParseVersionMark(version, out var parsedVersion) &&
+                    parsedVersion == SerialVersion.Version4)
                 {
-                    Refers.Add(refer);
+                    DeserializeV4(reader);
+                    return;
                 }
 
-                refers.Dispose();
-
-                reader.Read(out uint direction);
-                Direction = (Direction)direction;
-                reader.Read(out uint edgeType);
-                EdgeType = (EdgeType)edgeType;
+                DeserializeV3(reader);
             }
             catch (Exception)
             {
                 SetToInvalid();
             }
+        }
+
+        private void DeserializeV4<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out string name);
+            Name = name;
+            reader.Read(out int size);
+            Refers = new NativeList<NameSourceRefer>(size, Allocator.Persistent);
+            for (var i = 0; i < size; i++)
+            {
+                reader.Read(out NameSourceRefer refer);
+                Refers.Add(refer);
+            }
+
+            reader.Read(out uint direction);
+            Direction = (Direction)direction;
+            reader.Read(out uint edgeType);
+            EdgeType = (EdgeType)edgeType;
+        }
+
+        private void DeserializeV3<TReader>(TReader reader) where TReader : IReader
+        {
+            reader.Read(out string name);
+            Name = name;
+            reader.Read(out int size);
+            var refers = new NativeArray<NameSourceRefer>(size, Allocator.Temp);
+            reader.Read(refers);
+            Refers = new NativeList<NameSourceRefer>(size, Allocator.Persistent);
+            foreach (var refer in refers)
+            {
+                Refers.Add(refer);
+            }
+
+            refers.Dispose();
+
+            reader.Read(out uint direction);
+            Direction = (Direction)direction;
+            reader.Read(out uint edgeType);
+            EdgeType = (EdgeType)edgeType;
         }
 
         private void DeserializeToV2<TReader>(TReader reader, string name) where TReader : IReader
