@@ -129,7 +129,7 @@ namespace StationNaming.System
                 EntityManager.HasComponent<Selected>(_selectedEntity))
             {
                 EntityManager.RemoveComponent<Selected>(_selectedEntity);
-                SystemUtils.TryRemoveBuffer<NameCandidate>(EntityManager, _selectedEntity);
+                EntityManager.RemoveComponent<NameCandidateTag>(_selectedEntity);
             }
 
             if (entity != Entity.Null || entity != default)
@@ -156,7 +156,7 @@ namespace StationNaming.System
 
             var buffer = EntityManager.GetBuffer<NameCandidate>(entity);
 
-            List<ManagedNameCandidate> result = new List<ManagedNameCandidate>();
+            var result = new List<ManagedNameCandidate>();
             foreach (var nameCandidate in buffer)
             {
                 result.Add(nameCandidate);
@@ -211,6 +211,7 @@ namespace StationNaming.System
             }
 
             EntityManager.AddComponentData(entity, naming);
+            SystemUtils.AddComponent<ManualSelectNamingTag>(EntityManager, entity);
             _nameSystem.SetCustomName(entity, candidate.Name);
 
             return true;
@@ -239,7 +240,7 @@ namespace StationNaming.System
                 return;
             }
 
-            var last = refers[refers.Count - 1];
+            var last = refers[^1];
             NavigateToEntity(last.Refer);
         }
 
@@ -251,13 +252,6 @@ namespace StationNaming.System
             // TODO:
         }
 
-        private DynamicBuffer<T> GetBuffer<T>(Entity entity) where T : unmanaged, IBufferElementData
-        {
-            return EntityManager.HasBuffer<T>(entity)
-                ? EntityManager.GetBuffer<T>(entity)
-                : EntityManager.AddBuffer<T>(entity);
-        }
-
         private void CheckAndAddCurrent(Entity refer, Entity entity)
         {
             if (refer == Entity.Null)
@@ -265,7 +259,7 @@ namespace StationNaming.System
                 return;
             }
 
-            var buffer = GetBuffer<NamingAssociation>(refer);
+            var buffer = SystemUtils.GetBuffer<NamingAssociation>(EntityManager, refer);
             if (buffer.Length == 0)
             {
                 buffer.Add(new NamingAssociation(entity));

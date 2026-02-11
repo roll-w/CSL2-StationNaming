@@ -32,7 +32,7 @@ namespace StationNaming.Setting
 {
     public class NameFormatter
     {
-        private readonly EntityManager _entityManager;
+        private EntityManager _entityManager;
         private readonly NameSystem _nameSystem;
         private readonly PrefabSystem _prefabSystem;
 
@@ -84,6 +84,7 @@ namespace StationNaming.Setting
                 {
                     return;
                 }
+
                 var format = Options.SourceFormats[refer.Source];
                 var name = refer.GetName(_entityManager, _nameSystem);
                 var isNextIntersection = next?.Source == NameSource.Intersection;

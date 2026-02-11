@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 RollW
+// Copyright (c) 2024 RollW
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -68,7 +68,7 @@ namespace StationNaming.System
         private void CheckAndUpdate(Entity entity)
         {
             var namingAssociations = EntityManager.GetBuffer<NamingAssociation>(entity);
-            List<NamingAssociation> valid = new List<NamingAssociation>();
+            var valid = new List<NamingAssociation>();
 
             foreach (var naming in namingAssociations)
             {
@@ -89,20 +89,22 @@ namespace StationNaming.System
                 {
                     // it probably means user has changed the name,
                     // we should not update it
+                    selectNaming.SelectedName.Release();
                     EntityManager.RemoveComponent<ManualSelectNaming>(target);
                     continue;
                 }
 
                 var updatedName = GetUpdatedName(selectNaming, target);
 
-                var copy = rawNameCandidate;
+                var copy = rawNameCandidate.DeepCopy();
                 copy.Name = updatedName;
 
                 valid.Add(naming);
-                EntityManager.AddComponentData(
-                    target,
-                    new ManualSelectNaming(copy)
-                );
+                selectNaming.SelectedName = copy;
+
+                EntityManager.SetComponentData(target, selectNaming);
+
+                rawNameCandidate.Release();
 
                 var targetName = currentName.Replace(rawCandidateName, updatedName);
                 _nameSystem.SetCustomName(target, targetName);

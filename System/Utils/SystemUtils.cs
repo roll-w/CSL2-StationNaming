@@ -33,6 +33,15 @@ namespace StationNaming.System.Utils
                 : entityManager.AddBuffer<T>(entity);
         }
 
+        public static void AddComponent<T>(EntityManager entityManager, Entity entity)
+            where T : unmanaged, IComponentData
+        {
+            if (!entityManager.HasComponent<T>(entity))
+            {
+                entityManager.AddComponent<T>(entity);
+            }
+        }
+
         public static void TryRemoveBuffer<T>(
             EntityManager entityManager,
             Entity entity) where T : unmanaged, IBufferElementData
@@ -41,9 +50,65 @@ namespace StationNaming.System.Utils
             {
                 return;
             }
+
             var buffer = entityManager.GetBuffer<T>(entity);
             buffer.Clear();
+            entityManager.RemoveComponent<T>(entity);
         }
 
+        public static void TryCleanRemoveBuffer<T>(
+            EntityManager entityManager,
+            Entity entity) where T : unmanaged, IBufferElementData, ISelfReleasable
+        {
+            if (!entityManager.HasBuffer<T>(entity))
+            {
+                return;
+            }
+
+            var buffer = entityManager.GetBuffer<T>(entity);
+            for (var i = 0; i < buffer.Length; i++)
+            {
+                var item = buffer[i];
+                item.Release();
+            }
+
+            buffer.Clear();
+            entityManager.RemoveComponent<T>(entity);
+        }
+
+        public static void TryCleanRemoveComponent<T>(EntityManager entityManager, Entity entity)
+            where T : unmanaged, IComponentData, ISelfReleasable
+        {
+            if (!entityManager.HasComponent<T>(entity))
+            {
+                return;
+            }
+
+            var component = entityManager.GetComponentData<T>(entity);
+            component.Release();
+            entityManager.RemoveComponent<T>(entity);
+        }
+
+        /// <summary>
+        /// Get or create a buffer, and release all items in it if already exists.
+        /// </summary>
+        public static DynamicBuffer<T> SafeAddBuffer<T>(EntityManager entityManager, Entity target)
+            where T : unmanaged, IBufferElementData, ISelfReleasable
+        {
+            if (!entityManager.HasBuffer<T>(target))
+            {
+                return entityManager.AddBuffer<T>(target);
+            }
+
+            var buffer = entityManager.GetBuffer<T>(target);
+            for (var i = 0; i < buffer.Length; i++)
+            {
+                var item = buffer[i];
+                item.Release();
+            }
+
+            buffer.Clear();
+            return buffer;
+        }
     }
 }

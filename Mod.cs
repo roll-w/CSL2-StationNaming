@@ -26,6 +26,7 @@ using Game.Modding;
 using Game.SceneFlow;
 using StationNaming.Setting;
 using StationNaming.System;
+using StationNaming.System.Cleanup;
 
 namespace StationNaming
 {
@@ -69,6 +70,8 @@ namespace StationNaming
             updateSystem.UpdateAt<GeneralBuildingNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateBefore<AutoUpdateNamingSystem>(SystemUpdatePhase.UIUpdate);
             updateSystem.UpdateAfter<AutoNamingSystem>(SystemUpdatePhase.UIUpdate);
+            updateSystem.UpdateAfter<CleanupSetupSystem>(SystemUpdatePhase.GameSimulation);
+            updateSystem.UpdateAfter<CleanupSystem>(SystemUpdatePhase.ModificationEnd);
         }
 
         public void OnDispose()

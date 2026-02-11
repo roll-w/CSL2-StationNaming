@@ -70,13 +70,14 @@ namespace StationNaming.System
                 EntityManager.RemoveComponent<ToAutoNaming>(entity);
                 EntityManager.RemoveComponent<Selected>(entity);
 
-                var entityNaming = new ManualSelectNaming(candidate);
+                var entityNaming = new ManualSelectNaming(candidate.DeepCopy());
                 var association = new NamingAssociation(entity);
 
                 EntityManager.AddComponentData(entity, entityNaming);
+                SystemUtils.AddComponent<ManualSelectNamingTag>(EntityManager, entity);
                 AddAssociations(association, candidate.Refers);
 
-                candidates.Clear();
+                EntityManager.RemoveComponent<NameCandidateTag>(entity);
             }
         }
 
