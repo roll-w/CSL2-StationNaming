@@ -1,4 +1,4 @@
-﻿// MIT License
+// MIT License
 // 
 // Copyright (c) 2024 RollW
 // 
@@ -64,6 +64,35 @@ namespace StationNaming.System.Cleanup
             var manualSelectNamingEntities = _manualSelectNamingQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in manualSelectNamingEntities)
             {
+                if (!EntityManager.HasComponent<ManualSelectNaming>(entity))
+                {
+                    continue;
+                }
+
+                var manual = EntityManager.GetComponentData<ManualSelectNaming>(entity);
+
+                foreach (var refer in manual.SelectedName.Refers)
+                {
+                    if (refer.Refer == Entity.Null)
+                    {
+                        continue;
+                    }
+
+                    if (!EntityManager.HasBuffer<NamingAssociation>(refer.Refer))
+                    {
+                        continue;
+                    }
+
+                    var buffer = EntityManager.GetBuffer<NamingAssociation>(refer.Refer);
+                    for (var i = buffer.Length - 1; i >= 0; i--)
+                    {
+                        if (buffer[i].Target == entity)
+                        {
+                            buffer.RemoveAt(i);
+                        }
+                    }
+                }
+
                 SystemUtils.TryCleanRemoveComponent<ManualSelectNaming>(EntityManager, entity);
             }
 
