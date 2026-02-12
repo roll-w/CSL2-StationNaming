@@ -4,13 +4,13 @@
         <AssemblyTitle>$(Title)</AssemblyTitle>
         <Description>A Cities: Skylines 2 mod.</Description>
         <Authors>RollW</Authors>
-        <Copyright>Copyright (c) 2024-2025 RollW (github.com/roll-w). All rights reserved.</Copyright>
+        <Copyright>Copyright (c) 2024-2026 RollW (github.com/roll-w). All rights reserved.</Copyright>
         <Product>$(Title)</Product>
-        <Version>0.5.2</Version>
+        <Version>0.6.0</Version>
         <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 
         <OutputType>Library</OutputType>
-        <TargetFramework>net472</TargetFramework>
+        <TargetFramework>net48</TargetFramework>
         <Configurations>Debug;Release</Configurations>
         <LangVersion>9.0</LangVersion>
 

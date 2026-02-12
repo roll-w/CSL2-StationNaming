@@ -64,14 +64,16 @@ on GitHub.
 	<!--Link to the forum post where the mod can be discussed-->
 	<ForumLink Value="https://forum.paradoxplaza.com/forum/threads/station-naming.1662254" />
 	<!--Version of the mod-->
-	<ModVersion Value="0.5.2" />
+	<ModVersion Value="0.6.0"/>
 	<!--Recommended version of the base game to use the mod-->
 	<GameVersion Value="1.*" />
 	<!--Dependency for the mod, can be set multiple times-->
 	<Dependency Id="" />
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
-- Fix: Compatibility with 1.3.6.f1
+- Feature: Support for displaying and removing the currently selected naming.
+- Feature: Added options to customize the default transport stop naming source. Thanks to @Qing-78.
+- Fix: Minor bug fixes, performance optimizations and UI improvements.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
 	<ExternalLink Type="github" Url="https://github.com/roll-w/CSL2-StationNaming" />
