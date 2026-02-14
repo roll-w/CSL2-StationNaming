@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2024 RollW
+// Copyright (c) 2024 RollW
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -66,9 +66,15 @@ namespace StationNaming.System.Utils
             }
 
             var buffer = entityManager.GetBuffer<T>(entity);
+            if (buffer.Length == 0)
+            {
+                entityManager.RemoveComponent<T>(entity);
+                return;
+            }
+
             for (var i = 0; i < buffer.Length; i++)
             {
-                var item = buffer[i];
+                ref var item = ref buffer.ElementAt(i);
                 item.Release();
             }
 
@@ -103,7 +109,7 @@ namespace StationNaming.System.Utils
             var buffer = entityManager.GetBuffer<T>(target);
             for (var i = 0; i < buffer.Length; i++)
             {
-                var item = buffer[i];
+                ref var item = ref buffer.ElementAt(i);
                 item.Release();
             }
 

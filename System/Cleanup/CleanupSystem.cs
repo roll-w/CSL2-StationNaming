@@ -39,19 +39,17 @@ namespace StationNaming.System.Cleanup
 
         protected override void OnUpdate()
         {
+            var settings = Mod.GetInstance().GetSettings();
+            if (!settings.Enable)
+            {
+                return;
+            }
+
             if (_cleanupSetupQuery.CalculateEntityCount() == 0)
             {
                 // Setup not yet complete, skip cleanup
                 return;
             }
-
-            var selectedEntities = _selectedQuery.ToEntityArray(Allocator.Temp);
-            foreach (var entity in selectedEntities)
-            {
-                EntityManager.RemoveComponent<NameCandidateTag>(entity);
-            }
-
-            selectedEntities.Dispose();
 
             var nameCandidateEntities = _nameCandidatesQuery.ToEntityArray(Allocator.Temp);
             foreach (var entity in nameCandidateEntities)
@@ -97,6 +95,7 @@ namespace StationNaming.System.Cleanup
             }
 
             manualSelectNamingEntities.Dispose();
+            EntityManager.RemoveComponent<NameCandidateTag>(_selectedQuery);
         }
 
         protected override void OnCreate()
@@ -113,12 +112,11 @@ namespace StationNaming.System.Cleanup
                 }
             });
 
-            // If an entity was not selected, it shouldn't have the NameCandidateTag
             _selectedQuery = GetEntityQuery(new EntityQueryDesc
             {
                 All = new[]
                 {
-                    ComponentType.ReadOnly<NameCandidateTag>()
+                    ComponentType.ReadWrite<NameCandidateTag>()
                 },
                 None = new[]
                 {
@@ -130,7 +128,7 @@ namespace StationNaming.System.Cleanup
             {
                 All = new[]
                 {
-                    ComponentType.ReadOnly<NameCandidate>()
+                    ComponentType.ReadWrite<NameCandidate>()
                 },
                 None = new[]
                 {
@@ -142,7 +140,7 @@ namespace StationNaming.System.Cleanup
             {
                 All = new[]
                 {
-                    ComponentType.ReadOnly<ManualSelectNaming>()
+                    ComponentType.ReadWrite<ManualSelectNaming>()
                 },
                 None = new[]
                 {

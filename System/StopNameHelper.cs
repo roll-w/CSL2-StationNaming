@@ -116,7 +116,10 @@ namespace StationNaming.System
                 owner, length, includeSelf: false
             );
             var buildingName = _nameSystem.GetRenderedLabelName(owner);
-            var copy = new HashSet<NameCandidate>(candidates)
+            // Use DeepCopy to avoid sharing NativeList between station and stop buffers.
+            // Without deep copy, both buffers would share the same NativeList pointer,
+            // causing double-free when both entities are cleaned up.
+            var copy = new HashSet<NameCandidate>(candidates.Select(c => c.DeepCopy()))
             {
                 NameCandidate.Of(
                     buildingName, Direction.Init, EdgeType.Same,
@@ -391,8 +394,12 @@ namespace StationNaming.System
             Entity target
         )
         {
+            if (candidate.Refers.Length == 0)
+            {
+                return new List<NameCandidate>();
+            }
+
             if (!NameOptions.EnableDistrictPrefix
-                || candidate.Refers.Length == 0
                 || candidate.Refers[0].Source == NameSource.Owner)
             {
                 return new List<NameCandidate> { GenerateNameCandidate(candidate, target) };
@@ -461,18 +468,25 @@ namespace StationNaming.System
         {
             if (!raw.Name.IsEmpty)
             {
-                return raw;
+                return raw.DeepCopy();
+            }
+
+            if (raw.Refers.Length == 0)
+            {
+                return default;
             }
 
             var name = _nameFormatter.FormatRefers(
                 raw.Refers, target
             );
 
-            return new NameCandidate(
+            // Use DeepCopy to ensure the new candidate has its own NativeList.
+            // This prevents double-free when multiple candidates share the same refers.
+            return NameCandidate.Of(
                 name,
-                raw.Refers,
                 raw.Direction,
-                raw.EdgeType
+                raw.EdgeType,
+                raw.RefersToList().Select(r => r).ToArray()
             );
         }
 

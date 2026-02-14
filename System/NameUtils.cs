@@ -80,7 +80,8 @@ namespace StationNaming.System
 
         private static readonly Dictionary<Type, NameSource> PrefabToNameSource = new()
         {
-            { typeof(SpawnableBuildingData), NameSource.SpawnableBuilding }
+            { typeof(SpawnableBuildingData), NameSource.SpawnableBuilding },
+            { typeof(PlaceholderObjectData), NameSource.None }
         };
 
         public static NameSource TryGetBuildingSource(Entity target, EntityManager entityManager)
@@ -98,13 +99,7 @@ namespace StationNaming.System
                 }
             }
 
-            var source = TryGetBuildingSourceByPrefab(target, entityManager);
-            if (source != NameSource.None && source != NameSource.Unknown)
-            {
-                return source;
-            }
-
-            return NameSource.Building;
+            return TryGetBuildingSourceByPrefab(target, entityManager);
         }
 
         private static NameSource TryGetBuildingSourceByPrefab(Entity target, EntityManager entityManager)

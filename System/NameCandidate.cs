@@ -153,10 +153,13 @@ namespace StationNaming.System
 
         public void Release()
         {
-            if (Refers.IsCreated)
+            if (!Refers.IsCreated)
             {
-                Refers.Dispose();
+                Mod.GetLogger().Warn($"Tried to release a NameCandidate, but there is nothing to release: ${this}");
+                return;
             }
+            Refers.Dispose();
+            Refers = default;
         }
 
         public void Serialize<TWriter>(TWriter writer) where TWriter : IWriter
