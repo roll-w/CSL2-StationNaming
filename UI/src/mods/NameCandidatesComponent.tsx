@@ -1,4 +1,4 @@
-﻿import {ModuleRegistryExtend} from "cs2/modding";
+import {ModuleRegistryExtend} from "cs2/modding";
 import React, {useCallback, useEffect, useMemo, useState} from "react";
 import {Icon, PanelFoldout, PanelSection, PanelSectionRow, Tooltip} from "cs2/ui";
 import {call, trigger, useValue} from "cs2/api";
@@ -73,8 +73,8 @@ const CandidatesFoldout = React.memo((props: {
                 <PanelSectionRow
                     key={(candidate.Name || "") + ":" + idx}
                     left={<>
-                        <span>{candidate.Name}</span>
-                        <span style={{marginLeft: 8}}>
+                        <span className={componentStyles.candidateName}>{candidate.Name}</span>
+                        <span className={componentStyles.tagWrapper}>
                             <span className={componentStyles.tag}>
                                 {translate(getTranslationKeyOf(
                                     nameSourceToString(combineNameSource(candidate)),
@@ -161,8 +161,8 @@ const CandidatesComponent = () => {
                     return (
                         <PanelSectionRow
                             left={<>
-                                <span>{manualSelected.Name}</span>
-                                <span style={{marginLeft: 8}}>
+                                <span className={componentStyles.candidateName}>{manualSelected.Name}</span>
+                                <span className={componentStyles.tagWrapper}>
                                     <span
                                         className={componentStyles.tag}>{translate(getTranslationKeyOf(source, "NameSource"))}</span>
                                 </span>

@@ -8,6 +8,13 @@
   height: 28rem !important;
 }
 
+.candidateName {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
 .tag {
   display: inline-block;
   background-color: rgba(254, 254, 254, 0.1);
@@ -16,4 +23,13 @@
   border-radius: 4px;
   font-size: 12rem;
   vertical-align: middle;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tagWrapper {
+  display: inline-flex;
+  margin-left: 8px;
+  margin-right: 20px;
+  flex-shrink: 0;
 }
