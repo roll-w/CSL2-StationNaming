@@ -171,7 +171,7 @@ namespace StationNaming.System
                 nameCandidates.Add(NameCandidate.Of(
                     string.Empty,
                     Direction.Init, EdgeType.Same,
-                    edge, NameSource.Road
+                    root, NameSource.Road
                 ));
                 AddOtherRoadCandidate(root, roadEdges, nameCandidates);
             }
@@ -265,7 +265,7 @@ namespace StationNaming.System
                 var nameCandidate = NameCandidate.Of(
                     string.Empty, roadEdge.Direction,
                     roadEdge.EdgeType,
-                    roadEdge.Edge, NameSource.Road
+                    rootEntityForEdge, NameSource.Road
                 );
                 candidates.Add(nameCandidate);
                 switch (roadEdge.Direction)

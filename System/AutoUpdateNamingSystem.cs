@@ -53,7 +53,6 @@ namespace StationNaming.System
             _nameFormatter.Options = settings.ToNameOptions();
 
             var entities = _associationQuery.ToEntityArray(Allocator.Temp);
-
             foreach (var entity in entities)
             {
                 if (!EntityManager.HasBuffer<NamingAssociation>(entity))
@@ -61,13 +60,14 @@ namespace StationNaming.System
                     continue;
                 }
 
-                CheckAndUpdate(entity);
+                CheckAndUpdateFromRefer(entity);
             }
+            entities.Dispose();
         }
 
-        private void CheckAndUpdate(Entity entity)
+        private void CheckAndUpdateFromRefer(Entity referEntity)
         {
-            var namingAssociations = EntityManager.GetBuffer<NamingAssociation>(entity);
+            var namingAssociations = EntityManager.GetBuffer<NamingAssociation>(referEntity);
             var valid = new List<NamingAssociation>();
 
             foreach (var naming in namingAssociations)
@@ -76,38 +76,14 @@ namespace StationNaming.System
                 if (!EntityManager.Exists(target)
                     || !EntityManager.HasComponent<ManualSelectNaming>(target))
                 {
+                    Mod.GetLogger().Warn($"Target entity {target} associated with {referEntity} does not exist or does not have ManualSelectNaming component. Skipping.");
                     continue;
                 }
 
-                var selectNaming =
-                    EntityManager.GetComponentData<ManualSelectNaming>(target);
-                var rawNameCandidate = selectNaming.SelectedName;
-                var currentName = _nameSystem.GetRenderedLabelName(target);
-                var rawCandidateName = rawNameCandidate.Name.ToString();
-                if (!rawNameCandidate.IsValid() ||
-                    !currentName.Contains(rawCandidateName))
+                if (ProcessTargetUpdate(target))
                 {
-                    // it probably means user has changed the name,
-                    // we should not update it
-                    selectNaming.SelectedName.Release();
-                    EntityManager.RemoveComponent<ManualSelectNaming>(target);
-                    continue;
+                    valid.Add(naming);
                 }
-
-                var updatedName = GetUpdatedName(selectNaming, target);
-
-                var copy = rawNameCandidate.DeepCopy();
-                copy.Name = updatedName;
-
-                valid.Add(naming);
-                selectNaming.SelectedName = copy;
-
-                EntityManager.SetComponentData(target, selectNaming);
-
-                rawNameCandidate.Release();
-
-                var targetName = currentName.Replace(rawCandidateName, updatedName);
-                _nameSystem.SetCustomName(target, targetName);
             }
 
             namingAssociations.Clear();
@@ -117,13 +93,40 @@ namespace StationNaming.System
             }
         }
 
+        private bool ProcessTargetUpdate(Entity target)
+        {
+            var selectNaming =
+                EntityManager.GetComponentData<ManualSelectNaming>(target);
+            var rawNameCandidate = selectNaming.SelectedName;
+            var currentName = _nameSystem.GetRenderedLabelName(target);
+            var rawCandidateName = rawNameCandidate.Name.ToString();
+
+            if (!rawNameCandidate.IsValid() ||
+                !currentName.Contains(rawCandidateName))
+            {
+                EntityManager.RemoveComponent<ManualSelectNamingTag>(target);
+                return false;
+            }
+
+            var updatedName = GetUpdatedName(selectNaming, target);
+
+            rawNameCandidate.Name = updatedName;
+            selectNaming.SelectedName = rawNameCandidate;
+
+            EntityManager.SetComponentData(target, selectNaming);
+
+            var targetName = currentName.Replace(rawCandidateName, updatedName);
+            _nameSystem.SetCustomName(target, targetName);
+
+            return true;
+        }
+
         private string GetUpdatedName(ManualSelectNaming selectNaming, Entity entity)
         {
             var selectedName = selectNaming.SelectedName;
             var refers = selectedName.Refers;
 
-            var name = _nameFormatter.FormatRefers(refers, entity);
-            return name;
+            return _nameFormatter.FormatRefers(refers, entity);
         }
 
         protected override void OnCreate()
@@ -141,7 +144,6 @@ namespace StationNaming.System
                 All = new[]
                 {
                     ComponentType.ReadOnly<NamingAssociation>(),
-                    ComponentType.ReadOnly<CustomName>()
                 },
                 Any = new[]
                 {
