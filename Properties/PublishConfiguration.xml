@@ -72,7 +72,7 @@ on GitHub.
 	<!--Change log for new version. Single line or multi line. Supports minimal markdown subset-->
 	<ChangeLog>
 - Feature: Support for displaying and removing the currently selected naming.
-- Feature: Added options to customize the default transport stop naming source. Thanks to @Qing-78.
+- Feature: Added options to customize the default transport stop naming source. Thanks to @Qing-98.
 - Fix: Minor bug fixes, performance optimizations and UI improvements.
 	</ChangeLog>
 	<!--External link. supported types are discord, github, youtube, twitch, x, paypal, patreon-->
